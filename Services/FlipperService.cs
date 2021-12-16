@@ -271,6 +271,11 @@ namespace hypixel
 
             flip.Finder = LowPricedAuction.FinderType.FLIPPER;
             await NotifyAll(flip, Subs);
+            PrepareSlow(flip);
+        }
+
+        private void PrepareSlow(FlipInstance flip)
+        {
             SlowFlips.Enqueue(flip);
             Flipps.Enqueue(flip);
             FlipIdLookup[flip.UId] = true;
@@ -317,6 +322,7 @@ namespace hypixel
                     sendingSpan.Span.SetTag("error",true);
                 }
             }));
+            PrepareSlow(LowPriceToFlip(flip));
             scope.Span.Log($"Sent to {Subs.Count}");
         }
 
@@ -419,7 +425,7 @@ namespace hypixel
         }
 
 
-        internal async Task ListenToLowPriced()
+        public async Task ListenToLowPriced()
         {
             string[] topics = new string[] { LowPriceConsumeTopic };
 
