@@ -77,18 +77,18 @@ namespace hypixel
         public async Task<DeliveryResult<string, SettingsChange>> UpdateSettings(SettingsChange settings)
         {
             var cacheKey = "uflipset" + settings.UserId;
-            var stored = await CacheService.Instance.GetFromRedis<SettingsChange>(cacheKey);
             var serializer = SerializerFactory.GetSerializer<SettingsChange>();
+            /* var stored = await CacheService.Instance.GetFromRedis<SettingsChange>(cacheKey);
             //if(serializer.Serialize(settings,default).SequenceEqual(serializer.Serialize(stored,default)))
-            //    return null;
+            //    return null; */
             using (var p = new ProducerBuilder<string, SettingsChange>(producerConfig).SetValueSerializer(serializer).Build())
             {
+                var produceTask = p.ProduceAsync(SettingsTopic, new Message<string, SettingsChange> { Value = settings });
                 await CacheService.Instance.SaveInRedis(cacheKey, settings, TimeSpan.FromDays(5));
-                foreach (var item in settings.LongConIds)
-                {
-                    await CacheService.Instance.SaveInRedis(item.ToString(), settings);
-                }
-                return await p.ProduceAsync(SettingsTopic, new Message<string, SettingsChange> { Value = settings });
+                if (settings.LongConIds.Any())
+                    await CacheService.Instance.SaveInRedis(settings.LongConIds.LastOrDefault().ToString(), settings);
+
+                return await produceTask;
             }
         }
 
@@ -107,9 +107,9 @@ namespace hypixel
             if (!sendHistory)
                 return;
             SendFlipHistory(con, LoadBurst, 0);
-            if(SlowSubs.Count %10 == 0)
+            if (SlowSubs.Count % 10 == 0)
                 Console.WriteLine("Added new con " + SlowSubs.Count);
-            
+
         }
 
         private void RemoveNonConnection(IFlipConnection con)
@@ -319,7 +319,7 @@ namespace hypixel
                 {
                     sendingSpan.Span.Log(e.Message);
                     sendingSpan.Span.Log(e.StackTrace);
-                    sendingSpan.Span.SetTag("error",true);
+                    sendingSpan.Span.SetTag("error", true);
                 }
             }));
             PrepareSlow(LowPriceToFlip(flip));
