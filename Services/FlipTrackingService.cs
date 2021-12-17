@@ -69,7 +69,7 @@ namespace Coflnet.Sky.Commands
             await SendEvent(auctionId, playerId, FlipTracker.Client.Model.FlipEventType.NUMBER_64);
         }
 
-        private async Task SendEvent(string auctionId, string playerId, FlipTracker.Client.Model.FlipEventType type)
+        private Task SendEvent(string auctionId, string playerId, FlipTracker.Client.Model.FlipEventType type)
         {
             var flipEvent = new FlipTracker.Client.Model.FlipEvent()
             {
@@ -80,7 +80,7 @@ namespace Coflnet.Sky.Commands
             };
 
             producer.Produce(ProduceTopic, new Message<string, FlipTracker.Client.Model.FlipEvent>() { Value = flipEvent });
-
+            return Task.CompletedTask;
         }
 
         public async Task NewFlip(LowPricedAuction flip)
