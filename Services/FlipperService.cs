@@ -5,6 +5,7 @@ using System.Linq;
 using System.Runtime.Serialization;
 using System.Text;
 using System.Threading;
+using System.Threading.Channels;
 using System.Threading.Tasks;
 using Coflnet.Sky;
 using Coflnet.Sky.Commands;
@@ -24,9 +25,9 @@ namespace hypixel
     {
         public static FlipperService Instance = new FlipperService();
 
-        private ConcurrentDictionary<long, IFlipConnection> Subs = new ConcurrentDictionary<long, IFlipConnection>();
-        private ConcurrentDictionary<long, IFlipConnection> SlowSubs = new ConcurrentDictionary<long, IFlipConnection>();
-        private ConcurrentDictionary<long, IFlipConnection> SuperSubs = new ConcurrentDictionary<long, IFlipConnection>();
+        private ConcurrentDictionary<long, FlipConWrapper> Subs = new ConcurrentDictionary<long, FlipConWrapper>();
+        private ConcurrentDictionary<long, FlipConWrapper> SlowSubs = new ConcurrentDictionary<long, FlipConWrapper>();
+        private ConcurrentDictionary<long, FlipConWrapper> SuperSubs = new ConcurrentDictionary<long, FlipConWrapper>();
         public ConcurrentQueue<FlipInstance> Flipps = new ConcurrentQueue<FlipInstance>();
         private ConcurrentQueue<FlipInstance> SlowFlips = new ConcurrentQueue<FlipInstance>();
 
@@ -41,7 +42,7 @@ namespace hypixel
         private static ProducerConfig producerConfig = new ProducerConfig { BootstrapServers = SimplerConfig.Config.Instance["KAFKA_HOST"] };
 
         private const string FoundFlippsKey = "foundFlipps";
-        public int PremiumUserCount => Subs.Select(s => s.Value.UserId).Distinct().Count();
+        public int PremiumUserCount => Subs.Select(s => s.Value.Connection.UserId).Distinct().Count();
 
         static Prometheus.Histogram runtroughTime = Prometheus.Metrics.CreateHistogram("sky_commands_auction_to_flip_seconds", "Represents the time in seconds taken from loading the auction to sendingthe flip. (should be close to 0)",
             new Prometheus.HistogramConfiguration()
@@ -92,21 +93,24 @@ namespace hypixel
             }
         }
 
-        public void AddConnection(IFlipConnection con, bool sendHistory = true)
+        public void AddConnection(IFlipConnection connection, bool sendHistory = true)
         {
-            Subs.AddOrUpdate(con.Id, cid => con, (cid, oldMId) => con);
+            var con = new FlipConWrapper(connection);
+            Subs.AddOrUpdate(con.Connection.Id, cid => con, (cid, oldMId) => con);
             var toSendFlips = Flipps.Reverse().Take(25);
             if (sendHistory)
-                SendFlipHistory(con, toSendFlips, 0);
-            RemoveNonConnection(con);
+                SendFlipHistory(connection, toSendFlips, 0);
+            RemoveNonConnection(con.Connection);
+            Task.Run(con.Work);
         }
 
-        public void AddNonConnection(IFlipConnection con, bool sendHistory = true)
+        public void AddNonConnection(IFlipConnection connection, bool sendHistory = true)
         {
-            SlowSubs.AddOrUpdate(con.Id, cid => con, (cid, oldMId) => con);
+            var con = new FlipConWrapper(connection);
+            SlowSubs.AddOrUpdate(connection.Id, cid => con, (cid, oldMId) => con);
             if (!sendHistory)
                 return;
-            SendFlipHistory(con, LoadBurst, 0);
+            SendFlipHistory(connection, LoadBurst, 0);
             if (SlowSubs.Count % 10 == 0)
                 Console.WriteLine("Added new con " + SlowSubs.Count);
 
@@ -165,12 +169,12 @@ namespace hypixel
             var inacive = new List<long>();
             foreach (var item in Subs)
             {
-                if (!await item.Value.SendSold(auctionUUid))
+                if (!await item.Value.Connection.SendSold(auctionUUid))
                     inacive.Add(item.Key);
             }
             foreach (var item in SlowSubs)
             {
-                if (!await item.Value.SendSold(auctionUUid))
+                if (!await item.Value.Connection.SendSold(auctionUUid))
                     inacive.Add(item.Key);
             }
 
@@ -288,7 +292,7 @@ namespace hypixel
             }
         }
 
-        public async Task DeliverLowPricedAuction(LowPricedAuction flip)
+        public Task DeliverLowPricedAuction(LowPricedAuction flip)
         {
             var tracer = OpenTracing.Util.GlobalTracer.Instance;
             var span = OpenTracing.Util.GlobalTracer.Instance.BuildSpan("DeliverFlip");
@@ -304,9 +308,10 @@ namespace hypixel
 
             foreach (var item in Subs)
             {
-                await item.Value.SendFlip(flip);
-                scope.Span.Log("sent " + item.Value.UserId);
+                item.Value.AddLowPriced(flip);
+                scope.Span.Log("sent " + item.Value.Connection.UserId);
             }
+            return Task.CompletedTask;
             /*
             await Task.WhenAll(Subs.Select(async item =>
             {
@@ -328,7 +333,7 @@ namespace hypixel
         }
 
 
-        private static async Task NotifyAll(FlipInstance flip, ConcurrentDictionary<long, IFlipConnection> subscribers)
+        private static async Task NotifyAll(FlipInstance flip, ConcurrentDictionary<long, FlipConWrapper> subscribers)
         {
             if (flip.Auction != null && flip.Auction.NBTLookup == null)
                 flip.Auction.NBTLookup = NBT.CreateLookup(flip.Auction);
@@ -336,7 +341,7 @@ namespace hypixel
             {
                 try
                 {
-                    if (!subscribers.TryGetValue(item, out IFlipConnection connection) || !await connection.SendFlip(flip))
+                    if (!subscribers.TryGetValue(item, out FlipConWrapper connection) || !await connection.SendFlip(flip))
                         Unsubscribe(subscribers, item);
                 }
                 catch (Exception e)
@@ -347,9 +352,10 @@ namespace hypixel
             }
         }
 
-        private static void Unsubscribe(ConcurrentDictionary<long, IFlipConnection> subscribers, long item)
+        private static void Unsubscribe(ConcurrentDictionary<long, FlipConWrapper> subscribers, long item)
         {
-            subscribers.TryRemove(item, out IFlipConnection value);
+            if(subscribers.TryRemove(item, out FlipConWrapper value))
+                value.Stop();
         }
 
         public async Task ProcessSlowQueue()
@@ -439,17 +445,15 @@ namespace hypixel
                     return;
                 var time = (DateTime.Now - flip.Auction.FindTime).TotalSeconds;
                 runtroughTime.Observe(time);
-                Task.Run(async () =>
+
+                try
                 {
-                    try
-                    {
-                        await DeliverLowPricedAuction(flip);
-                    }
-                    catch (Exception e)
-                    {
-                        dev.Logger.Instance.Error(e, "delivering low priced auction");
-                    }
-                }).ConfigureAwait(false);
+                    DeliverLowPricedAuction(flip);
+                }
+                catch (Exception e)
+                {
+                    dev.Logger.Instance.Error(e, "delivering low priced auction");
+                }
             });
         }
 
@@ -457,11 +461,11 @@ namespace hypixel
         {
             foreach (var item in settings.LongConIds)
             {
-                if (SlowSubs.TryGetValue(item, out IFlipConnection con)
+                if (SlowSubs.TryGetValue(item, out FlipConWrapper con)
                     || Subs.TryGetValue(item, out con)
                     || SuperSubs.TryGetValue(item, out con))
                 {
-                    con.UpdateSettings(settings);
+                    con.Connection.UpdateSettings(settings);
                 }
             }
             /*foreach (var item in SkyblockBackEnd.GetConnectionsOfUser(settings.UserId))
@@ -573,59 +577,46 @@ namespace hypixel
         });
     }
 
-    public enum AccountTier
+    public class FlipConWrapper
     {
-        NONE,
-        STARTER_PREMIUM,
-        PREMIUM,
-        PREMIUM_PLUS,
-        SUPER_PREMIUM = 4
-    }
+        public IFlipConnection Connection;
 
-    [DataContract]
-    public class FlipInstance
-    {
-        [DataMember(Name = "median")]
-        public int MedianPrice;
-        [DataMember(Name = "cost")]
-        public int LastKnownCost;
-        [DataMember(Name = "uuid")]
-        public string Uuid;
-        [DataMember(Name = "name")]
-        public string Name;
-        [DataMember(Name = "sellerName")]
-        public string SellerName;
-        [DataMember(Name = "volume")]
-        public float Volume;
-        [DataMember(Name = "tag")]
-        public string Tag;
-        [DataMember(Name = "bin")]
-        public bool Bin;
-        [DataMember(Name = "sold")]
-        public bool Sold { get; set; }
-        [DataMember(Name = "tier")]
-        public Tier Rarity { get; set; }
-        [DataMember(Name = "prop")]
-        public List<string> Interesting { get; set; }
-        [DataMember(Name = "secondLowestBin")]
-        public long? SecondLowestBin { get; set; }
+        private Channel<LowPricedAuction> LowPriced = Channel.CreateBounded<LowPricedAuction>(100);
 
-        [DataMember(Name = "lowestBin")]
-        public long? LowestBin;
-        [DataMember(Name = "auction")]
-        public SaveAuction Auction;
-        [IgnoreDataMember]
-        public long UId => AuctionService.Instance.GetId(this.Uuid);
-        [IgnoreDataMember]
-        public long Profit => MedianPrice - LastKnownCost;
+        private CancellationTokenSource cancellationTokenSource = null;
 
-        [IgnoreDataMember]
-        public long ProfitPercentage => (Profit * 100 / LastKnownCost);
+        public FlipConWrapper(IFlipConnection connection)
+        {
+            Connection = connection;
+        }
 
-        [IgnoreDataMember]
-        public Dictionary<string, string> Context { get; set; }
+        public async Task Work()
+        {
+            cancellationTokenSource?.Cancel();
+            cancellationTokenSource = new CancellationTokenSource();
+            var stoppingToken = cancellationTokenSource.Token;
+            while (!stoppingToken.IsCancellationRequested)
+            {
+                var flip = await LowPriced.Reader.ReadAsync(stoppingToken);
+                await Connection.SendFlip(flip);
+            }
+        }
 
-        [DataMember(Name = "finder")]
-        public LowPricedAuction.FinderType Finder;
+        public bool AddLowPriced(LowPricedAuction lp)
+        {
+            return LowPriced.Writer.TryWrite(lp);
+        }
+
+        public Task<bool> SendFlip(FlipInstance flip)
+        {
+            return Connection.SendFlip(flip);
+        }
+
+        public void Stop()
+        {
+            cancellationTokenSource?.Cancel();
+        }
+
+
     }
 }
