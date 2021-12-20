@@ -56,6 +56,8 @@ namespace hypixel
         private Queue<FlipInstance> LoadBurst = new Queue<FlipInstance>();
         private ConcurrentDictionary<long, DateTime> SoldAuctions = new ConcurrentDictionary<long, DateTime>();
 
+        public event Action<SettingsChange> OnSettingsChange;
+
         private async Task TryLoadFromCache()
         {
             if (Flipps.Count == 0)
@@ -468,10 +470,7 @@ namespace hypixel
                     con.Connection.UpdateSettings(settings);
                 }
             }
-            /*foreach (var item in SkyblockBackEnd.GetConnectionsOfUser(settings.UserId))
-            {
-                item.UpdateSettings(settings);
-            }*/
+            OnSettingsChange?.Invoke(settings);
         }
 
         private async Task ConsumeBatch<T>(string[] topics, Action<T> work, int batchSize = 10)
