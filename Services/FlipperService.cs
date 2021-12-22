@@ -11,9 +11,9 @@ using Coflnet.Sky;
 using Coflnet.Sky.Commands;
 using Coflnet.Sky.Commands.Helper;
 using Coflnet.Sky.Commands.Shared;
-using Coflnet.Sky.Filter;
 using Confluent.Kafka;
 using OpenTracing.Propagation;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace hypixel
 {
@@ -213,7 +213,8 @@ namespace hypixel
             if (settings == null || settings.Visibility == null)
                 return;
             if (settings.Visibility.Seller && flip.SellerName == null)
-                flip.SellerName = await PlayerSearch.Instance.GetNameWithCacheAsync(flip.Auction.AuctioneerId);
+                flip.SellerName = await DiHandler.ServiceProvider.GetRequiredService<Coflnet.Sky.PlayerName.Client.Api.PlayerNameApi>()
+                    .PlayerNameNameUuidGetAsync(flip.Auction.AuctioneerId);
 
             if (flip.LowestBin == 0 && (settings.Visibility.LowestBin || settings.Visibility.SecondLowestBin || settings.BasedOnLBin))
             {
