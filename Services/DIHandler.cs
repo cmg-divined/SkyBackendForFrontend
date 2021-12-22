@@ -8,9 +8,9 @@ namespace Coflnet.Sky.Commands.Shared
         private static System.IServiceProvider _serviceProvider;
         public static System.IServiceProvider ServiceProvider
         {
-            get 
+            get
             {
-                if(_serviceProvider == null)
+                if (_serviceProvider == null)
                     _serviceProvider = _servics.BuildServiceProvider();
                 return _serviceProvider;
             }
@@ -19,9 +19,10 @@ namespace Coflnet.Sky.Commands.Shared
         private static IServiceCollection _servics;
         public static void AddCoflService(this IServiceCollection services)
         {
-            services.AddSingleton<PlayerName.Client.Api.PlayerNameApi>(context => {
+            services.AddSingleton<PlayerName.Client.Api.PlayerNameApi>(context =>
+            {
                 var config = context.GetRequiredService<IConfiguration>();
-                return new PlayerName.Client.Api.PlayerNameApi(config["PLAYERNAME_HOST"]);
+                return new PlayerName.Client.Api.PlayerNameApi(config["PLAYERNAME_URL"] ?? "http://" + config["PLAYERNAME_HOST"]);
             });
 
             _servics = services;
