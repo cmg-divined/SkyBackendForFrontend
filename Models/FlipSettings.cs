@@ -63,7 +63,11 @@ namespace Coflnet.Sky.Commands.Shared
         public (bool, string) MatchesSettings(FlipInstance flip)
         {
             GetPrice(flip, out long targetPrice, out long profit);
-
+            if (AllowedFinders != LowPricedAuction.FinderType.UNKOWN && flip.Finder != LowPricedAuction.FinderType.UNKOWN
+                                    && !AllowedFinders.HasFlag(flip.Finder)
+                                    && (int)flip.Finder != 3)
+                return (false,"finder " + flip.Finder.ToString());
+            
             if (profit < MinProfit)
                 return (false, "minProfit");
             if (flip.Volume < MinVolume)
@@ -79,19 +83,19 @@ namespace Coflnet.Sky.Commands.Shared
 
             if (WhiteList != null)
             {
-                if(WhiteListMatcher == null)
+                if (WhiteListMatcher == null)
                     WhiteListMatcher = new ListMatcher(WhiteList);
                 var match = WhiteListMatcher.IsMatch(flip);
-                if(match.Item1)
+                if (match.Item1)
                     return (true, "whitelist " + match.Item2);
             }
-                
+
             if (BlackList != null)
             {
-                if(BlackListMatcher == null)
+                if (BlackListMatcher == null)
                     BlackListMatcher = new ListMatcher(BlackList);
                 var match = BlackListMatcher.IsMatch(flip);
-                if(match.Item1)
+                if (match.Item1)
                     return (false, "blacklist " + match.Item2);
             }
 
@@ -122,23 +126,23 @@ namespace Coflnet.Sky.Commands.Shared
             {
                 foreach (var item in BlackList)
                 {
-                    if(item.filter == null || item.filter.Count == 0)
+                    if (item.filter == null || item.filter.Count == 0)
                         Ids.Add(item.ItemTag);
-                    else 
+                    else
                         RemainingFilters.Add(item);
                 }
             }
 
-            public (bool,string) IsMatch(FlipInstance flip)
+            public (bool, string) IsMatch(FlipInstance flip)
             {
-                if(Ids.Contains(flip.Tag))
-                    return (true, "for "+ flip.Tag);
+                if (Ids.Contains(flip.Tag))
+                    return (true, "for " + flip.Tag);
                 foreach (var item in RemainingFilters)
                 {
                     if (item.MatchesSettings(flip))
                         return (true, $"filter for {item.filter.Keys.First()}: {item.filter.Values.First()}");
                 }
-                return (false,"no match");
+                return (false, "no match");
             }
         }
     }
