@@ -2,10 +2,7 @@ using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
-using System.Runtime.Serialization;
 using System.Text;
-using System.Threading;
-using System.Threading.Channels;
 using System.Threading.Tasks;
 using Coflnet.Sky;
 using Coflnet.Sky.Commands;
@@ -14,6 +11,8 @@ using Coflnet.Sky.Commands.Shared;
 using Confluent.Kafka;
 using OpenTracing.Propagation;
 using Microsoft.Extensions.DependencyInjection;
+using RestSharp;
+using Newtonsoft.Json;
 
 namespace hypixel
 {
@@ -55,6 +54,7 @@ namespace hypixel
         /// </summary>
         private Queue<FlipInstance> LoadBurst = new Queue<FlipInstance>();
         private ConcurrentDictionary<long, DateTime> SoldAuctions = new ConcurrentDictionary<long, DateTime>();
+        static RestClient SkyFlipperHost = new RestClient("http://" + SimplerConfig.Config.Instance["SKYFLIPPER_HOST"]);
 
         public event Action<SettingsChange> OnSettingsChange;
 
@@ -357,7 +357,7 @@ namespace hypixel
 
         private static void Unsubscribe(ConcurrentDictionary<long, FlipConWrapper> subscribers, long item)
         {
-            if(subscribers.TryRemove(item, out FlipConWrapper value))
+            if (subscribers.TryRemove(item, out FlipConWrapper value))
                 value.Stop();
         }
 
@@ -540,83 +540,12 @@ namespace hypixel
                 SoldAuctions.TryRemove(item, out DateTime deleted);
             }
         }
-    }
 
-
-    [DataContract]
-    public class SettingsChange
-    {
-        [DataMember(Name = "version")]
-        public int Version;
-        [DataMember(Name = "settings")]
-        public FlipSettings Settings = new FlipSettings();
-        [DataMember(Name = "userId")]
-        public int UserId;
-        [DataMember(Name = "mcIds")]
-        public List<string> McIds = new List<string>();
-
-        [DataMember(Name = "conIds")]
-        public HashSet<string> ConIds = new HashSet<string>();
-
-        [DataMember(Name = "tier")]
-        public AccountTier Tier;
-        [DataMember(Name = "expires")]
-        public DateTime ExpiresAt;
-        [IgnoreDataMember]
-        public IEnumerable<long> LongConIds => ConIds.Select(id =>
+        public async Task<List<SaveAuction>> GetReferences(string uuid)
         {
-            try
-            {
-                return BitConverter.ToInt64(Convert.FromBase64String(id.Replace('_', '/').Replace('-', '+')));
-            }
-            catch (Exception)
-            {
-                Console.WriteLine("invalid conid: " + id);
-                return new Random().Next();
-            }
-        });
-    }
-
-    public class FlipConWrapper
-    {
-        public IFlipConnection Connection;
-
-        private Channel<LowPricedAuction> LowPriced = Channel.CreateBounded<LowPricedAuction>(100);
-
-        private CancellationTokenSource cancellationTokenSource = null;
-
-        public FlipConWrapper(IFlipConnection connection)
-        {
-            Connection = connection;
+            var response = await SkyFlipperHost.ExecuteAsync(new RestRequest("flip/{uuid}/based").AddParameter("uuid", uuid, ParameterType.UrlSegment));
+            var result = JsonConvert.DeserializeObject<List<SaveAuction>>(response.Content);
+            return result;
         }
-
-        public async Task Work()
-        {
-            cancellationTokenSource?.Cancel();
-            cancellationTokenSource = new CancellationTokenSource();
-            var stoppingToken = cancellationTokenSource.Token;
-            while (!stoppingToken.IsCancellationRequested)
-            {
-                var flip = await LowPriced.Reader.ReadAsync(stoppingToken);
-                await Connection.SendFlip(flip);
-            }
-        }
-
-        public bool AddLowPriced(LowPricedAuction lp)
-        {
-            return LowPriced.Writer.TryWrite(lp);
-        }
-
-        public Task<bool> SendFlip(FlipInstance flip)
-        {
-            return Connection.SendFlip(flip);
-        }
-
-        public void Stop()
-        {
-            cancellationTokenSource?.Cancel();
-        }
-
-
     }
 }
