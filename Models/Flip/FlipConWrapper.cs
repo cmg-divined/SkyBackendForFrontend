@@ -1,3 +1,4 @@
+using System.Collections.Concurrent;
 using System.Threading;
 using System.Threading.Channels;
 using System.Threading.Tasks;
@@ -24,10 +25,29 @@ namespace hypixel
             cancellationTokenSource?.Cancel();
             cancellationTokenSource = new CancellationTokenSource();
             var stoppingToken = cancellationTokenSource.Token;
+            var count = Connection.LatestSettings.Tier switch 
+            {
+                AccountTier.PREMIUM => 3,
+                AccountTier.SUPER_PREMIUM => 6,
+                _ => 1
+            };
+            var limiter = new SemaphoreSlim(count);
+            
             while (!stoppingToken.IsCancellationRequested)
             {
                 var flip = await LowPriced.Reader.ReadAsync(stoppingToken);
-                await Connection.SendFlip(flip);
+                var task = Task.Run(async () =>
+                {
+                    try
+                    {
+                        await limiter.WaitAsync();
+                        await Connection.SendFlip(flip);
+                    }
+                    finally
+                    {
+                        limiter.Release();
+                    }
+                });
             }
         }
 

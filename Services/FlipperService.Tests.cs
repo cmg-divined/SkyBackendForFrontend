@@ -44,6 +44,8 @@ namespace Coflnet.Sky.Commands.Tests
 
             public int UserId => 1;
 
+            public SettingsChange LatestSettings => new SettingsChange();
+
             public FlipInstance LastFlip;
 
             public Task<bool> SendFlip(FlipInstance flip)

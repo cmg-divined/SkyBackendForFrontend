@@ -16,6 +16,7 @@ namespace Coflnet.Sky.Commands
         Task<bool> SendFlip(LowPricedAuction flip);
         Task<bool> SendSold(string uuid);
         FlipSettings Settings { get; }
+        SettingsChange LatestSettings { get; }
         long Id { get; }
         int UserId { get; }
 
