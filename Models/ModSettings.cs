@@ -20,5 +20,10 @@ namespace Coflnet.Sky.Commands.Shared
         /// </summary>
         [DataMember(Name = "shortNumbers")]
         public bool ShortNumbers;
+        /// <summary>
+        /// Block "flips in 10 seconds" from appearing
+        /// </summary>
+        [DataMember(Name = "blockTenSecMsg")]
+        public bool BlockTenSecondsMsg;
     }
 }
