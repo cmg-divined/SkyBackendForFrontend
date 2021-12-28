@@ -105,9 +105,10 @@ namespace Coflnet.Sky.Commands
             using (var context = new HypixelContext())
             {
                 var playerId = await context.Players.Where(p => p.UuId == uuid).Select(p => p.Id).FirstOrDefaultAsync();
+                var startTime = DateTime.Now - timeSpan;
                 var uidKey = NBT.Instance.GetKeyId("uid");
                 var sellList = await context.Auctions.Where(a => a.SellerId == playerId)
-                    .Where(a => a.End > DateTime.Now - timeSpan && a.HighestBidAmount > 0 && a.Bin)
+                    .Where(a => a.End > startTime && a.End < DateTime.Now && a.HighestBidAmount > 0 && a.Bin)
                     .Include(a => a.NBTLookup)
                     .Where(a => a.NBTLookup.Where(l => l.KeyId == uidKey).Any())
                     .ToListAsync();
@@ -119,7 +120,8 @@ namespace Coflnet.Sky.Commands
                         return a.NBTLookup.Where(l => l.KeyId == uidKey).FirstOrDefault().Value;
                     }).ToList();
                 var SalesUidLookup = sells.Select(a => a.Key).ToHashSet();
-                var playerBids = await context.Bids.Where(b => b.BidderId == playerId).Where(b => b.Auction.NBTLookup.Where(b => b.KeyId == uidKey && SalesUidLookup.Contains(b.Value)).Any())
+                var playerBids = await context.Bids.Where(b => b.BidderId == playerId && b.Timestamp > startTime.Subtract(TimeSpan.FromDays(14)))
+                    .Where(b => b.Auction.NBTLookup.Where(b => b.KeyId == uidKey && SalesUidLookup.Contains(b.Value)).Any())
                     // filtering
                     .OrderByDescending(auction => auction.Id)
                     //.Include (p => p.Auction)
@@ -130,7 +132,6 @@ namespace Coflnet.Sky.Commands
                         b.Auction.End,
                         b.Amount,
                         itemUid = b.Auction.NBTLookup.Where(b => b.KeyId == uidKey).FirstOrDefault().Value
-
                     }).GroupBy(b => b.Uuid)
                     .Select(bid => new
                     {
