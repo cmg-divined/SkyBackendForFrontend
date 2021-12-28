@@ -107,15 +107,17 @@ namespace Coflnet.Sky.Commands
                 var playerId = await context.Players.Where(p => p.UuId == uuid).Select(p => p.Id).FirstOrDefaultAsync();
                 var uidKey = NBT.Instance.GetKeyId("uid");
                 var sellList = await context.Auctions.Where(a => a.SellerId == playerId)
-                    .Where(a => a.End > DateTime.Now - timeSpan && a.HighestBidAmount > 0)
+                    .Where(a => a.End > DateTime.Now - timeSpan && a.HighestBidAmount > 0 && a.Bin)
                     .Include(a => a.NBTLookup)
                     .Where(a => a.NBTLookup.Where(l => l.KeyId == uidKey).Any())
                     .ToListAsync();
-                
+
                 var sells = sellList
-                    .GroupBy(a =>{
+                    .GroupBy(a =>
+                    {
                         Console.WriteLine($"{a.ItemName} {a.NBTLookup.Where(l => l.KeyId == uidKey).FirstOrDefault().Value} {a.Uuid} {a.End}");
-                        return a.NBTLookup.Where(l => l.KeyId == uidKey).FirstOrDefault().Value;}).ToList();
+                        return a.NBTLookup.Where(l => l.KeyId == uidKey).FirstOrDefault().Value;
+                    }).ToList();
                 var SalesUidLookup = sells.Select(a => a.Key).ToHashSet();
                 var playerBids = await context.Bids.Where(b => b.BidderId == playerId).Where(b => b.Auction.NBTLookup.Where(b => b.KeyId == uidKey && SalesUidLookup.Contains(b.Value)).Any())
                     // filtering
@@ -137,18 +139,27 @@ namespace Coflnet.Sky.Commands
                         HighestBid = bid.Max(b => b.HighestBidAmount),
                         HighestOwnBid = bid.Max(b => b.Amount),
                         End = bid.Max(b => b.End),
-                        itemUid = bid.Max(b=>b.itemUid)
+                        itemUid = bid.Max(b => b.itemUid)
                     })
                     //.ThenInclude (b => b.Auction)
                     .ToListAsync();
 
-                var flips = playerBids.Where(a =>SalesUidLookup.Contains(a.itemUid) ).Select(async b =>
+                var flips = playerBids.Where(a => SalesUidLookup.Contains(a.itemUid)).Select(async b =>
                 {
-                    var flipStats = await flipTracking.TrackerFlipsAuctionIdGetAsync(AuctionService.Instance.GetId(b.Key));
-                    var first = flipStats?.OrderBy(f=>f.Timestamp).FirstOrDefault();
-                    var soldFor = sells.Where(s=>s.Key == b.itemUid)?
+                    FlipTracker.Client.Model.Flip first = null;
+                    try
+                    {
+                        var flipStats = await flipTracking.TrackerFlipsAuctionIdGetAsync(AuctionService.Instance.GetId(b.Key));
+                        first = flipStats?.OrderBy(f => f.Timestamp).FirstOrDefault();
+                    }
+                    catch (Exception e)
+                    {
+                        dev.Logger.Instance.Error(e,"getting flip details for auction " + b.Key);
+                    }
+
+                    var soldFor = sells.Where(s => s.Key == b.itemUid)?
                             .FirstOrDefault()
-                            ?.OrderByDescending(b=>b.End)
+                            ?.OrderByDescending(b => b.End)
                             .FirstOrDefault()
                             ?.HighestBidAmount;
                     return new FlipDetails()
@@ -161,7 +172,7 @@ namespace Coflnet.Sky.Commands
                     };
                 });
 
-                return new FlipSumary(){Flips = await Task.WhenAll(flips)};
+                return new FlipSumary() { Flips = await Task.WhenAll(flips) };
             }
         }
     }
