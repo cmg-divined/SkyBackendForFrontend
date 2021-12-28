@@ -6,5 +6,6 @@ namespace Coflnet.Sky.Commands.Shared
     public class FlipSumary
     {
         public FlipDetails[] Flips;
+        public long TotalProfit;
     }
 }

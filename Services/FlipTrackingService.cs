@@ -116,15 +116,15 @@ namespace Coflnet.Sky.Commands
                 var sells = sellList
                     .GroupBy(a =>
                     {
-                        Console.WriteLine($"{a.ItemName} {a.NBTLookup.Where(l => l.KeyId == uidKey).FirstOrDefault().Value} {a.Uuid} {a.End}");
+                        //Console.WriteLine($"{a.ItemName} {a.NBTLookup.Where(l => l.KeyId == uidKey).FirstOrDefault().Value} {a.Uuid} {a.End}");
                         return a.NBTLookup.Where(l => l.KeyId == uidKey).FirstOrDefault().Value;
                     }).ToList();
                 var SalesUidLookup = sells.Select(a => a.Key).ToHashSet();
-                var playerBids = await context.Bids.Where(b => b.BidderId == playerId && b.Timestamp > startTime.Subtract(TimeSpan.FromDays(14)))
-                    .Where(b => b.Auction.NBTLookup.Where(b => b.KeyId == uidKey && SalesUidLookup.Contains(b.Value)).Any())
+                var sales = await context.NBTLookups.Where(b => b.KeyId == uidKey && SalesUidLookup.Contains(b.Value)).Select(n=>n.AuctionId).ToListAsync();
+                var playerBids = await context.Bids.Where(b => b.BidderId == playerId && sales.Contains(b.Auction.Id) && b.Timestamp > startTime.Subtract(TimeSpan.FromDays(14)))
+                    //.Where(b => b.Auction.NBTLookup.Where(b => b.KeyId == uidKey && SalesUidLookup.Contains(b.Value)).Any())
                     // filtering
-                    .OrderByDescending(auction => auction.Id)
-                    //.Include (p => p.Auction)
+                    .OrderByDescending(bid => bid.Id)
                     .Select(b => new
                     {
                         b.Auction.Uuid,
@@ -157,23 +157,27 @@ namespace Coflnet.Sky.Commands
                     {
                         dev.Logger.Instance.Error(e,"getting flip details for auction " + b.Key);
                     }
-
-                    var soldFor = sells.Where(s => s.Key == b.itemUid)?
+                    var sell = sells.Where(s => s.Key == b.itemUid)?
                             .FirstOrDefault()
                             ?.OrderByDescending(b => b.End)
-                            .FirstOrDefault()
+                            .FirstOrDefault();
+                    var soldFor = sell
                             ?.HighestBidAmount;
                     return new FlipDetails()
                     {
                         Finder = (first == null ? LowPricedAuction.FinderType.UNKOWN : (LowPricedAuction.FinderType)first.FinderType),
                         OriginAuction = b.Key,
+                        SoldAuction = sell?.Uuid,
                         PricePaid = b.HighestOwnBid,
                         SoldFor = soldFor ?? 0,
-                        uId = b.itemUid
+                        uId = b.itemUid,
+                        ItemName = sell?.ItemName
                     };
                 });
-
-                return new FlipSumary() { Flips = await Task.WhenAll(flips) };
+                var result = await Task.WhenAll(flips);
+                return new FlipSumary() { 
+                    Flips = result, 
+                    TotalProfit = result.Sum(r=>r.SoldFor-r.PricePaid) };
             }
         }
     }
