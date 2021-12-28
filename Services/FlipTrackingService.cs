@@ -110,10 +110,10 @@ namespace Coflnet.Sky.Commands
                 var sellList = await context.Auctions.Where(a => a.SellerId == playerId)
                     .Where(a => a.End > startTime && a.End < DateTime.Now && a.HighestBidAmount > 0 && a.Bin)
                     .Include(a => a.NBTLookup)
-                    .Where(a => a.NBTLookup.Where(l => l.KeyId == uidKey).Any())
                     .ToListAsync();
 
                 var sells = sellList
+                    .Where(a => a.NBTLookup.Where(l => l.KeyId == uidKey).Any())
                     .GroupBy(a =>
                     {
                         //Console.WriteLine($"{a.ItemName} {a.NBTLookup.Where(l => l.KeyId == uidKey).FirstOrDefault().Value} {a.Uuid} {a.End}");
