@@ -1,10 +1,16 @@
+using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using Coflnet.Sky.FlipTracker.Client.Api;
 using Confluent.Kafka;
+using hypixel;
+using Microsoft.EntityFrameworkCore;
+using Coflnet.Sky.Commands.Shared;
 
 namespace Coflnet.Sky.Commands
 {
-    public class FlipTrackingService
+    public partial class FlipTrackingService
     {
         public TrackerApi flipTracking;
 
@@ -23,9 +29,11 @@ namespace Coflnet.Sky.Commands
 
         public FlipTrackingService()
         {
-            producer = new ProducerBuilder<string, FlipTracker.Client.Model.FlipEvent>(new ProducerConfig { 
-                    BootstrapServers = SimplerConfig.Config.Instance["KAFKA_HOST"], 
-                    CancellationDelayMaxMs = 1000 })
+            producer = new ProducerBuilder<string, FlipTracker.Client.Model.FlipEvent>(new ProducerConfig
+            {
+                BootstrapServers = SimplerConfig.Config.Instance["KAFKA_HOST"],
+                CancellationDelayMaxMs = 1000
+            })
                     .SetValueSerializer(hypixel.SerializerFactory.GetSerializer<FlipTracker.Client.Model.FlipEvent>()).Build();
             flipTracking = new TrackerApi("http://" + SimplerConfig.Config.Instance["FLIPTRACKER_HOST"]);
         }
@@ -90,6 +98,71 @@ namespace Coflnet.Sky.Commands
                 FinderType = (FlipTracker.Client.Model.FinderType?)flip.Finder,
                 TargetPrice = flip.TargetPrice
             });
+        }
+
+        public async Task<FlipSumary> GetPlayerFlips(string uuid, TimeSpan timeSpan)
+        {
+            using (var context = new HypixelContext())
+            {
+                var playerId = await context.Players.Where(p => p.UuId == uuid).Select(p => p.Id).FirstOrDefaultAsync();
+                var uidKey = NBT.Instance.GetKeyId("uid");
+                var sellList = await context.Auctions.Where(a => a.SellerId == playerId)
+                    .Where(a => a.End > DateTime.Now - timeSpan && a.HighestBidAmount > 0)
+                    .Include(a => a.NBTLookup)
+                    .Where(a => a.NBTLookup.Where(l => l.KeyId == uidKey).Any())
+                    .ToListAsync();
+                
+                var sells = sellList
+                    .GroupBy(a =>{
+                        Console.WriteLine($"{a.ItemName} {a.NBTLookup.Where(l => l.KeyId == uidKey).FirstOrDefault().Value} {a.Uuid} {a.End}");
+                        return a.NBTLookup.Where(l => l.KeyId == uidKey).FirstOrDefault().Value;}).ToList();
+                var SalesUidLookup = sells.Select(a => a.Key).ToHashSet();
+                var playerBids = await context.Bids.Where(b => b.BidderId == playerId).Where(b => b.Auction.NBTLookup.Where(b => b.KeyId == uidKey && SalesUidLookup.Contains(b.Value)).Any())
+                    // filtering
+                    .OrderByDescending(auction => auction.Id)
+                    //.Include (p => p.Auction)
+                    .Select(b => new
+                    {
+                        b.Auction.Uuid,
+                        b.Auction.HighestBidAmount,
+                        b.Auction.End,
+                        b.Amount,
+                        itemUid = b.Auction.NBTLookup.Where(b => b.KeyId == uidKey).FirstOrDefault().Value
+
+                    }).GroupBy(b => b.Uuid)
+                    .Select(bid => new
+                    {
+                        bid.Key,
+                        Amount = bid.Max(b => b.Amount),
+                        HighestBid = bid.Max(b => b.HighestBidAmount),
+                        HighestOwnBid = bid.Max(b => b.Amount),
+                        End = bid.Max(b => b.End),
+                        itemUid = bid.Max(b=>b.itemUid)
+                    })
+                    //.ThenInclude (b => b.Auction)
+                    .ToListAsync();
+
+                var flips = playerBids.Where(a =>SalesUidLookup.Contains(a.itemUid) ).Select(async b =>
+                {
+                    var flipStats = await flipTracking.TrackerFlipsAuctionIdGetAsync(AuctionService.Instance.GetId(b.Key));
+                    var first = flipStats?.OrderBy(f=>f.Timestamp).FirstOrDefault();
+                    var soldFor = sells.Where(s=>s.Key == b.itemUid)?
+                            .FirstOrDefault()
+                            ?.OrderByDescending(b=>b.End)
+                            .FirstOrDefault()
+                            ?.HighestBidAmount;
+                    return new FlipDetails()
+                    {
+                        Finder = (first == null ? LowPricedAuction.FinderType.UNKOWN : (LowPricedAuction.FinderType)first.FinderType),
+                        OriginAuction = b.Key,
+                        PricePaid = b.HighestOwnBid,
+                        SoldFor = soldFor ?? 0,
+                        uId = b.itemUid
+                    };
+                });
+
+                return new FlipSumary(){Flips = await Task.WhenAll(flips)};
+            }
         }
     }
 }
