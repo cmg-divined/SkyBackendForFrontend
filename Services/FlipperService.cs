@@ -396,7 +396,10 @@ namespace hypixel
         public Task ListentoUnavailableTopics()
         {
             Console.WriteLine("listening to unavailibily topics");
-            string[] topics = new string[] { Indexer.AuctionEndedTopic, Indexer.SoldAuctionTopic, Indexer.MissingAuctionsTopic };
+            string[] topics = new string[] {
+                SimplerConfig.Config.Instance["TOPICS:MISSING_AUCTION"],
+                SimplerConfig.Config.Instance["TOPICS:SOLD_AUCTION"],
+                SimplerConfig.Config.Instance["TOPICS:AUCTION_ENDED"] };
             return ConsumeBatch<SaveAuction>(topics, AuctionSold);
         }
 
