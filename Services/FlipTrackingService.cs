@@ -145,18 +145,13 @@ namespace Coflnet.Sky.Commands
                     //.ThenInclude (b => b.Auction)
                     .ToListAsync();
 
-                var flips = playerBids.Where(a => SalesUidLookup.Contains(a.itemUid)).Select(async b =>
+                var flipStats = (await flipTracking.TrackerBatchFlipsPostAsync(playerBids.Select(b=>AuctionService.Instance.GetId(b.Key)).ToList()))
+                        .GroupBy(t=>t.AuctionId)
+                        .ToDictionary(t=>t.Key,v=>v.AsEnumerable());
+                var flips = playerBids.Where(a => SalesUidLookup.Contains(a.itemUid)).Select(b =>
                 {
-                    FlipTracker.Client.Model.Flip first = null;
-                    try
-                    {
-                        var flipStats = await flipTracking.TrackerFlipsAuctionIdGetAsync(AuctionService.Instance.GetId(b.Key));
-                        first = flipStats?.OrderBy(f => f.Timestamp).FirstOrDefault();
-                    }
-                    catch (Exception e)
-                    {
-                        dev.Logger.Instance.Error(e,"getting flip details for auction " + b.Key);
-                    }
+                    FlipTracker.Client.Model.Flip first = flipStats[AuctionService.Instance.GetId(b.Key)].OrderBy(b=>b.Timestamp).FirstOrDefault();
+
                     var sell = sells.Where(s => s.Key == b.itemUid)?
                             .FirstOrDefault()
                             ?.OrderByDescending(b => b.End)
@@ -173,11 +168,11 @@ namespace Coflnet.Sky.Commands
                         uId = b.itemUid,
                         ItemName = sell?.ItemName
                     };
-                });
-                var result = await Task.WhenAll(flips);
+                }).ToArray();
+
                 return new FlipSumary() { 
-                    Flips = result, 
-                    TotalProfit = result.Sum(r=>r.SoldFor-r.PricePaid) };
+                    Flips = flips, 
+                    TotalProfit = flips.Sum(r=>r.SoldFor-r.PricePaid) };
             }
         }
     }
