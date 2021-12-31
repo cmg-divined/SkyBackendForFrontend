@@ -1,3 +1,5 @@
+using System;
+
 namespace Coflnet.Sky.Commands.Shared
 {
     /// <summary>
@@ -14,6 +16,8 @@ namespace Coflnet.Sky.Commands.Shared
         public long uId;
         public string OriginAuction;
         public string SoldAuction;
+        public DateTime BuyTime;
+        public DateTime SellTime;
     }
 
 }

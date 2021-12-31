@@ -168,7 +168,9 @@ namespace Coflnet.Sky.Commands
                         PricePaid = b.HighestOwnBid,
                         SoldFor = soldFor ?? 0,
                         uId = b.itemUid,
-                        ItemName = sell?.ItemName
+                        ItemName = sell?.ItemName,
+                        BuyTime = b.End,
+                        SellTime = sell.End
                     };
                 }).ToArray();
 
