@@ -6,6 +6,8 @@ namespace Coflnet.Sky.Commands.Shared
     public class FlipDetails
     {
         public string ItemName;
+        public string ItemTag;
+        public string Tier;
         public long PricePaid;
         public long SoldFor;
         public LowPricedAuction.FinderType Finder;

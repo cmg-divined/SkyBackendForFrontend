@@ -162,6 +162,8 @@ namespace Coflnet.Sky.Commands
                     {
                         Finder = (first == null ? LowPricedAuction.FinderType.UNKOWN : (LowPricedAuction.FinderType)first.FinderType),
                         OriginAuction = b.Key,
+                        ItemTag = sell.Tag,
+                        Tier = sell.Tier.ToString(),
                         SoldAuction = sell?.Uuid,
                         PricePaid = b.HighestOwnBid,
                         SoldFor = soldFor ?? 0,
