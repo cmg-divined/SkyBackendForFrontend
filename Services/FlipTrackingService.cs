@@ -7,6 +7,7 @@ using Confluent.Kafka;
 using hypixel;
 using Microsoft.EntityFrameworkCore;
 using Coflnet.Sky.Commands.Shared;
+using Coflnet.Sky.FlipTracker.Client.Model;
 
 namespace Coflnet.Sky.Commands
 {
@@ -45,7 +46,7 @@ namespace Coflnet.Sky.Commands
         {
             try
             {
-                await SendEvent(auctionId, playerId, FlipTracker.Client.Model.FlipEventType.NUMBER_1);
+                await SendEvent(auctionId, playerId, FlipTracker.Client.Model.FlipEventType.FLIPRECEIVE);
             }
             catch (System.Exception e)
             {
@@ -56,27 +57,27 @@ namespace Coflnet.Sky.Commands
         }
         public async Task ClickFlip(string auctionId, string playerId)
         {
-            await SendEvent(auctionId, playerId, FlipTracker.Client.Model.FlipEventType.NUMBER_2);
+            await SendEvent(auctionId, playerId, FlipTracker.Client.Model.FlipEventType.FLIPCLICK);
         }
         public async Task PurchaseStart(string auctionId, string playerId)
         {
-            await SendEvent(auctionId, playerId, FlipTracker.Client.Model.FlipEventType.NUMBER_4);
+            await SendEvent(auctionId, playerId, FlipTracker.Client.Model.FlipEventType.PURCHASESTART);
         }
         public async Task PurchaseConfirm(string auctionId, string playerId)
         {
-            await SendEvent(auctionId, playerId, FlipTracker.Client.Model.FlipEventType.NUMBER_8);
+            await SendEvent(auctionId, playerId, FlipTracker.Client.Model.FlipEventType.PURCHASECONFIRM);
         }
         public async Task Sold(string auctionId, string playerId)
         {
-            await SendEvent(auctionId, playerId, FlipTracker.Client.Model.FlipEventType.NUMBER_16);
+            await SendEvent(auctionId, playerId, FlipTracker.Client.Model.FlipEventType.AUCTIONSOLD);
         }
         public async Task UpVote(string auctionId, string playerId)
         {
-            await SendEvent(auctionId, playerId, FlipTracker.Client.Model.FlipEventType.NUMBER_32);
+            await SendEvent(auctionId, playerId, FlipTracker.Client.Model.FlipEventType.UPVOTE);
         }
         public async Task DownVote(string auctionId, string playerId)
         {
-            await SendEvent(auctionId, playerId, FlipTracker.Client.Model.FlipEventType.NUMBER_64);
+            await SendEvent(auctionId, playerId, FlipTracker.Client.Model.FlipEventType.DOWNVOTE);
         }
 
         private Task SendEvent(string auctionId, string playerId, FlipTracker.Client.Model.FlipEventType type)
@@ -113,26 +114,27 @@ namespace Coflnet.Sky.Commands
             if (start < end - TimeSpan.FromDays(1))
                 throw new CoflnetException("span_to_large", "Querying for more than a day is not supported");
 
-            var idTask = flipAnalyse.AnalyseFinderFinderTypeIdsGetAsync((Coflnet.Sky.FlipTracker.Client.Model.FinderType)type, start, end);
+            var idTask = flipAnalyse.AnalyseFinderFinderTypeIdsGetAsync(Enum.Parse<FinderType>(type.ToString(), true), start, end);
             using (var context = new HypixelContext())
             {
                 var ids = await idTask;
                 var buyList = await context.Auctions.Where(a => ids.Contains(a.UId))
                     .Include(a => a.NBTLookup)
                     .ToListAsync();
-                
+
                 var uidKey = NBT.Instance.GetKeyId("uid");
                 var buyLookup = buyList
                     .Where(a => a.NBTLookup.Where(l => l.KeyId == uidKey).Any())
                     .GroupBy(a =>
                     {
                         return a.NBTLookup.Where(l => l.KeyId == uidKey).FirstOrDefault().Value;
-                    }).ToDictionary(b=>b.Key);
+                    }).ToDictionary(b => b.Key);
                 var buyUidLookup = buyLookup.Select(a => a.Key).ToHashSet();
                 var sellIds = await context.NBTLookups.Where(b => b.KeyId == uidKey && buyUidLookup.Contains(b.Value)).Select(n => n.AuctionId).ToListAsync();
-                var sells = await context.Auctions.Where(b =>sellIds.Contains(b.Id) && b.End > start).Select(s => new {s.End,s.HighestBidAmount,s.NBTLookup,s.Uuid}).ToListAsync();
+                var sells = await context.Auctions.Where(b => sellIds.Contains(b.Id) && b.End > start).Select(s => new { s.End, s.HighestBidAmount, s.NBTLookup, s.Uuid }).ToListAsync();
 
-                return sells.Select(s=>{
+                return sells.Select(s =>
+                {
                     var uid = s.NBTLookup.Where(b => b.KeyId == uidKey).FirstOrDefault().Value;
                     var buy = buyLookup.GetValueOrDefault(uid)?.FirstOrDefault();
                     return new FlipDetails()
