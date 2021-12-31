@@ -150,7 +150,7 @@ namespace Coflnet.Sky.Commands
                         .ToDictionary(t=>t.Key,v=>v.AsEnumerable());
                 var flips = playerBids.Where(a => SalesUidLookup.Contains(a.itemUid)).Select(b =>
                 {
-                    FlipTracker.Client.Model.Flip first = flipStats[AuctionService.Instance.GetId(b.Key)].OrderBy(b=>b.Timestamp).FirstOrDefault();
+                    FlipTracker.Client.Model.Flip first = flipStats.GetValueOrDefault(AuctionService.Instance.GetId(b.Key))?.OrderBy(b=>b.Timestamp).FirstOrDefault();
 
                     var sell = sells.Where(s => s.Key == b.itemUid)?
                             .FirstOrDefault()
