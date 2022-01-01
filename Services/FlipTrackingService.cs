@@ -131,7 +131,8 @@ namespace Coflnet.Sky.Commands
                     }).ToDictionary(b => b.Key);
                 var buyUidLookup = buyLookup.Select(a => a.Key).ToHashSet();
                 var sellIds = await context.NBTLookups.Where(b => b.KeyId == uidKey && buyUidLookup.Contains(b.Value)).Select(n => n.AuctionId).ToListAsync();
-                var sells = await context.Auctions.Where(b => sellIds.Contains(b.Id) && b.End > start).Select(s => new { s.End, s.HighestBidAmount, s.NBTLookup, s.Uuid }).ToListAsync();
+                var sells = await context.Auctions.Where(b => sellIds.Contains(b.Id) && b.End > start && b.HighestBidAmount > 0 && b.End < DateTime.Now)
+                                        .Select(s => new { s.End, s.HighestBidAmount, s.NBTLookup, s.Uuid }).ToListAsync();
 
                 return sells.Select(s =>
                 {
