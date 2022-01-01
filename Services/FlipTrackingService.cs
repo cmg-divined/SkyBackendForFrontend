@@ -103,6 +103,11 @@ namespace Coflnet.Sky.Commands
             });
         }
 
+        public async Task<int> ActiveFlipperCount()
+        {
+            return await flipAnalyse.UsersActiveCountGetAsync();
+        }
+
         public async Task<List<FlipDetails>> GetFlipsForFinder(LowPricedAuction.FinderType type, DateTime start, DateTime end)
         {
             if (start > end)
