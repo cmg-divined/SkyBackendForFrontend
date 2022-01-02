@@ -94,12 +94,14 @@ namespace Coflnet.Sky.Commands
             return Task.CompletedTask;
         }
 
-        public async Task NewFlip(LowPricedAuction flip)
+        public async Task NewFlip(LowPricedAuction flip, DateTime foundAt = default)
         {
             var res = await flipTracking.TrackerFlipAuctionIdPostAsync(flip.Auction.Uuid, new FlipTracker.Client.Model.Flip()
             {
                 FinderType = (FlipTracker.Client.Model.FinderType?)flip.Finder,
-                TargetPrice = flip.TargetPrice
+                TargetPrice = flip.TargetPrice,
+                Timestamp = foundAt,
+                AuctionId = flip.UId
             });
         }
 
