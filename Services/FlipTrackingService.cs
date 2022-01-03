@@ -142,7 +142,7 @@ namespace Coflnet.Sky.Commands
                 var sells = await context.Auctions.Where(b => sellIds.Contains(b.Id) && !buyAuctionUidLookup.Contains(b.UId) && b.End > start && b.HighestBidAmount > 0 && b.End < DateTime.Now)
                                         .Select(s => new { s.End, s.HighestBidAmount, s.NBTLookup, s.Uuid }).ToListAsync();
 
-                return sells.Select(s =>
+                return sells.GroupBy(s=>s.NBTLookup.Where(b => b.KeyId == uidKey).FirstOrDefault()).Select(s=>s.OrderBy(s=>s.End).First()).Select(s =>
                 {
                     var uid = s.NBTLookup.Where(b => b.KeyId == uidKey).FirstOrDefault().Value;
                     var buy = buyLookup.GetValueOrDefault(uid)?.OrderBy(b=>b.End).Where(b => b.Uuid != s.Uuid).FirstOrDefault();
