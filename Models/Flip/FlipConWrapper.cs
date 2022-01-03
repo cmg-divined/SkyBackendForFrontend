@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Concurrent;
 using System.Threading;
 using System.Threading.Channels;
@@ -25,30 +26,39 @@ namespace hypixel
             cancellationTokenSource?.Cancel();
             cancellationTokenSource = new CancellationTokenSource();
             var stoppingToken = cancellationTokenSource.Token;
-            var count = Connection.LatestSettings.Tier switch 
+            var count = Connection.LatestSettings.Tier switch
             {
                 AccountTier.PREMIUM => 3,
                 AccountTier.SUPER_PREMIUM => 6,
                 _ => 1
             };
             var limiter = new SemaphoreSlim(count);
-            
-            while (!stoppingToken.IsCancellationRequested)
+
+            for (int i = 0; i < count; i++)
             {
-                var flip = await LowPriced.Reader.ReadAsync(stoppingToken);
-                var task = Task.Run(async () =>
+                var worker = Task.Run(async () =>
                 {
-                    try
+                    while (!stoppingToken.IsCancellationRequested)
                     {
-                        await limiter.WaitAsync();
-                        await Connection.SendFlip(flip);
-                    }
-                    finally
-                    {
-                        limiter.Release();
+                        try
+                        {
+                            var flip = await LowPriced.Reader.ReadAsync(stoppingToken);
+                            //await limiter.WaitAsync();
+                            await Connection.SendFlip(flip);
+                        }
+                        catch(Exception e)
+                        {
+                            dev.Logger.Instance.Error(e,"seding flip to " + Connection.UserId);
+                        }
+                        finally
+                        {
+                            //limiter.Release();
+                        }
                     }
                 });
             }
+
+
         }
 
         public bool AddLowPriced(LowPricedAuction lp)

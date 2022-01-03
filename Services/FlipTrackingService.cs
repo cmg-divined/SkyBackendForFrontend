@@ -137,7 +137,7 @@ namespace Coflnet.Sky.Commands
                         return a.NBTLookup.Where(l => l.KeyId == uidKey).FirstOrDefault().Value;
                     }).ToDictionary(b => b.Key);
                 var buyUidLookup = buyLookup.Select(a => a.Key).ToHashSet();
-                var sellIds = await context.NBTLookups.Where(b => b.KeyId == uidKey && buyUidLookup.Contains(b.Value)).Select(n => n.AuctionId).ToListAsync();
+                var sellIds = await context.NBTLookups.Where(b => b.KeyId == uidKey && buyUidLookup.Contains(b.Value)).GroupBy(v=>v.Value).Select(n => n.OrderBy(b=>b.AuctionId).First().AuctionId).ToListAsync();
                 var sells = await context.Auctions.Where(b => sellIds.Contains(b.Id) && b.End > start && b.HighestBidAmount > 0 && b.End < DateTime.Now)
                                         .Select(s => new { s.End, s.HighestBidAmount, s.NBTLookup, s.Uuid }).ToListAsync();
 
@@ -159,7 +159,7 @@ namespace Coflnet.Sky.Commands
                         Tier = buy.Tier.ToString(),
                         uId = uid
                     };
-                }).ToList();
+                }).Where(f=>f != null).ToList();
             }
 
         }
