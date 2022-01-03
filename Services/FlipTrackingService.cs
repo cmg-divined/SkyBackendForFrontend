@@ -137,14 +137,17 @@ namespace Coflnet.Sky.Commands
                         return a.NBTLookup.Where(l => l.KeyId == uidKey).FirstOrDefault().Value;
                     }).ToDictionary(b => b.Key);
                 var buyUidLookup = buyLookup.Select(a => a.Key).ToHashSet();
-                var sellIds = await context.NBTLookups.Where(b => b.KeyId == uidKey && buyUidLookup.Contains(b.Value)).GroupBy(v=>v.Value).Select(n => n.OrderBy(b=>b.AuctionId).First().AuctionId).ToListAsync();
-                var sells = await context.Auctions.Where(b => sellIds.Contains(b.Id) && b.End > start && b.HighestBidAmount > 0 && b.End < DateTime.Now)
+                var sellIds = await context.NBTLookups.Where(b => b.KeyId == uidKey && buyUidLookup.Contains(b.Value)).Select(n => n.AuctionId).ToListAsync();
+                var buyAuctionUidLookup = buyLookup.Select(a => a.Value.First().UId).ToHashSet();
+                var sells = await context.Auctions.Where(b => sellIds.Contains(b.Id) && !buyAuctionUidLookup.Contains(b.UId) && b.End > start && b.HighestBidAmount > 0 && b.End < DateTime.Now)
                                         .Select(s => new { s.End, s.HighestBidAmount, s.NBTLookup, s.Uuid }).ToListAsync();
 
                 return sells.Select(s =>
                 {
                     var uid = s.NBTLookup.Where(b => b.KeyId == uidKey).FirstOrDefault().Value;
-                    var buy = buyLookup.GetValueOrDefault(uid)?.FirstOrDefault();
+                    var buy = buyLookup.GetValueOrDefault(uid)?.OrderBy(b=>b.End).Where(b => b.Uuid != s.Uuid).FirstOrDefault();
+                    if (buy == null)
+                        return null;
                     return new FlipDetails()
                     {
                         BuyTime = buy.End,
@@ -159,7 +162,7 @@ namespace Coflnet.Sky.Commands
                         Tier = buy.Tier.ToString(),
                         uId = uid
                     };
-                }).Where(f=>f != null).ToList();
+                }).Where(f => f != null).ToList();
             }
 
         }
