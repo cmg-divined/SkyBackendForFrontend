@@ -27,5 +27,8 @@ namespace Coflnet.Sky.Commands.Shared
         public bool ProfitPercentage;
         [DataMember(Name = "profit")]
         public bool Profit;
+
+        [DataMember(Name = "sellerOpenBtn")]
+        public bool SellerOpenButton { get; set; }
     }
 }
