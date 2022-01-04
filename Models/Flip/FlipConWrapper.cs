@@ -46,9 +46,9 @@ namespace hypixel
                             //await limiter.WaitAsync();
                             await Connection.SendFlip(flip);
                         }
-                        catch(Exception e)
+                        catch (Exception e)
                         {
-                            dev.Logger.Instance.Error(e,"seding flip to " + Connection.UserId);
+                            dev.Logger.Instance.Error(e, "seding flip to " + Connection.UserId);
                         }
                         finally
                         {

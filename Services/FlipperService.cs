@@ -297,6 +297,8 @@ namespace hypixel
 
         public Task DeliverLowPricedAuction(LowPricedAuction flip)
         {
+            if (flip.Auction.Context != null)
+                flip.Auction.Context["crec"] = DateTime.Now.ToString();
             var tracer = OpenTracing.Util.GlobalTracer.Instance;
             var span = OpenTracing.Util.GlobalTracer.Instance.BuildSpan("DeliverFlip");
             //if (flip.Auction.TraceContext != null)
