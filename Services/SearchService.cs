@@ -20,7 +20,6 @@ namespace hypixel
     {
         const int targetAmount = 5;
         private const string VALID_MINECRAFT_NAME_CHARS = "abcdefghijklmnopqrstuvwxyz1234567890_";
-        ConcurrentDictionary<string, CacheItem> cache = new ConcurrentDictionary<string, CacheItem>();
         ConcurrentQueue<PopularSite> popularSite = new ConcurrentQueue<PopularSite>();
 
         private int updateCount = 0;
@@ -348,92 +347,35 @@ namespace hypixel
             });
         }
 
-        class CacheItem
+        public List<SearchResultItem> RankSearchResults(string search, IEnumerable<SearchResultItem> result)
         {
-            public List<SearchResultItem> response;
-            public int hitCount;
-            public DateTime created;
-
-            public CacheItem(List<SearchResultItem> response)
-            {
-                this.response = response;
-                this.created = DateTime.Now;
-                this.hitCount = 0;
-            }
+            var orderedResult = result.Where(r => r.Name != null)
+                            .Select(r =>
+                            {
+                                var lower = r.Name.ToLower();
+                                return new
+                                {
+                                    rating = String.IsNullOrEmpty(r.Name) ? 0 :
+                                lower.Length / 2
+                                - r.HitCount * 2
+                                - (lower == search ? 10000000 : 0) // is exact match
+                                - (lower.Length > search.Length && lower.Truncate(search.Length) == search ? 100 : 0) // matches search
+                                - (Fastenshtein.Levenshtein.Distance(lower, search) <= 1 ? 40 : 0) // just one mutation off maybe a typo
+                                + Fastenshtein.Levenshtein.Distance(lower.PadRight(search.Length), search) / 2 // distance to search
+                                + Fastenshtein.Levenshtein.Distance(lower.Truncate(search.Length), search),
+                                    r
+                                };
+                            })
+                            .OrderBy(r => r.rating)
+                        .Where(r => r.rating < 10)
+                        .ToList()
+                        .Select(r => r.r)
+                        .Distinct(new SearchService.SearchResultComparer())
+                        .Take(5)
+                        .ToList();
+            return orderedResult;
         }
 
-        [DataContract]
-        public class SearchResultItem
-        {
-            private const int ITEM_EXTRA_IMPORTANCE = 10;
-            private const int NOT_NORMALIZED_PENILTY = ITEM_EXTRA_IMPORTANCE * 3 / 2;
-            [DataMember(Name = "name")]
-            public string Name;
-            [DataMember(Name = "id")]
-            public string Id;
-            [DataMember(Name = "type")]
-            public string Type;
-            [DataMember(Name = "iconUrl")]
-            public string IconUrl;
-            /// <summary>
-            /// Low resolution preview icon
-            /// </summary>
-            [DataMember(Name = "img")]
-            public string Image;
-
-            [DataMember(Name = "tier")]
-            public Tier Tier;
-            [IgnoreMember]
-            //[Key("hits")]
-            public int HitCount;
-
-            public SearchResultItem() { }
-
-            public SearchResultItem(ItemDetails.ItemSearchResult item)
-            {
-                this.Name = item.Name;
-                this.Id = item.Tag;
-                this.Type = "item";
-                var isPet = IsPet(item);
-                if (!item.Tag.StartsWith("POTION") && !isPet && !item.Tag.StartsWith("RUNE"))
-                    IconUrl = "https://sky.shiiyu.moe/item/" + item.Tag;
-                else
-                    this.IconUrl = item.IconUrl;
-                if (isPet && !Name.Contains("Pet"))
-                    this.Name += " Pet";
-
-                this.HitCount = item.HitCount + ITEM_EXTRA_IMPORTANCE;
-                if (ItemReferences.RemoveReforgesAndLevel(Name) != Name)
-                    this.HitCount -= NOT_NORMALIZED_PENILTY;
-                this.Tier = item.Tier;
-            }
-
-            private static bool IsPet(ItemDetails.ItemSearchResult item)
-            {
-                return (item.Tag.StartsWith("PET") && !item.Tag.StartsWith("PET_SKIN"));
-            }
-
-            public override bool Equals(object obj)
-            {
-                return obj is SearchResultItem item &&
-                       Id == item.Id &&
-                       Type == item.Type;
-            }
-
-            public override int GetHashCode()
-            {
-                return HashCode.Combine(Id, Type);
-            }
-
-            public SearchResultItem(PlayerResult player)
-            {
-                this.Name = player.Name;
-                this.Id = player.UUid;
-                this.IconUrl = PlayerHeadUrl(player.UUid);
-                this.Type = "player";
-                this.HitCount = player.HitCount;
-            }
-        }
         public class SearchResultComparer : IEqualityComparer<SearchResultItem>
         {
             public bool Equals([AllowNull] SearchResultItem x, [AllowNull] SearchResultItem y)
