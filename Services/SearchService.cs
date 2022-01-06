@@ -347,7 +347,7 @@ namespace hypixel
                                 {
                                     rating = String.IsNullOrEmpty(r.Name) ? 0 :
                                 lower.Length / 2
-                                - r.HitCount * 2
+                                - r.HitCount * 5
                                 - (lower == search ? 10000000 : 0) // is exact match
                                 - (lower.Length > search.Length && lower.Truncate(search.Length) == search ? 100 : 0) // matches search
                                 - (Fastenshtein.Levenshtein.Distance(lower, search) <= 1 ? 40 : 0) // just one mutation off maybe a typo
