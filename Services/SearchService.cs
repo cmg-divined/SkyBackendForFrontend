@@ -13,6 +13,7 @@ using dev;
 using MessagePack;
 using Microsoft.EntityFrameworkCore;
 using RestSharp;
+using System.Threading.Channels;
 
 namespace hypixel
 {
@@ -44,10 +45,10 @@ namespace hypixel
             return popularSite;
         }
 
-        public Task<ConcurrentQueue<SearchResultItem>> Search(string search, CancellationToken token)
+        public Task<Channel<SearchResultItem>> Search(string search, CancellationToken token)
         {
             if (search.Length > 40)
-                return Task.FromResult(new ConcurrentQueue<SearchResultItem>());
+                return Task.FromResult(Channel.CreateBounded<SearchResultItem>(0));
             return CreateResponse(search, token);
 
         }
@@ -170,7 +171,7 @@ namespace hypixel
                 }*/
 
         private static Regex RomanNumber = new Regex("^[IVX]+$");
-        private static async Task<ConcurrentQueue<SearchResultItem>> CreateResponse(string search, CancellationToken token)
+        private static async Task<Channel<SearchResultItem>> CreateResponse(string search, CancellationToken token)
         {
             var result = new List<SearchResultItem>();
 
@@ -178,7 +179,7 @@ namespace hypixel
             var itemTask = ItemDetails.Instance.Search(search, 12);
             var playersTask = PlayerSearch.Instance.Search(search, targetAmount, false);
 
-            var Results = new ConcurrentQueue<SearchResultItem>();
+            var Results = Channel.CreateBounded<SearchResultItem>(50);
             var searchTasks = new ConfiguredTaskAwaitable[4];
             var searchWords = search.Split(' ');
 
@@ -203,22 +204,11 @@ namespace hypixel
             }, token).ConfigureAwait(false);
             ComputeEnchantments(search, Results, searchWords);
 
-
-
-            var timeout = DateTime.Now + TimeSpan.FromMilliseconds(400);
-            while (DateTime.Now < timeout)
-            {
-                if (Results.Count >= 2)
-                    return Results;
-                await Task.Delay(5);
-            }
-            Console.WriteLine("=> past timeout");
-
             return Results;
             // return result.OrderBy(r => r.Name?.Length / 2 - r.HitCount - (r.Name?.ToLower() == search.ToLower() ? 10000000 : 0)).Take(targetAmount).ToList();
         }
 
-        private static async Task SearchForAuctions(string search, ConcurrentQueue<SearchResultItem> Results, string[] searchWords)
+        private static async Task SearchForAuctions(string search, Channel<SearchResultItem> Results, string[] searchWords)
         {
             if (searchWords.Count() > 1)
                 return;
@@ -244,7 +234,7 @@ namespace hypixel
             }
         }
 
-        private static void AddAuctionAsResult(ConcurrentQueue<SearchResultItem> Results, SaveAuction auction)
+        private static void AddAuctionAsResult(Channel<SearchResultItem> Results, SaveAuction auction)
         {
             var key = NBT.GetLookupKey("uid");
             var filter = new Dictionary<string, string>();
@@ -252,7 +242,7 @@ namespace hypixel
             AddFilterResult(Results, filter, auction.ItemName, auction.Tag, 100_000);
         }
 
-        private static async Task FindItems(string search, Task<IEnumerable<ItemDetails.ItemSearchResult>> itemTask, ConcurrentQueue<SearchResultItem> Results)
+        private static async Task FindItems(string search, Task<IEnumerable<ItemDetails.ItemSearchResult>> itemTask, Channel<SearchResultItem> Results)
         {
             var items = await itemTask;
             if (items.Count() == 0)
@@ -260,26 +250,26 @@ namespace hypixel
 
             foreach (var item in items.Select(item => new SearchResultItem(item)))
             {
-                Results.Enqueue(item);
+                await Results.Writer.WriteAsync(item);
             }
         }
 
-        private static async Task FindPlayers(Task<IEnumerable<PlayerResult>> playersTask, ConcurrentQueue<SearchResultItem> Results)
+        private static async Task FindPlayers(Task<IEnumerable<PlayerResult>> playersTask, Channel<SearchResultItem> Results)
         {
             var playerList = (await playersTask);
             foreach (var item in playerList.Select(player => new SearchResultItem(player)))
-                Results.Enqueue(item);
+                await Results.Writer.WriteAsync(item);
             if (playerList.Count() == 1)
                 await IndexerClient.TriggerNameUpdate(playerList.First().UUid);
         }
 
-        private static async Task FindSimilarSearches(string search, ConcurrentQueue<SearchResultItem> Results, string[] searchWords)
+        private static async Task FindSimilarSearches(string search, Channel<SearchResultItem> Results, string[] searchWords)
         {
             if (search.Length <= 2)
                 return;
             await Task.Delay(1);
             foreach (var item in await CoreServer.ExecuteCommandWithCache<string, List<SearchResultItem>>("fullSearch", search.Substring(0, search.Length - 2)))
-                Results.Enqueue(item);
+                await Results.Writer.WriteAsync(item);
             if (searchWords.Count() == 1 || String.IsNullOrWhiteSpace(searchWords.Last()))
                 return;
             if (searchWords[1].Length < 2)
@@ -287,13 +277,13 @@ namespace hypixel
             foreach (var item in await CoreServer.ExecuteCommandWithCache<string, List<SearchResultItem>>("fullSearch", searchWords[1]))
             {
                 item.HitCount -= 20; // no exact match
-                Results.Enqueue(item);
+                await Results.Writer.WriteAsync(item);
             }
         }
 
         private static ConcurrentDictionary<string, Enchantment.EnchantmentType> Enchantments = new ConcurrentDictionary<string, Enchantment.EnchantmentType>();
 
-        private static void ComputeEnchantments(string search, ConcurrentQueue<SearchResultItem> Results, string[] searchWords)
+        private static void ComputeEnchantments(string search, Channel<SearchResultItem> Results, string[] searchWords)
         {
             var lastSpace = search.LastIndexOf(' ');
             if (Enchantments.Count == 0)
@@ -335,9 +325,9 @@ namespace hypixel
             }
         }
 
-        private static void AddFilterResult(ConcurrentQueue<SearchResultItem> Results, Dictionary<string, string> filter, string resultText, string itemTag, int hitCount = 10)
+        private static void AddFilterResult(Channel<SearchResultItem> Results, Dictionary<string, string> filter, string resultText, string itemTag, int hitCount = 10)
         {
-            Results.Enqueue(new SearchResultItem
+            Results.Writer.TryWrite(new SearchResultItem
             {
                 HitCount = hitCount, // account for "Enchantment" suffix
                 Name = resultText,
