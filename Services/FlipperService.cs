@@ -106,6 +106,18 @@ namespace hypixel
             Task.Run(con.Work);
         }
 
+        public void AddConnectionPlus(IFlipConnection connection, bool sendHistory = true)
+        {
+            var con = new FlipConWrapper(connection);
+            RemoveConnection(con.Connection);
+            SuperSubs.AddOrUpdate(con.Connection.Id, cid => con, (cid, oldMId) => con);
+            var toSendFlips = Flipps.Reverse().Take(25);
+            if (sendHistory)
+                SendFlipHistory(connection, toSendFlips, 0);
+            RemoveNonConnection(con.Connection);
+            Task.Run(con.Work);
+        }
+
         public void AddNonConnection(IFlipConnection connection, bool sendHistory = true)
         {
             var con = new FlipConWrapper(connection);
@@ -126,6 +138,7 @@ namespace hypixel
         public void RemoveConnection(IFlipConnection con)
         {
             Unsubscribe(Subs, con.Id);
+            Unsubscribe(SuperSubs, con.Id);
             RemoveNonConnection(con);
         }
 

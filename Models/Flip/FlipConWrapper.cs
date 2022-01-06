@@ -71,9 +71,16 @@ namespace hypixel
                 Finder = lp.Finder,
                 TargetPrice = lp.TargetPrice
             };
-            if(Connection.Settings.FastMode)
-                return Connection.SendFlip(copy).Result;
-            
+            if (Connection.Settings.FastMode)
+                try
+                {
+                    return Connection.SendFlip(copy).Wait(10);
+                }
+                catch (Exception e)
+                {
+                    dev.Logger.Instance.Error(e, "fast send ");
+                }
+
             return LowPriced.Writer.TryWrite(copy);
         }
 
