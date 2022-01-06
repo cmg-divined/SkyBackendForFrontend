@@ -362,7 +362,8 @@ namespace hypixel
                                 - (lower.Length > search.Length && lower.Truncate(search.Length) == search ? 100 : 0) // matches search
                                 - (Fastenshtein.Levenshtein.Distance(lower, search) <= 1 ? 40 : 0) // just one mutation off maybe a typo
                                 + Fastenshtein.Levenshtein.Distance(lower.PadRight(search.Length), search) / 2 // distance to search
-                                + Fastenshtein.Levenshtein.Distance(lower.Truncate(search.Length), search),
+                                + Fastenshtein.Levenshtein.Distance(lower.Truncate(search.Length), search)
+                                - (r.Type == "item" ? 50 : 0),
                                     r
                                 };
                             })
