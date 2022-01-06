@@ -43,6 +43,9 @@ namespace Coflnet.Sky.Commands.Shared
         [DataMember(Name = "finders")]
         public LowPricedAuction.FinderType AllowedFinders;
 
+        [DataMember(Name = "fastMode")]
+        public bool FastMode;
+
         /// <summary>
         /// The initiating party that sent the change
         /// </summary>

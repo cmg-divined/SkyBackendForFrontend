@@ -283,7 +283,7 @@ namespace hypixel
 
         private void PrepareSlow(FlipInstance flip)
         {
-            if(FlipIdLookup.ContainsKey(flip.UId))
+            if (FlipIdLookup.ContainsKey(flip.UId))
                 return;
             SlowFlips.Enqueue(flip);
             Flipps.Enqueue(flip);
@@ -312,6 +312,10 @@ namespace hypixel
 
             if (flip.Auction != null && flip.Auction.NBTLookup == null)
                 flip.Auction.NBTLookup = NBT.CreateLookup(flip.Auction);
+            foreach (var item in SuperSubs)
+            {
+                item.Value.AddLowPriced(flip);
+            }
 
             foreach (var item in Subs)
             {
@@ -320,24 +324,6 @@ namespace hypixel
             }
             PrepareSlow(LowPriceToFlip(flip));
             return Task.CompletedTask;
-            /*
-            await Task.WhenAll(Subs.Select(async item =>
-            {
-                using var sendingSpan = OpenTracing.Util.GlobalTracer.Instance.BuildSpan("SingleDevliver")
-                    .AsChildOf(scope.Span).StartActive();
-                try
-                {
-                    await item.Value.SendFlip(flip);
-                }
-                catch (Exception e)
-                {
-                    sendingSpan.Span.Log(e.Message);
-                    sendingSpan.Span.Log(e.StackTrace);
-                    sendingSpan.Span.SetTag("error", true);
-                }
-            }));
-            PrepareSlow(LowPriceToFlip(flip));
-            scope.Span.Log($"Sent to {Subs.Count}"); */
         }
 
 
@@ -495,7 +481,7 @@ namespace hypixel
                     {
                         try
                         {
-                            var cr = c.Consume(2000);
+                            var cr = c.Consume(30000);
                             if (cr == null)
                             {
                                 await Task.Delay(10);
@@ -505,6 +491,16 @@ namespace hypixel
                                 Console.WriteLine($"consumed {cr.TopicPartitionOffset.Topic} {cr.TopicPartitionOffset.Offset}");
                             work(cr.Message.Value);
                             batch.Add(cr.TopicPartitionOffset);
+                            while (batch.Count <= batchSize)
+                            {
+                                cr = c.Consume(TimeSpan.Zero);
+                                if (cr == null)
+                                {
+                                    break;
+                                }
+                                batch.Add(cr.TopicPartitionOffset);
+                                work(cr.Message.Value);
+                            }
                         }
                         catch (ConsumeException e)
                         {

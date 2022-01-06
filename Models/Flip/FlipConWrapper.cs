@@ -63,7 +63,18 @@ namespace hypixel
 
         public bool AddLowPriced(LowPricedAuction lp)
         {
-            return LowPriced.Writer.TryWrite(lp);
+            var copy = new LowPricedAuction()
+            {
+                AdditionalProps = new System.Collections.Generic.Dictionary<string, string>(lp.AdditionalProps),
+                Auction = lp.Auction,
+                DailyVolume = lp.DailyVolume,
+                Finder = lp.Finder,
+                TargetPrice = lp.TargetPrice
+            };
+            if(Connection.Settings.FastMode)
+                return Connection.SendFlip(copy).Result;
+            
+            return LowPriced.Writer.TryWrite(copy);
         }
 
         public Task<bool> SendFlip(FlipInstance flip)
