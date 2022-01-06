@@ -283,6 +283,8 @@ namespace hypixel
 
         private void PrepareSlow(FlipInstance flip)
         {
+            if(FlipIdLookup.ContainsKey(flip.UId))
+                return;
             SlowFlips.Enqueue(flip);
             Flipps.Enqueue(flip);
             FlipIdLookup[flip.UId] = true;
@@ -316,6 +318,7 @@ namespace hypixel
                 item.Value.AddLowPriced(flip);
                 scope.Span.Log("sent " + item.Value.Connection.UserId);
             }
+            PrepareSlow(LowPriceToFlip(flip));
             return Task.CompletedTask;
             /*
             await Task.WhenAll(Subs.Select(async item =>
