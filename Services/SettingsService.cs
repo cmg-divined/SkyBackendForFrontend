@@ -14,7 +14,7 @@ namespace Coflnet.Sky.Commands.Shared
         public SettingsService(IConfiguration config)
         {
             con = ConnectionMultiplexer.Connect(config["SETTINGS_REDIS_HOST"]);
-            api = new SettingsApi("http://" + config["SETTINGS_HOST"]);
+            api = new SettingsApi(config["SETTINGS_BASE_URL"]);
         }
 
         public async Task<ChannelMessageQueue> GetAndSubscribe<T>(string userId, string key, Action<T> update)
