@@ -62,11 +62,10 @@ namespace Coflnet.Sky.Commands.Shared
         /// <returns></returns>
         public async Task<CurrentPrice> GetCurrentPrice(string itemTag, int count = 1)
         {
-            var itemTask = ItemDetails.Instance.GetDetailsWithCache(itemTag);
             int id = GetItemId(itemTag, false);
             if (id == 0)
                 return new CurrentPrice() { Available = -1 };
-            var item = await itemTask;
+            var item = await ItemDetails.Instance.GetDetailsWithCache(itemTag);
             if (item.IsBazaar)
             {
                 var product = await context.BazaarPrices

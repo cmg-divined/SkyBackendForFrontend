@@ -393,7 +393,8 @@ namespace hypixel
         {
             GroupId = System.Net.Dns.GetHostName(),
             BootstrapServers = Program.KafkaHost,
-            AutoOffsetReset = AutoOffsetReset.Latest
+            AutoOffsetReset = AutoOffsetReset.Latest,
+
         };
 
 
@@ -448,11 +449,9 @@ namespace hypixel
 
             await ConsumeBatch<LowPricedAuction>(topics, flip =>
             {
-                if (flip.Auction.Start < DateTime.Now - TimeSpan.FromMinutes(3))
+                if (flip.Auction.Start.ToUniversalTime() < DateTime.Now.ToUniversalTime() - TimeSpan.FromMinutes(4))
                     return;
 
-                if (flip.TargetPrice - flip.Auction.StartingBid < 50_000)
-                    return;
                 var time = (DateTime.Now - flip.Auction.FindTime).TotalSeconds;
                 runtroughTime.Observe(time);
 

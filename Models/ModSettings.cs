@@ -26,6 +26,6 @@ namespace Coflnet.Sky.Commands.Shared
         [DataMember(Name = "blockTenSecMsg")]
         public bool BlockTenSecondsMsg;
         [DataMember(Name = "format")]
-        public string Format { get; set; }
+        public string Format;
     }
 }

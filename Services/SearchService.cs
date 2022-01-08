@@ -171,7 +171,7 @@ namespace hypixel
                 }*/
 
         private static Regex RomanNumber = new Regex("^[IVX]+$");
-        private static async Task<Channel<SearchResultItem>> CreateResponse(string search, CancellationToken token)
+        private static Task<Channel<SearchResultItem>> CreateResponse(string search, CancellationToken token)
         {
             var result = new List<SearchResultItem>();
 
@@ -204,7 +204,7 @@ namespace hypixel
             }, token).ConfigureAwait(false);
             ComputeEnchantments(search, Results, searchWords);
 
-            return Results;
+            return Task.FromResult(Results);
             // return result.OrderBy(r => r.Name?.Length / 2 - r.HitCount - (r.Name?.ToLower() == search.ToLower() ? 10000000 : 0)).Take(targetAmount).ToList();
         }
 
