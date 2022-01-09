@@ -72,6 +72,41 @@ namespace Coflnet.Sky.Commands.Shared
             Assert.IsFalse(matches.Item1, "flip should not match");
         }
 
+        [Test]
+        public void WhitelistBookEnchantBlackistItem()
+        {
+            NBT.Instance = new NBTMock();
+            var tag = "ENCHANTED_BOOK";
+            FlipInstance bookOfa = CreatOfaAuction(tag);
+            FlipInstance reaperOfa = CreatOfaAuction("REAPER");
+            var oneForAllFilter = new Dictionary<string, string>() { { "Enchantment", "ultimate_one_for_all" }, { "EnchantLvl", "1" } };
+            var settings = new FlipSettings()
+            {
+                BlackList = new List<ListEntry>() { new ListEntry() { ItemTag = "REAPER", filter = oneForAllFilter } },
+                WhiteList = new List<ListEntry>() { new ListEntry() { ItemTag = "ENCHANTED_BOOK", filter = oneForAllFilter } }
+            };
+            var matches = settings.MatchesSettings(bookOfa);
+            var shouldNotBatch = settings.MatchesSettings(reaperOfa);
+            Assert.True(matches.Item1, "flip should match");
+            Assert.IsFalse(shouldNotBatch.Item1, "flip should not match");
+        }
+
+        private static FlipInstance CreatOfaAuction(string tag)
+        {
+            return new FlipInstance()
+            {
+                MedianPrice = 10,
+                Volume = 10,
+                Auction = new SaveAuction()
+                {
+                    Tag = tag,
+                    Enchantments = new List<Enchantment>(){
+                    new Enchantment(Enchantment.EnchantmentType.ultimate_one_for_all,1)
+                }
+                }
+
+            };
+        }
 
         class NBTMock : INBT
         {

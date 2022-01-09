@@ -19,7 +19,7 @@ namespace Coflnet.Sky.Commands.Shared
         {
             if (filterCache == null)
                 filterCache = new FlipFilter(this.filter);
-            return filterCache.IsMatch(flip);
+            return (ItemTag == null || ItemTag == flip.Auction.Tag ) &&  filterCache.IsMatch(flip);
         }
     }
 }

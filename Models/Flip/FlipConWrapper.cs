@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Concurrent;
+using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Channels;
 using System.Threading.Tasks;
@@ -65,7 +66,7 @@ namespace hypixel
         {
             var copy = new LowPricedAuction()
             {
-                AdditionalProps = new System.Collections.Generic.Dictionary<string, string>(lp.AdditionalProps),
+                AdditionalProps = lp.AdditionalProps == null ? new Dictionary<string, string>() : new Dictionary<string, string>(lp.AdditionalProps),
                 Auction = lp.Auction,
                 DailyVolume = lp.DailyVolume,
                 Finder = lp.Finder,
