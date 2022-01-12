@@ -29,6 +29,8 @@ namespace Coflnet.Sky.Commands.Shared
                 if (item.FieldType.IsPrimitive || item.FieldType == typeof(string))
                     options.Add(prefix + (item.GetCustomAttributes(typeof(DataMemberAttribute), true).First() as DataMemberAttribute).Name, item.Name);
             }
+            options.Remove("changer");
+            options.Remove("showavgSellTime");
         }
 
         public string[] Options()
