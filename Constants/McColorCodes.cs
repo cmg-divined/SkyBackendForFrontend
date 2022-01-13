@@ -19,5 +19,11 @@ namespace Coflnet.Sky.Commands.MC
         public static readonly string YELLOW = "§e";
         public static readonly string WHITE = "§f";
         public static readonly string MINECOIN_GOLD = "§g";
+        public static readonly string BOLD = "§l";
+        public static readonly string RESET = "§r";
+        public static readonly string ITALIC = "§o";
+        public static readonly string OBFUSCATED = "§k";
+        public static readonly string STRIKE = "§m";
+        public static readonly string UNDERLINE = "§n";
     }
 }
