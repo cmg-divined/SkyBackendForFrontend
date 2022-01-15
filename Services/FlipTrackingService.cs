@@ -148,6 +148,9 @@ namespace Coflnet.Sky.Commands
                     var buy = buyLookup.GetValueOrDefault(uid)?.OrderBy(b=>b.End).Where(b => b.Uuid != s.Uuid).FirstOrDefault();
                     if (buy == null)
                         return null;
+                    // make sure that this is the correct sell of this flip
+                    if(buy.End > s.End)
+                        return null;
                     return new FlipDetails()
                     {
                         BuyTime = buy.End,
