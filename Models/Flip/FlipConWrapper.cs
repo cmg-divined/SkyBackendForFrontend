@@ -47,13 +47,13 @@ namespace hypixel
                             //await limiter.WaitAsync();
                             await Connection.SendFlip(flip);
                         }
+                        catch (OperationCanceledException)
+                        {
+                            return;
+                        }
                         catch (Exception e)
                         {
                             dev.Logger.Instance.Error(e, "seding flip to " + Connection.UserId);
-                        }
-                        finally
-                        {
-                            //limiter.Release();
                         }
                     }
                 });
