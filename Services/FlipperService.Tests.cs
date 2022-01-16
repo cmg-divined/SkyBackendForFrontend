@@ -4,6 +4,7 @@ using System.Threading.Tasks;
 using Coflnet.Sky.Commands.Shared;
 using Coflnet.Sky.Filter;
 using hypixel;
+using Microsoft.Extensions.Logging;
 using NUnit.Framework;
 
 namespace Coflnet.Sky.Commands.Tests
@@ -67,6 +68,11 @@ namespace Coflnet.Sky.Commands.Tests
             public void UpdateSettings(SettingsChange settings)
             {
                 throw new System.NotImplementedException();
+            }
+
+            public void Log(string message, LogLevel level = LogLevel.Information)
+            {
+                throw new NotImplementedException();
             }
         }
     }

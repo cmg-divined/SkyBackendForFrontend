@@ -2,6 +2,7 @@ using System.Threading.Tasks;
 using Coflnet.Sky.Commands.Shared;
 using Coflnet.Sky.Filter;
 using hypixel;
+using Microsoft.Extensions.Logging;
 
 namespace Coflnet.Sky.Commands
 {
@@ -19,7 +20,12 @@ namespace Coflnet.Sky.Commands
         SettingsChange LatestSettings { get; }
         long Id { get; }
         int UserId { get; }
-
+        /// <summary>
+        /// Logs information to the connection
+        /// </summary>
+        /// <param name="message">The message to log</param>
+        /// <param name="level"></param>
+        void Log(string message, LogLevel level = LogLevel.Information);
         void UpdateSettings(SettingsChange settings);
     }
 }

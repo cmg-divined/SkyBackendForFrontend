@@ -49,10 +49,12 @@ namespace hypixel
                         }
                         catch (OperationCanceledException)
                         {
+                            Connection.Log("canceled", Microsoft.Extensions.Logging.LogLevel.Error);
                             return;
                         }
                         catch (Exception e)
                         {
+                            Connection.Log(e.Message, Microsoft.Extensions.Logging.LogLevel.Error);
                             dev.Logger.Instance.Error(e, "seding flip to " + Connection.UserId);
                         }
                     }
@@ -93,6 +95,7 @@ namespace hypixel
         public void Stop()
         {
             cancellationTokenSource?.Cancel();
+            Connection.Log("canceled by " + Environment.StackTrace);
         }
 
 
