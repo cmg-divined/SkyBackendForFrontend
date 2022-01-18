@@ -119,6 +119,50 @@ namespace Coflnet.Sky.Commands.Shared
             profit = targetPrice * 98 / 100 - flip.LastKnownCost;
         }
 
+        public override bool Equals(object obj)
+        {
+            return obj is FlipSettings settings &&
+                   EqualityComparer<Dictionary<string, string>>.Default.Equals(Filters, settings.Filters) &&
+                   EqualityComparer<List<ListEntry>>.Default.Equals(BlackList, settings.BlackList) &&
+                   EqualityComparer<List<ListEntry>>.Default.Equals(WhiteList, settings.WhiteList) &&
+                   BasedOnLBin == settings.BasedOnLBin &&
+                   MinProfit == settings.MinProfit &&
+                   MinProfitPercent == settings.MinProfitPercent &&
+                   MinVolume == settings.MinVolume &&
+                   MaxCost == settings.MaxCost &&
+                   EqualityComparer<VisibilitySettings>.Default.Equals(Visibility, settings.Visibility) &&
+                   EqualityComparer<ModSettings>.Default.Equals(ModSettings, settings.ModSettings) &&
+                   AllowedFinders == settings.AllowedFinders &&
+                   FastMode == settings.FastMode &&
+                   Changer == settings.Changer &&
+                   EqualityComparer<FlipFilter>.Default.Equals(filter, settings.filter) &&
+                   EqualityComparer<List<FlipFilter>>.Default.Equals(blackListFilters, settings.blackListFilters) &&
+                   EqualityComparer<ListMatcher>.Default.Equals(BlackListMatcher, settings.BlackListMatcher) &&
+                   EqualityComparer<ListMatcher>.Default.Equals(WhiteListMatcher, settings.WhiteListMatcher);
+        }
+
+        public override int GetHashCode()
+        {
+            HashCode hash = new HashCode();
+            hash.Add(Filters);
+            hash.Add(BlackList);
+            hash.Add(WhiteList);
+            hash.Add(BasedOnLBin);
+            hash.Add(MinProfit);
+            hash.Add(MinProfitPercent);
+            hash.Add(MinVolume);
+            hash.Add(MaxCost);
+            hash.Add(Visibility);
+            hash.Add(ModSettings);
+            hash.Add(AllowedFinders);
+            hash.Add(FastMode);
+            hash.Add(Changer);
+            hash.Add(filter);
+            hash.Add(blackListFilters);
+            hash.Add(BlackListMatcher);
+            hash.Add(WhiteListMatcher);
+            return hash.ToHashCode();
+        }
 
         public class ListMatcher
         {
@@ -148,6 +192,8 @@ namespace Coflnet.Sky.Commands.Shared
                 return (false, "no match");
             }
         }
+
+        
     }
 
 }
