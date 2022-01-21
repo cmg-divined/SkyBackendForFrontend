@@ -97,6 +97,8 @@ namespace hypixel
 
         public void AddConnection(IFlipConnection connection, bool sendHistory = true)
         {
+            if(Subs.ContainsKey(connection.Id))
+                return;
             var con = new FlipConWrapper(connection);
             Subs.AddOrUpdate(con.Connection.Id, cid => con, (cid, oldMId) => con);
             var toSendFlips = Flipps.Reverse().Take(25);
@@ -108,6 +110,8 @@ namespace hypixel
 
         public void AddConnectionPlus(IFlipConnection connection, bool sendHistory = true)
         {
+            if(SuperSubs.ContainsKey(connection.Id))
+                return;
             var con = new FlipConWrapper(connection);
             RemoveConnection(con.Connection);
             SuperSubs.AddOrUpdate(con.Connection.Id, cid => con, (cid, oldMId) => con);
