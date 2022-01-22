@@ -166,7 +166,8 @@ namespace Coflnet.Sky.Commands
                         uId = uid
                     };
                 }).Where(f => f != null).GroupBy(s => s.OriginAuction)
-                .Select(s => s.Where(s => s.SellTime > s.BuyTime).OrderBy(s => s.SellTime).First())
+                .Select(s => s.Where(s => s.SellTime > s.BuyTime).OrderBy(s => s.SellTime).FirstOrDefault())
+                .Where(f => f != null)
                 .ToList();
             }
 
