@@ -165,7 +165,7 @@ namespace Coflnet.Sky.Commands
                         Tier = buy.Tier.ToString(),
                         uId = uid
                     };
-                }).Where(f => f != null).GroupBy(s=>s.OriginAuction).Select(s=>s.OrderBy(s=>s.SellTime).First()).ToList();
+                }).Where(f => f != null).GroupBy(s=>s.uId).Select(s=>s.OrderBy(s=>s.SellTime).First()).ToList();
             }
 
         }
