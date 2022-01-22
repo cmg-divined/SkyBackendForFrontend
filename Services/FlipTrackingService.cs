@@ -145,11 +145,11 @@ namespace Coflnet.Sky.Commands
                 return sells.Select(s =>
                 {
                     var uid = s.NBTLookup.Where(b => b.KeyId == uidKey).FirstOrDefault().Value;
-                    var buy = buyLookup.GetValueOrDefault(uid)?.OrderBy(b=>b.End).Where(b => b.Uuid != s.Uuid).FirstOrDefault();
+                    var buy = buyLookup.GetValueOrDefault(uid)?.OrderBy(b => b.End).Where(b => b.Uuid != s.Uuid).FirstOrDefault();
                     if (buy == null)
                         return null;
                     // make sure that this is the correct sell of this flip
-                    if(buy.End > s.End)
+                    if (buy.End > s.End)
                         return null;
                     return new FlipDetails()
                     {
@@ -165,7 +165,9 @@ namespace Coflnet.Sky.Commands
                         Tier = buy.Tier.ToString(),
                         uId = uid
                     };
-                }).Where(f => f != null).GroupBy(s=>s.uId).Select(s=>s.OrderBy(s=>s.SellTime).First()).ToList();
+                }).Where(f => f != null).GroupBy(s => s.OriginAuction)
+                .Select(s => s.Where(s => s.SellTime > s.BuyTime).OrderBy(s => s.SellTime).First())
+                .ToList();
             }
 
         }
