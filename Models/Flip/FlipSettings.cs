@@ -173,11 +173,21 @@ namespace Coflnet.Sky.Commands.Shared
             {
                 foreach (var item in BlackList)
                 {
-                    if (item.filter == null || item.filter.Count == 0)
-                        Ids.Add(item.ItemTag);
-                    else
-                        RemainingFilters.Add(item);
+                    AddElement(item);
+                    AddElement(new ListEntry()
+                    {
+                        filter = item.filter,
+                        ItemTag = "STARRED_" + item.ItemTag
+                    });
                 }
+            }
+
+            private void AddElement(ListEntry item)
+            {
+                if (item.filter == null || item.filter.Count == 0)
+                    Ids.Add(item.ItemTag);
+                else
+                    RemainingFilters.Add(item);
             }
 
             public (bool, string) IsMatch(FlipInstance flip)
