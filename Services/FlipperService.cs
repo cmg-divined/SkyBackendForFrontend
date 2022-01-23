@@ -353,7 +353,10 @@ namespace hypixel
                 try
                 {
                     if (!subscribers.TryGetValue(item, out FlipConWrapper connection) || !await connection.SendFlip(flip))
+                    {
+                        connection.Connection.Log("unsubed because of " + JsonConvert.SerializeObject(flip), Microsoft.Extensions.Logging.LogLevel.Error);
                         Unsubscribe(subscribers, item);
+                    }
                 }
                 catch (Exception e)
                 {
