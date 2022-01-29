@@ -1,7 +1,10 @@
 
+using System;
 using System.Collections.Generic;
+using System.Linq.Expressions;
 using System.Runtime.Serialization;
 using hypixel;
+using Coflnet.Sky.Filter;
 
 namespace Coflnet.Sky.Commands.Shared
 {
@@ -13,13 +16,20 @@ namespace Coflnet.Sky.Commands.Shared
         [DataMember(Name = "filter")]
         public Dictionary<string, string> filter;
 
-        private FlipFilter filterCache;
+        private Func<FlipInstance,bool> filterCache;
 
         public bool MatchesSettings(FlipInstance flip)
         {
             if (filterCache == null)
-                filterCache = new FlipFilter(this.filter);
-            return (ItemTag == null || ItemTag == flip.Auction.Tag ) &&  filterCache.IsMatch(flip);
+                filterCache = GetExpression().Compile();
+            return filterCache(flip);
+        }
+
+        public Expression<Func<FlipInstance,bool>> GetExpression()
+        {
+            var filterCache = new FlipFilter(this.filter);
+            Expression<Func<FlipInstance,bool>> normal = (flip) => (ItemTag == null || ItemTag == flip.Auction.Tag);
+            return filterCache.GetExpression();
         }
     }
 }

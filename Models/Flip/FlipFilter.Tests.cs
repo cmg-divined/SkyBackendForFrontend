@@ -20,7 +20,6 @@ namespace Coflnet.Sky.Commands.Shared
                 },
                 FlatenedNBT = new Dictionary<string, string>() { { "candy", "3" } }
             }
-
         };
         [Test]
         public void IsMatch()
@@ -89,6 +88,23 @@ namespace Coflnet.Sky.Commands.Shared
             var shouldNotBatch = settings.MatchesSettings(reaperOfa);
             Assert.True(matches.Item1, "flip should match");
             Assert.IsFalse(shouldNotBatch.Item1, "flip should not match");
+        }
+
+
+
+        [Test]
+        public void MinProfitFilterMatch()
+        {
+            NBT.Instance = new NBTMock();
+            sampleFlip.Auction.NBTLookup = new List<NBTLookup>() { new NBTLookup(1, 2) };
+            var settings = new FlipSettings()
+            {
+                MinProfit = 10000,
+                WhiteList = new List<ListEntry>() { new ListEntry() { filter = new Dictionary<string, string>() { { "MinProfit", "5" } } } }
+            };
+            var matches = settings.MatchesSettings(sampleFlip);
+            System.Console.WriteLine(sampleFlip.Profit);
+            Assert.IsTrue(matches.Item1, matches.Item2);
         }
 
         private static FlipInstance CreatOfaAuction(string tag)
