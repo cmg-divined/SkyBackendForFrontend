@@ -233,8 +233,8 @@ namespace Coflnet.Sky.Commands.Shared
 
             public (bool, string) IsMatch(FlipInstance flip)
             {
-                if (Ids.Contains(flip.Tag))
-                    return (true, "for " + flip.Tag);
+                if (Ids.Contains(flip.Auction.Tag))
+                    return (true, "for " + flip.Auction.Tag);
 
                 if (flip.Auction.Tag != null && Matchers.TryGetValue(flip.Auction.Tag, out Func<FlipInstance, bool> matcher) && matcher(flip))
                     return (true, "matched filter for item");
