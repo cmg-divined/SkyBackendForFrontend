@@ -97,7 +97,7 @@ namespace hypixel
 
         public void AddConnection(IFlipConnection connection, bool sendHistory = true)
         {
-            if(Subs.ContainsKey(connection.Id))
+            if (Subs.ContainsKey(connection.Id))
                 return;
             var con = new FlipConWrapper(connection);
             Subs.AddOrUpdate(con.Connection.Id, cid => con, (cid, oldMId) => con);
@@ -110,7 +110,7 @@ namespace hypixel
 
         public void AddConnectionPlus(IFlipConnection connection, bool sendHistory = true)
         {
-            if(SuperSubs.ContainsKey(connection.Id))
+            if (SuperSubs.ContainsKey(connection.Id))
                 return;
             var con = new FlipConWrapper(connection);
             RemoveConnection(con.Connection);
@@ -337,9 +337,16 @@ namespace hypixel
             foreach (var item in Subs)
             {
                 item.Value.AddLowPriced(flip);
-                scope.Span.Log("sent " + item.Value.Connection.UserId);
             }
-            PrepareSlow(LowPriceToFlip(flip));
+            if (flip.TargetPrice - flip.Auction.StartingBid < 200_000) // send below 200k profit out to everyone
+            {
+                foreach (var item in SlowSubs)
+                {
+                    item.Value.AddLowPriced(flip);
+                }
+            }
+            else
+                PrepareSlow(LowPriceToFlip(flip));
             return Task.CompletedTask;
         }
 
