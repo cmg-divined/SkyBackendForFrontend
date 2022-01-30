@@ -9,6 +9,7 @@ namespace Coflnet.Sky.Commands.Shared
 {
     public class VolumeDetailedFlipFilter : DetailedFlipFilter
     {
+        public object[] Options => new object[]{1,100_000_000};
         public Expression<Func<FlipInstance, bool>> GetExpression(Dictionary<string, string> filters, string content)
         {
             Expression<Func<FlipInstance, long>> selector = (f)=>(long)f.Volume;

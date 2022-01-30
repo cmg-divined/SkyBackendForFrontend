@@ -15,27 +15,27 @@ namespace Coflnet.Sky.Commands.Shared
         private Func<SaveAuction, bool> Filters;
         private Func<FlipInstance, bool> FlipFilters = null;
 
-        private static ClassNameDictonary<DetailedFlipFilter> additionalFilters = new();
+        public static ClassNameDictonary<DetailedFlipFilter> AdditionalFilters {private set; get; }= new();
 
         static FlipFilter()
         {
-            additionalFilters.Add<MinProfitDetailedFlipFilter>();
-            additionalFilters.Add<VolumeDetailedFlipFilter>();
-            additionalFilters.Add<MinProfitPercentageDetailedFlipFilter>();
-            additionalFilters.Add<FlipFinderDetailedFlipFilter>();
+            AdditionalFilters.Add<MinProfitDetailedFlipFilter>();
+            AdditionalFilters.Add<VolumeDetailedFlipFilter>();
+            AdditionalFilters.Add<MinProfitPercentageDetailedFlipFilter>();
+            AdditionalFilters.Add<FlipFinderDetailedFlipFilter>();
         }
 
         public FlipFilter(Dictionary<string, string> filters)
         {
             Expression<Func<FlipInstance, bool>> expression = null;
             if (filters != null)
-                foreach (var item in additionalFilters.Keys)
+                foreach (var item in AdditionalFilters.Keys)
                 {
                     var match = filters.Where(f=>f.Key.ToLower() == item).FirstOrDefault();
                     if (match.Key != default)
                     {
                         filters.Remove(match.Key);
-                        expression = additionalFilters[item].GetExpression(filters, match.Value);
+                        expression = AdditionalFilters[item].GetExpression(filters, match.Value);
                         Console.WriteLine("set expression " + expression.ToString());
                     }
                 }
