@@ -19,10 +19,12 @@ namespace Coflnet.Sky.Commands.Shared
 
         static FlipFilter()
         {
-            AdditionalFilters.Add<MinProfitDetailedFlipFilter>();
             AdditionalFilters.Add<VolumeDetailedFlipFilter>();
-            AdditionalFilters.Add<MinProfitPercentageDetailedFlipFilter>();
+            AdditionalFilters.Add<ProfitDetailedFlipFilter>();
+            AdditionalFilters.Add<ProfitPercentageDetailedFlipFilter>();
             AdditionalFilters.Add<FlipFinderDetailedFlipFilter>();
+            AdditionalFilters.Add<MinProfitPercentageDetailedFlipFilter>();
+            AdditionalFilters.Add<MinProfitDetailedFlipFilter>();
         }
 
         public FlipFilter(Dictionary<string, string> filters)

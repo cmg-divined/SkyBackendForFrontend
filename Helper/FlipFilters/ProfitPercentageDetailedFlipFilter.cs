@@ -5,14 +5,11 @@ using hypixel;
 
 namespace Coflnet.Sky.Commands.Shared
 {
-
-    public class VolumeDetailedFlipFilter : NumberDetailedFlipFinder
+    public class ProfitPercentageDetailedFlipFilter : NumberDetailedFlipFinder
     {
-        public override object[] Options => new object[]{1,1000};
-
         protected override Expression<Func<FlipInstance, long>> GetSelector()
         {
-            return (f) => (long)f.Volume;
+            return (f) => (long)f.ProfitPercentage;
         }
     }
     
