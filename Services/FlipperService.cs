@@ -156,7 +156,7 @@ namespace hypixel
                 try
                 {
 
-                    foreach (var item in toSendFlips)
+                    foreach (var item in toSendFlips.ToList())
                     {
                         await con.SendFlip(item);
 
