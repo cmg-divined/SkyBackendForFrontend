@@ -74,7 +74,7 @@ namespace hypixel
                 Finder = lp.Finder,
                 TargetPrice = lp.TargetPrice
             };
-            if (Connection.Settings.FastMode)
+            if (Connection?.Settings?.FastMode ?? false)
                 try
                 {
                     return Connection.SendFlip(copy).Wait(10);

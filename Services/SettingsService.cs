@@ -17,18 +17,40 @@ namespace Coflnet.Sky.Commands.Shared
             api = new SettingsApi(config["SETTINGS_BASE_URL"]);
         }
 
-        public async Task<ChannelMessageQueue> GetAndSubscribe<T>(string userId, string key, Action<T> update)
+        public async Task<ChannelMessageQueue> GetAndSubscribe<T>(string userId, string key, Action<T> update, Func<T> defaultGetter = null)
         {
-            // subscribe, get then process subscription to not loose any update
-            var subTask = con.GetSubscriber().SubscribeAsync(key);
-            var value = await api.SettingsUserIdSettingKeyGetAsync(userId, key);
-            update(Deserialize<T>(value));
-            var sub = await subTask;
-            sub.OnMessage(a =>
+            try
             {
-                update(Deserialize<T>(a.Message));
-            });
-            return sub;
+                // subscribe, get then process subscription to not loose any update
+                var subTask = con.GetSubscriber().SubscribeAsync(GetSubKey(userId, key));
+                var value = await api.SettingsUserIdSettingKeyGetAsync(userId, key);
+                T val;
+                if (value == null)
+                {
+                    if (defaultGetter != null)
+                        val = defaultGetter();
+                    else
+                        val = default(T);
+                }
+                else
+                    val = Deserialize<T>(value);
+                update(val);
+                var sub = await subTask;
+                sub.OnMessage(a =>
+                {
+                    update(Deserialize<T>(a.Message));
+                });
+                return sub;
+            }
+            catch (Exception e)
+            {
+                throw new Exception("Could not subscribe to setting ", e);
+            }
+        }
+
+        private static string GetSubKey(string userId, string key)
+        {
+            return userId + key;
         }
 
         public async Task UpdateSetting<T>(string userId, string key, T data)
@@ -38,6 +60,8 @@ namespace Coflnet.Sky.Commands.Shared
 
         private static T Deserialize<T>(string a)
         {
+            if (a.StartsWith("\""))
+                a = JsonConvert.DeserializeObject<string>(a);
             return JsonConvert.DeserializeObject<T>(a);
         }
     }
