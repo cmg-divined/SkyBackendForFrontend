@@ -15,7 +15,7 @@ namespace Coflnet.Sky.Commands.Shared
         private Func<SaveAuction, bool> Filters;
         private Func<FlipInstance, bool> FlipFilters = null;
 
-        public static ClassNameDictonary<DetailedFlipFilter> AdditionalFilters {private set; get; }= new();
+        public static CamelCaseNameDictionary<DetailedFlipFilter> AdditionalFilters {private set; get; }= new();
 
         static FlipFilter()
         {
