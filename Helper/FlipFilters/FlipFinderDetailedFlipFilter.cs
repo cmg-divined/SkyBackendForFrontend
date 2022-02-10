@@ -4,12 +4,19 @@ using System.Collections.Generic;
 using System.Linq.Expressions;
 using System.Linq;
 using hypixel;
+using Coflnet.Sky.Filter;
 
 namespace Coflnet.Sky.Commands.Shared
 {
     public class FlipFinderDetailedFlipFilter : DetailedFlipFilter
     {
-        public object[] Options =>  Enum.GetValues<LowPricedAuction.FinderType>().Select(t=> (object)t).ToArray();
+        public object[] Options => new LowPricedAuction.FinderType[]{
+            LowPricedAuction.FinderType.FLIPPER,
+            LowPricedAuction.FinderType.SNIPER,
+            LowPricedAuction.FinderType.SNIPER_MEDIAN
+        }.Select(t=> (object)t).ToArray();
+
+        public FilterType FilterType => FilterType.Equal;
 
         public Expression<Func<FlipInstance, bool>> GetExpression(Dictionary<string, string> filters, string val)
         {
@@ -18,6 +25,4 @@ namespace Coflnet.Sky.Commands.Shared
             return flip => flip.Finder == targetType;
         }
     }
-
-
 }
