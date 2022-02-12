@@ -8,6 +8,7 @@ using hypixel;
 using Coflnet.Sky.Filter;
 using Newtonsoft.Json;
 using System.Collections.Concurrent;
+using AgileObjects.ReadableExpressions;
 
 namespace Coflnet.Sky.Commands.Shared
 {
@@ -81,7 +82,7 @@ namespace Coflnet.Sky.Commands.Shared
             var match = WhiteListMatcher.IsMatch(flip);
             if (match.Item1)
                 return (true, "whitelist " + match.Item2);
-                
+
             if (AllowedFinders != LowPricedAuction.FinderType.UNKOWN && flip.Finder != LowPricedAuction.FinderType.UNKOWN
                                     && !AllowedFinders.HasFlag(flip.Finder)
                                     && (int)flip.Finder != 3)
@@ -113,7 +114,7 @@ namespace Coflnet.Sky.Commands.Shared
 
             if (filter == null)
                 filter = new FlipFilter(this.Filters);
-            
+
             return (filter.IsMatch(flip), "general filter");
         }
 
@@ -188,11 +189,12 @@ namespace Coflnet.Sky.Commands.Shared
                 foreach (var item in BlackList)
                 {
                     AddElement(item);
-                    AddElement(new ListEntry()
-                    {
-                        filter = item.filter,
-                        ItemTag = "STARRED_" + item.ItemTag
-                    });
+                    if (item.ItemTag != null)
+                        AddElement(new ListEntry()
+                        {
+                            filter = item.filter,
+                            ItemTag = "STARRED_" + item.ItemTag
+                        });
                 }
                 ConcurrentDictionary<string, Expression<Func<FlipInstance, bool>>> isMatch = new();
                 foreach (var item in RemainingFilters)
@@ -204,6 +206,7 @@ namespace Coflnet.Sky.Commands.Shared
                 {
                     try
                     {
+                        Console.WriteLine($"\nexpression {item.Key}" + item.Value.ToReadableString());
                         Matchers.Add(item.Key, item.Value.Compile());
 
                     }

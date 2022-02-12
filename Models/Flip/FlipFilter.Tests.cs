@@ -91,7 +91,6 @@ namespace Coflnet.Sky.Commands.Shared
         }
 
 
-
         [Test]
         public void MinProfitFilterMatch()
         {
@@ -105,6 +104,54 @@ namespace Coflnet.Sky.Commands.Shared
             var matches = settings.MatchesSettings(sampleFlip);
             System.Console.WriteLine(sampleFlip.Profit);
             Assert.IsTrue(matches.Item1, matches.Item2);
+        }
+
+
+        [Test]
+        public void FlipFilterFinderCustomMinProfitNoBinMatch()
+        {
+            var settings = new FlipSettings()
+            {
+                MinProfit = 10000,
+                WhiteList = new List<ListEntry>() { new ListEntry() { filter = new Dictionary<string, string>() {
+                    { "MinProfit", "5" },{"FlipFinder", "SNIPER_MEDIAN"},{"Bin","false"} } } }
+            };
+            sampleFlip.LastKnownCost = 10;
+            sampleFlip.MedianPrice = 100;
+            sampleFlip.Finder = LowPricedAuction.FinderType.SNIPER_MEDIAN;
+            Matches(settings, sampleFlip);
+            sampleFlip.Finder = LowPricedAuction.FinderType.FLIPPER;
+            NoMatch(settings, sampleFlip);
+        }
+        [Test]
+        public void FlipFilterFinderCustomMinProfitMatch()
+        {
+            var settings = new FlipSettings()
+            {
+                MinProfit = 10000,
+                WhiteList = new List<ListEntry>() { new ListEntry() { filter = new Dictionary<string, string>() {
+                    { "MinProfit", "5" } } } }
+            };
+            sampleFlip.LastKnownCost = 10;
+            sampleFlip.MedianPrice = 100;
+            sampleFlip.Finder = LowPricedAuction.FinderType.SNIPER_MEDIAN;
+            Matches(settings, sampleFlip);
+        }
+
+        private static void Matches(FlipSettings targetSettings, FlipInstance flip)
+        {
+            var matches = targetSettings.MatchesSettings(flip);
+            Assert.IsTrue(matches.Item1, matches.Item2);
+        }
+        private static void NoMatch(FlipSettings targetSettings, FlipInstance flip)
+        {
+            var matches = targetSettings.MatchesSettings(flip);
+            Assert.IsFalse(matches.Item1, matches.Item2);
+        }
+
+        private static ListEntry CreateFilter(string key, string value)
+        {
+            return new ListEntry() { filter = new Dictionary<string, string>() { { key, value } } };
         }
 
         private static FlipInstance CreatOfaAuction(string tag)

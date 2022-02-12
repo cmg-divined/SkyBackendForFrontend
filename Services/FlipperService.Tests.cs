@@ -31,6 +31,7 @@ namespace Coflnet.Sky.Commands.Tests
                     TargetPrice = 5
                 });
             }
+            await Task.Delay(10); // wait for the async sending to finish
             Assert.Less(watch.ElapsedMilliseconds, 40);
             Assert.AreEqual(5, con.LastFlip.MedianPrice);
             Assert.AreEqual(2, con.LastFlip.Volume);
@@ -45,7 +46,11 @@ namespace Coflnet.Sky.Commands.Tests
 
             public int UserId => 1;
 
-            public SettingsChange LatestSettings => new SettingsChange();
+            public SettingsChange LatestSettings => new SettingsChange()
+            {
+                Tier = AccountTier.PREMIUM,
+                ExpiresAt = DateTime.Now + TimeSpan.FromHours(2)
+            };
 
             public FlipInstance LastFlip;
 

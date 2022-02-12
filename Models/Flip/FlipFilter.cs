@@ -5,6 +5,7 @@ using System.Linq;
 using System.Linq.Expressions;
 using Coflnet.Sky.Filter;
 using hypixel;
+using AgileObjects.ReadableExpressions;
 
 namespace Coflnet.Sky.Commands.Shared
 {
@@ -14,8 +15,9 @@ namespace Coflnet.Sky.Commands.Shared
 
         private Func<SaveAuction, bool> Filters;
         private Func<FlipInstance, bool> FlipFilters = null;
+        Expression<Func<FlipInstance, bool>> expression = null;
 
-        public static CamelCaseNameDictionary<DetailedFlipFilter> AdditionalFilters {private set; get; }= new();
+        public static CamelCaseNameDictionary<DetailedFlipFilter> AdditionalFilters { private set; get; } = new();
 
         static FlipFilter()
         {
@@ -27,23 +29,44 @@ namespace Coflnet.Sky.Commands.Shared
             AdditionalFilters.Add<MinProfitDetailedFlipFilter>();
         }
 
-        public FlipFilter(Dictionary<string, string> filters)
+        public FlipFilter(Dictionary<string, string> originalf)
         {
-            Expression<Func<FlipInstance, bool>> expression = null;
+            if (originalf == null || originalf.Count == 0)
+            {
+                expression = f => true;
+                return;
+            }
+            var filters = new Dictionary<string, string>(originalf);
+            //   Expression<Func<FlipInstance, bool>> expression = null;
             if (filters != null)
                 foreach (var item in AdditionalFilters.Keys)
                 {
-                    var match = filters.Where(f=>f.Key.ToLower() == item.ToLower()).FirstOrDefault();
+                    var match = filters.Where(f => f.Key.ToLower() == item.ToLower()).FirstOrDefault();
                     if (match.Key != default)
                     {
                         filters.Remove(match.Key);
-                        expression = AdditionalFilters[item].GetExpression(filters, match.Value);
-                        Console.WriteLine("set expression " + expression.ToString());
+                        var newPart = AdditionalFilters[item].GetExpression(filters, match.Value);
+                        if (expression == null)
+                            expression = newPart;
+                        else
+                            expression = newPart.And(expression);
                     }
                 }
+            var filterExpression = FilterEngine.GetMatchExpression(filters);
+            Expression<Func<FlipInstance, SaveAuction>> flipToAuction = f => f.Auction;
+            var invoke = Expression.Invoke(filterExpression, flipToAuction.Body);
+            Expression<Func<FlipInstance, bool>> auctionMatcher = Expression.Lambda<Func<FlipInstance, bool>>(invoke, flipToAuction.Parameters[0]);
+
+            if (auctionMatcher == null)
+                throw new Exception("matcher is null");
+            if (expression == null)
+                expression = auctionMatcher;
+            else
+                expression = auctionMatcher.And(expression);
             Filters = FilterEngine.GetMatcher(filters);
             if (expression != null)
                 FlipFilters = expression.Compile();
+
         }
 
         public bool IsMatch(FlipInstance flip)
@@ -53,13 +76,7 @@ namespace Coflnet.Sky.Commands.Shared
 
         public Expression<Func<FlipInstance, bool>> GetExpression()
         {
-            if (Filters == null && FlipFilters == null)
-                return f => true;
-            if (FlipFilters == null)
-                return f => Filters(f.Auction);
-            if (Filters == null)
-                return flip => FlipFilters(flip);
-            return flip => Filters(flip.Auction) && FlipFilters(flip);
+            return expression;
         }
     }
 
