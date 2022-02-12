@@ -33,7 +33,7 @@ namespace Coflnet.Sky.Commands.Shared
             if (filters != null)
                 foreach (var item in AdditionalFilters.Keys)
                 {
-                    var match = filters.Where(f=>f.Key.ToLower() == item).FirstOrDefault();
+                    var match = filters.Where(f=>f.Key.ToLower() == item.ToLower()).FirstOrDefault();
                     if (match.Key != default)
                     {
                         filters.Remove(match.Key);
@@ -59,7 +59,6 @@ namespace Coflnet.Sky.Commands.Shared
                 return f => Filters(f.Auction);
             if (Filters == null)
                 return flip => FlipFilters(flip);
-            Console.WriteLine("hmmm ");
             return flip => Filters(flip.Auction) && FlipFilters(flip);
         }
     }
