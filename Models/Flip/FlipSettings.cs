@@ -1,14 +1,11 @@
 
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Linq.Expressions;
 using System.Runtime.Serialization;
 using hypixel;
 using Coflnet.Sky.Filter;
-using Newtonsoft.Json;
 using System.Collections.Concurrent;
-using AgileObjects.ReadableExpressions;
 
 namespace Coflnet.Sky.Commands.Shared
 {
@@ -206,7 +203,6 @@ namespace Coflnet.Sky.Commands.Shared
                 {
                     try
                     {
-                        Console.WriteLine($"\nexpression {item.Key}" + item.Value.ToReadableString());
                         Matchers.Add(item.Key, item.Value.Compile());
 
                     }
