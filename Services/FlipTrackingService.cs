@@ -222,7 +222,7 @@ namespace Coflnet.Sky.Commands
                         HighestBid = bid.Max(b => b.HighestBidAmount),
                         HighestOwnBid = bid.Max(b => b.Amount),
                         End = bid.Max(b => b.End),
-                        Nbt = bid.Max(b => b.Nbt)
+                        Nbt = bid.OrderByDescending(b => b.Amount).First().Nbt
                     })
                     //.ThenInclude (b => b.Auction)
                     .ToListAsync();
