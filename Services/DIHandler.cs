@@ -25,6 +25,9 @@ namespace Coflnet.Sky.Commands.Shared
                 return new PlayerName.Client.Api.PlayerNameApi(config["PLAYERNAME_URL"] ?? "http://" + config["PLAYERNAME_HOST"]);
             });
             services.AddSingleton<SettingsService>();
+            services.AddSingleton<GemPriceService>();
+            services.AddHostedService<GemPriceService>(di=>di.GetRequiredService<GemPriceService>());
+            services.AddSingleton<FlipTrackingService>();
 
             _servics = services;
         }

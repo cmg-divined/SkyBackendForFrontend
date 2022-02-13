@@ -137,6 +137,20 @@ namespace Coflnet.Sky.Commands.Shared
             sampleFlip.Finder = LowPricedAuction.FinderType.SNIPER_MEDIAN;
             Matches(settings, sampleFlip);
         }
+        [Test]
+        public void FlipFilterFinderBlacklist()
+        {
+            var settings = new FlipSettings()
+            {
+                MinProfit = 100,
+                BlackList = new List<ListEntry>() { new ListEntry() { filter = new Dictionary<string, string>() {
+                    { "FlipFinder", "FLIPPER" } } } }
+            };
+            sampleFlip.LastKnownCost = 10;
+            sampleFlip.MedianPrice = 1000000;
+            sampleFlip.Finder = LowPricedAuction.FinderType.FLIPPER;
+            NoMatch(settings, sampleFlip);
+        }
 
         private static void Matches(FlipSettings targetSettings, FlipInstance flip)
         {

@@ -18,6 +18,10 @@ namespace Coflnet.Sky.Commands.Shared
         public string SoldAuction;
         public DateTime BuyTime;
         public DateTime SellTime;
+        /// <summary>
+        /// Profit of this flip (takes property changes into account)
+        /// </summary>
+        public long Profit;
     }
 
 }

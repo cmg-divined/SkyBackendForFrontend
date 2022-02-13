@@ -16,10 +16,11 @@ namespace Coflnet.Sky.Commands
         public TrackerApi flipTracking;
         private AnalyseApi flipAnalyse;
 
-        public static FlipTrackingService Instance = new FlipTrackingService();
+        //public static FlipTrackingService Instance = new FlipTrackingService();
 
         private static string ProduceTopic;
         private static ProducerConfig producerConfig;
+        private GemPriceService gemPriceService;
 
         IProducer<string, FlipTracker.Client.Model.FlipEvent> producer;
 
@@ -29,7 +30,7 @@ namespace Coflnet.Sky.Commands
             ProduceTopic = SimplerConfig.Config.Instance["TOPICS:FLIP_EVENT"];
         }
 
-        public FlipTrackingService()
+        public FlipTrackingService(GemPriceService gemPriceService)
         {
             producer = new ProducerBuilder<string, FlipTracker.Client.Model.FlipEvent>(new ProducerConfig
             {
@@ -39,6 +40,7 @@ namespace Coflnet.Sky.Commands
                     .SetValueSerializer(hypixel.SerializerFactory.GetSerializer<FlipTracker.Client.Model.FlipEvent>()).Build();
             flipTracking = new TrackerApi("http://" + SimplerConfig.Config.Instance["FLIPTRACKER_HOST"]);
             flipAnalyse = new AnalyseApi("http://" + SimplerConfig.Config.Instance["FLIPTRACKER_HOST"]);
+            this.gemPriceService = gemPriceService;
         }
 
 
@@ -151,6 +153,13 @@ namespace Coflnet.Sky.Commands
                     // make sure that this is the correct sell of this flip
                     if (buy.End > s.End)
                         return null;
+
+                    var profit = gemPriceService.GetGemWrthFromLookup(buy.NBTLookup)
+                                - gemPriceService.GetGemWrthFromLookup(s.NBTLookup)
+                                + s.HighestBidAmount
+                                - buy.HighestBidAmount;
+
+
                     return new FlipDetails()
                     {
                         BuyTime = buy.End,
@@ -163,7 +172,8 @@ namespace Coflnet.Sky.Commands
                         SoldAuction = s.Uuid,
                         SoldFor = s.HighestBidAmount,
                         Tier = buy.Tier.ToString(),
-                        uId = uid
+                        uId = uid,
+                        Profit = profit
                     };
                 }).Where(f => f != null).GroupBy(s => s.OriginAuction)
                 .Select(s => s.Where(s => s.SellTime > s.BuyTime).OrderBy(s => s.SellTime).FirstOrDefault())
@@ -203,7 +213,7 @@ namespace Coflnet.Sky.Commands
                         b.Auction.HighestBidAmount,
                         b.Auction.End,
                         b.Amount,
-                        itemUid = b.Auction.NBTLookup.Where(b => b.KeyId == uidKey).FirstOrDefault().Value
+                        Nbt = b.Auction.NBTLookup
                     }).GroupBy(b => b.Uuid)
                     .Select(bid => new
                     {
@@ -212,7 +222,7 @@ namespace Coflnet.Sky.Commands
                         HighestBid = bid.Max(b => b.HighestBidAmount),
                         HighestOwnBid = bid.Max(b => b.Amount),
                         End = bid.Max(b => b.End),
-                        itemUid = bid.Max(b => b.itemUid)
+                        Nbt = bid.Max(b => b.Nbt)
                     })
                     //.ThenInclude (b => b.Auction)
                     .ToListAsync();
@@ -220,16 +230,23 @@ namespace Coflnet.Sky.Commands
                 var flipStats = (await flipTracking.TrackerBatchFlipsPostAsync(playerBids.Select(b => AuctionService.Instance.GetId(b.Key)).ToList()))
                         ?.GroupBy(t => t.AuctionId)
                         ?.ToDictionary(t => t.Key, v => v.AsEnumerable());
-                var flips = playerBids.Where(a => SalesUidLookup.Contains(a.itemUid)).Select(b =>
+                var flips = playerBids.Where(a => SalesUidLookup.Contains(a.Nbt.Where(b => b.KeyId == uidKey).FirstOrDefault().Value)).Select(b =>
                 {
                     FlipTracker.Client.Model.Flip first = flipStats?.GetValueOrDefault(AuctionService.Instance.GetId(b.Key))?.OrderBy(b => b.Timestamp).FirstOrDefault();
-
-                    var sell = sells.Where(s => s.Key == b.itemUid)?
+                    var uId = b.Nbt.Where(b => b.KeyId == uidKey).FirstOrDefault().Value;
+                    var sell = sells.Where(s => s.Key == uId)?
                             .FirstOrDefault()
                             ?.OrderByDescending(b => b.End)
                             .FirstOrDefault();
                     var soldFor = sell
                             ?.HighestBidAmount;
+
+                    var profit = gemPriceService.GetGemWrthFromLookup(b.Nbt)
+                        - gemPriceService.GetGemWrthFromLookup(sell.NBTLookup)
+                        + sell.HighestBidAmount
+                        - b.HighestBid;
+
+
                     return new FlipDetails()
                     {
                         Finder = (first == null ? LowPricedAuction.FinderType.UNKOWN : (LowPricedAuction.FinderType)first.FinderType),
@@ -239,12 +256,13 @@ namespace Coflnet.Sky.Commands
                         SoldAuction = sell?.Uuid,
                         PricePaid = b.HighestOwnBid,
                         SoldFor = soldFor ?? 0,
-                        uId = b.itemUid,
+                        uId = uId,
                         ItemName = sell?.ItemName,
                         BuyTime = b.End,
-                        SellTime = sell.End
+                        SellTime = sell.End,
+                        Profit = profit
                     };
-                }).ToArray();
+                }).OrderByDescending(f=>f.Profit).ToArray();
 
                 return new FlipSumary()
                 {
