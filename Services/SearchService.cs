@@ -245,7 +245,7 @@ namespace hypixel
         private static async Task FindItems(string search, Task<IEnumerable<ItemDetails.ItemSearchResult>> itemTask, Channel<SearchResultItem> Results)
         {
             var items = await itemTask;
-            if (items.Count() == 0)
+            if (items.Count() == 0 && !IsHex(search))
                 items = await ItemDetails.Instance.FindClosest(search);
 
             foreach (var item in items.Select(item => new SearchResultItem(item)))
@@ -265,7 +265,7 @@ namespace hypixel
 
         private static async Task FindSimilarSearches(string search, Channel<SearchResultItem> Results, string[] searchWords)
         {
-            if (search.Length <= 2)
+            if (search.Length <= 2 || IsHex(search))
                 return;
             await Task.Delay(1);
             foreach (var item in await CoreServer.ExecuteCommandWithCache<string, List<SearchResultItem>>("fullSearch", search.Substring(0, search.Length - 2)))
@@ -279,6 +279,11 @@ namespace hypixel
                 item.HitCount -= 20; // no exact match
                 await Results.Writer.WriteAsync(item);
             }
+        }
+
+        private static bool IsHex(string search)
+        {
+            return search.Length >= 10 && long.TryParse(search.Substring(0, 10), System.Globalization.NumberStyles.HexNumber, null, out long res);
         }
 
         private static ConcurrentDictionary<string, Enchantment.EnchantmentType> Enchantments = new ConcurrentDictionary<string, Enchantment.EnchantmentType>();
