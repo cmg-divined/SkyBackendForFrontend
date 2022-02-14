@@ -212,7 +212,24 @@ namespace hypixel
         {
             if (searchWords.Count() > 1)
                 return;
-            if (search.Length == 32)
+            if (long.TryParse(search, out long uid))
+            {
+                Console.WriteLine("detected uid " + uid);
+                using (var context = new HypixelContext())
+                {
+                    var auction = await context.Auctions.Where(a => a.UId == uid).Include(a => a.NBTLookup).FirstOrDefaultAsync();
+                    Console.WriteLine(Newtonsoft.Json.JsonConvert.SerializeObject(auction));
+                    try 
+                    {
+                    AddAuctionAsResult(Results, auction);
+
+                    } catch(Exception e)
+                    {
+                        dev.Logger.Instance.Error(e, "adding auction");
+                    }
+                }
+            }
+            else if (search.Length == 32)
             {
                 var auction = await AuctionService.Instance.GetAuctionAsync(search, a => a.Include(a => a.NBTLookup));
                 AddAuctionAsResult(Results, auction);
@@ -236,10 +253,18 @@ namespace hypixel
 
         private static void AddAuctionAsResult(Channel<SearchResultItem> Results, SaveAuction auction)
         {
+            Results.Writer.TryWrite(new SearchResultItem
+            {
+                HitCount = 100_000, // account for "Enchantment" suffix
+                Name = auction.ItemName + " (Auction)",
+                Type = "auction",
+                IconUrl = "https://sky.coflnet.com/static/icon/" + auction.Tag,
+                Id = auction.Uuid
+            });
             var key = NBT.GetLookupKey("uid");
             var filter = new Dictionary<string, string>();
             filter["UId"] = auction.NBTLookup.Where(l => l.KeyId == key).FirstOrDefault().Value.ToString("X");
-            AddFilterResult(Results, filter, auction.ItemName, auction.Tag, 100_000);
+            AddFilterResult(Results, filter, auction.ItemName + "(Sells)", auction.Tag, 100_000);
         }
 
         private static async Task FindItems(string search, Task<IEnumerable<ItemDetails.ItemSearchResult>> itemTask, Channel<SearchResultItem> Results)
@@ -332,6 +357,7 @@ namespace hypixel
 
         private static void AddFilterResult(Channel<SearchResultItem> Results, Dictionary<string, string> filter, string resultText, string itemTag, int hitCount = 10)
         {
+            Console.WriteLine($"Adding {resultText} {hitCount}");
             Results.Writer.TryWrite(new SearchResultItem
             {
                 HitCount = hitCount, // account for "Enchantment" suffix
