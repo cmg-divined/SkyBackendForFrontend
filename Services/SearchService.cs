@@ -264,7 +264,7 @@ namespace hypixel
             var key = NBT.GetLookupKey("uid");
             var filter = new Dictionary<string, string>();
             filter["UId"] = auction.NBTLookup.Where(l => l.KeyId == key).FirstOrDefault().Value.ToString("X");
-            AddFilterResult(Results, filter, auction.ItemName + "(Sells)", auction.Tag, 100_000);
+            AddFilterResult(Results, filter, auction.ItemName + " (Sells)", auction.Tag, 100_000);
         }
 
         private static async Task FindItems(string search, Task<IEnumerable<ItemDetails.ItemSearchResult>> itemTask, Channel<SearchResultItem> Results)
