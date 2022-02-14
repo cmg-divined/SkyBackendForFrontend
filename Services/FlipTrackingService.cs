@@ -212,6 +212,7 @@ namespace Coflnet.Sky.Commands
                         b.Auction.Uuid,
                         b.Auction.HighestBidAmount,
                         b.Auction.End,
+                        b.Auction.Tag,
                         b.Amount,
                         Nbt = b.Auction.NBTLookup
                     }).GroupBy(b => b.Uuid)
@@ -222,6 +223,7 @@ namespace Coflnet.Sky.Commands
                         HighestBid = bid.Max(b => b.HighestBidAmount),
                         HighestOwnBid = bid.Max(b => b.Amount),
                         End = bid.Max(b => b.End),
+                        Tag = bid.First().Tag,
                         Nbt = bid.OrderByDescending(b => b.Amount).First().Nbt
                     })
                     //.ThenInclude (b => b.Auction)
@@ -241,7 +243,7 @@ namespace Coflnet.Sky.Commands
                     var soldFor = sell
                             ?.HighestBidAmount;
 
-                    var profit = gemPriceService.GetGemWrthFromLookup(b.Nbt)
+                    var profit = b.Tag != sell.Tag ? 0 : gemPriceService.GetGemWrthFromLookup(b.Nbt)
                         - gemPriceService.GetGemWrthFromLookup(sell.NBTLookup)
                         + sell.HighestBidAmount
                         - b.HighestBid;
@@ -262,12 +264,12 @@ namespace Coflnet.Sky.Commands
                         SellTime = sell.End,
                         Profit = profit
                     };
-                }).OrderByDescending(f=>f.Profit).ToArray();
+                }).OrderByDescending(f => f.Profit).ToArray();
 
                 return new FlipSumary()
                 {
                     Flips = flips,
-                    TotalProfit = flips.Sum(r => r.SoldFor - r.PricePaid)
+                    TotalProfit = flips.Sum(r => r.Profit)
                 };
             }
         }
