@@ -70,6 +70,7 @@ namespace Coflnet.Sky.Commands.Shared
             {
                 var product = await context.BazaarPrices
                     .Where(p => p.ProductId == itemTag)
+                    .Where(p => p.BuySummery.Count() > 3)
                     .OrderByDescending(p => p.Id)
                     .Include(p => p.BuySummery)
                     .Include(p => p.QuickStatus)
