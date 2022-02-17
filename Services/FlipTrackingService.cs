@@ -136,7 +136,7 @@ namespace Coflnet.Sky.Commands
                     .ToListAsync();
                 // only include flips that were bought shortly after being reported
                 buyList = buyList
-                    .Where(a => flips.TryGetValue(a.UId, out Flip f) && f.Timestamp < a.End && f.Timestamp > a.End - TimeSpan.FromSeconds(50)).ToList();
+                    .Where(a => !flips.TryGetValue(a.UId, out Flip f) || f.Timestamp < a.End && f.Timestamp > a.End - TimeSpan.FromSeconds(50)).ToList();
 
                 var uidKey = NBT.Instance.GetKeyId("uid");
                 var buyLookup = buyList
