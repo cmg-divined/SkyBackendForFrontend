@@ -133,7 +133,7 @@ namespace Coflnet.Sky.Commands
                     throw new CoflnetException("retrieve_failed", "Could not retrieve data from the flip tracker");
                 var flips = receivedFlips.ToDictionary(f=>f.AuctionId);
                 var ids = flips.Keys;
-                var buyList = await context.Auctions.Where(a => ids.Contains(a.UId))
+                var buyList = await context.Auctions.Where(a => ids.Contains(a.UId) && a.HighestBidAmount > 0)
                     .Include(a => a.NBTLookup)
                     .ToListAsync();
                 // only include flips that were bought shortly after being reported
@@ -165,7 +165,7 @@ namespace Coflnet.Sky.Commands
                     // make sure that this is the correct sell of this flip
                     if (buy.End > s.End)
                         return null;
-                    if(s.HighestBidAmount == 0)
+                    if(buy.HighestBidAmount == 0)
                         return null;
 
                     var profit = gemPriceService.GetGemWrthFromLookup(buy.NBTLookup)
