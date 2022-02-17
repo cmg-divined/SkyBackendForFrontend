@@ -123,13 +123,20 @@ namespace Coflnet.Sky.Commands
             if (start < end - TimeSpan.FromDays(1))
                 throw new CoflnetException("span_to_large", "Querying for more than a day is not supported");
 
-            var idTask = flipAnalyse.AnalyseFinderFinderTypeIdsGetAsync(Enum.Parse<FinderType>(type.ToString(), true), start, end);
+            var idTask = flipAnalyse.AnalyseFinderFinderTypeGetAsync(Enum.Parse<FinderType>(type.ToString(), true), start, end);
             using (var context = new HypixelContext())
             {
-                var ids = await idTask;
+                var receivedFlips = await idTask;
+                if(receivedFlips == null)
+                    throw new CoflnetException("retrieve_failed", "Could not retrieve data from the flip tracker");
+                var flips = receivedFlips.ToDictionary(f=>f.AuctionId);
+                var ids = flips.Keys;
                 var buyList = await context.Auctions.Where(a => ids.Contains(a.UId))
                     .Include(a => a.NBTLookup)
                     .ToListAsync();
+                // only include flips that were bought shortly after being reported
+                buyList = buyList
+                    .Where(a => flips.TryGetValue(a.UId, out Flip f) && f.Timestamp < a.End && f.Timestamp > a.End - TimeSpan.FromSeconds(50)).ToList();
 
                 var uidKey = NBT.Instance.GetKeyId("uid");
                 var buyLookup = buyList
@@ -152,6 +159,8 @@ namespace Coflnet.Sky.Commands
                         return null;
                     // make sure that this is the correct sell of this flip
                     if (buy.End > s.End)
+                        return null;
+                    if(s.HighestBidAmount == 0)
                         return null;
 
                     var profit = gemPriceService.GetGemWrthFromLookup(buy.NBTLookup)
