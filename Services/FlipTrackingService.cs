@@ -8,6 +8,8 @@ using hypixel;
 using Microsoft.EntityFrameworkCore;
 using Coflnet.Sky.Commands.Shared;
 using Coflnet.Sky.FlipTracker.Client.Model;
+using OpenTracing.Util;
+using Newtonsoft.Json;
 
 namespace Coflnet.Sky.Commands
 {
@@ -135,9 +137,12 @@ namespace Coflnet.Sky.Commands
                     .Include(a => a.NBTLookup)
                     .ToListAsync();
                 // only include flips that were bought shortly after being reported
-                buyList = buyList
-                    .Where(a => !flips.TryGetValue(a.UId, out Flip f) || f.Timestamp < a.End && f.Timestamp > a.End - TimeSpan.FromSeconds(50)).ToList();
+                //buyList = buyList.Where(a => !flips.TryGetValue(a.UId, out Flip f) || f.Timestamp < a.End && f.Timestamp > a.End - TimeSpan.FromSeconds(50)).ToList();
 
+                GlobalTracer.Instance.ActiveSpan.Log(flips.Count.ToString());
+                GlobalTracer.Instance.ActiveSpan.Log(JsonConvert.SerializeObject(flips.Take(5)));
+                GlobalTracer.Instance.ActiveSpan.Log(buyList.Count.ToString());
+                GlobalTracer.Instance.ActiveSpan.Log(JsonConvert.SerializeObject(buyList.Take(5)));
                 var uidKey = NBT.Instance.GetKeyId("uid");
                 var buyLookup = buyList
                     .Where(a => a.NBTLookup.Where(l => l.KeyId == uidKey).Any())
