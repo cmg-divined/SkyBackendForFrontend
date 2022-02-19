@@ -131,7 +131,7 @@ namespace Coflnet.Sky.Commands
                 var receivedFlips = await idTask;
                 if(receivedFlips == null)
                     throw new CoflnetException("retrieve_failed", "Could not retrieve data from the flip tracker");
-                var flips = receivedFlips.ToDictionary(f=>f.AuctionId);
+                var flips = receivedFlips.GroupBy(r=>r.AuctionId).Select(g=>g.First()).ToDictionary(f=>f.AuctionId);
                 var ids = flips.Keys;
                 var buyList = await context.Auctions.Where(a => ids.Contains(a.UId) && a.HighestBidAmount > 0)
                     .Include(a => a.NBTLookup)
