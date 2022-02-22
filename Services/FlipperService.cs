@@ -465,7 +465,7 @@ namespace hypixel
             await ConsumeBatch<LowPricedAuction>(topics, flip =>
             {
                 if (flip.Auction.Start.ToUniversalTime() < DateTime.Now.ToUniversalTime() - TimeSpan.FromMinutes(4) 
-                    && !flip.Auction.Bin || flip.Auction.End < DateTime.UtcNow)
+                    && flip.Auction.Bin || flip.Auction.End < DateTime.UtcNow)
                     return;
 
                 var time = (DateTime.Now - flip.Auction.FindTime).TotalSeconds;
