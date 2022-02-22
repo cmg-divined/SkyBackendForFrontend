@@ -429,6 +429,7 @@ namespace hypixel
             string[] topics = new string[] { ConsumeTopic };
 
             Console.WriteLine("starting to listen for new auctions via topic " + ConsumeTopic);
+            
             await ConsumeBatch<FlipInstance>(topics, flip =>
             {
                 if (flip.MedianPrice - flip.LastKnownCost < 50_000)
@@ -463,7 +464,8 @@ namespace hypixel
 
             await ConsumeBatch<LowPricedAuction>(topics, flip =>
             {
-                if (flip.Auction.Start.ToUniversalTime() < DateTime.Now.ToUniversalTime() - TimeSpan.FromMinutes(4))
+                if (flip.Auction.Start.ToUniversalTime() < DateTime.Now.ToUniversalTime() - TimeSpan.FromMinutes(4) 
+                    && !flip.Auction.Bin || flip.Auction.End < DateTime.UtcNow)
                     return;
 
                 var time = (DateTime.Now - flip.Auction.FindTime).TotalSeconds;
