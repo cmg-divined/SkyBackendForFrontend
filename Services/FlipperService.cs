@@ -229,9 +229,10 @@ namespace hypixel
         {
             if (settings == null || settings.Visibility == null)
                 return;
+            var timeOut = new System.Threading.CancellationTokenSource(12000);
             if (settings.Visibility.Seller && flip.SellerName == null)
                 flip.SellerName = (await DiHandler.ServiceProvider.GetRequiredService<Coflnet.Sky.PlayerName.Client.Api.PlayerNameApi>()
-                    .PlayerNameNameUuidGetAsync(flip.Auction.AuctioneerId))?.Trim('"');
+                    .PlayerNameNameUuidGetAsync(flip.Auction.AuctioneerId, timeOut.Token))?.Trim('"');
 
             if (flip.LowestBin == 0 && (settings.Visibility.LowestBin || settings.Visibility.SecondLowestBin || settings.BasedOnLBin))
             {
