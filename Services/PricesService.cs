@@ -49,6 +49,17 @@ namespace Coflnet.Sky.Commands.Shared
             };
         }
 
+        public async Task<PriceSumary> GetSumaryCache(string itemTag)
+        {
+            var sumary = await CacheService.Instance.GetFromRedis<PriceSumary>("psum"+itemTag);
+            if(sumary == default)
+            {
+                sumary = await GetSumary(itemTag, new Dictionary<string, string>());
+                await CacheService.Instance.SaveInRedis("psum"+itemTag,sumary,TimeSpan.FromHours(2));
+            }
+            return sumary;
+        }
+
         private static int GetItemId(string itemTag, bool forceget = true)
         {
             return ItemDetails.Instance.GetItemIdForName(itemTag, forceget);
