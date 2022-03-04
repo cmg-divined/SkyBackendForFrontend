@@ -117,7 +117,7 @@ namespace Coflnet.Sky.Commands.Shared
             if (id == 0)
                 return new CurrentPrice() { Available = -1 };
             var item = await ItemDetails.Instance.GetDetailsWithCache(itemTag);
-            if (item.IsBazaar)
+            if (item?.IsBazaar ?? false)
             {
                 var product = await context.BazaarPrices
                     .Where(p => p.ProductId == itemTag)
@@ -140,7 +140,7 @@ namespace Coflnet.Sky.Commands.Shared
             {
                 var filter = new Dictionary<string, string>();
                 var lowestBins = await ItemPrices.GetLowestBin(itemTag, filter, count <= 2 ? 2 : count);
-                if (lowestBins.Count == 0)
+                if (lowestBins == null || lowestBins.Count == 0)
                 {
                     var sumary = await GetSumary(itemTag, filter);
                     return new CurrentPrice() { Buy = sumary.Med, Sell = sumary.Min };
