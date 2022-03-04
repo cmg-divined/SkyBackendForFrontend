@@ -224,7 +224,6 @@ namespace Coflnet.Sky.Commands
                     .Select(b => new
                     {
                         b.Auction.Uuid,
-                        b.Auction.HighestBidAmount,
                         b.Auction.End,
                         b.Auction.Tag,
                         b.Amount,
@@ -234,7 +233,6 @@ namespace Coflnet.Sky.Commands
                     {
                         bid.Key,
                         Amount = bid.Max(b => b.Amount),
-                        HighestBid = bid.Max(b => b.HighestBidAmount),
                         HighestOwnBid = bid.Max(b => b.Amount),
                         End = bid.Max(b => b.End),
                         Tag = bid.First().Tag,
@@ -260,7 +258,7 @@ namespace Coflnet.Sky.Commands
                     var profit = b.Tag != sell.Tag ? 0 : gemPriceService.GetGemWrthFromLookup(b.Nbt)
                         - gemPriceService.GetGemWrthFromLookup(sell.NBTLookup)
                         + sell.HighestBidAmount
-                        - b.HighestBid;
+                        - b.HighestOwnBid;
 
 
                     return new FlipDetails()
