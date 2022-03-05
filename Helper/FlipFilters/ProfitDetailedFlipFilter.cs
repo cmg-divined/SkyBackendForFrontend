@@ -5,7 +5,7 @@ using hypixel;
 
 namespace Coflnet.Sky.Commands.Shared
 {
-    public class ProfitDetailedFlipFilter : NumberDetailedFlipFinder
+    public class ProfitDetailedFlipFilter : NumberDetailedFlipFilter
     {
         protected override Expression<Func<FlipInstance, long>> GetSelector()
         {

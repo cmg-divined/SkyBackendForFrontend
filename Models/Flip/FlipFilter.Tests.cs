@@ -8,19 +8,25 @@ namespace Coflnet.Sky.Commands.Shared
 {
     public class FlipFilterTests
     {
-        FlipInstance sampleFlip = new FlipInstance()
+        FlipInstance sampleFlip;
+
+        [SetUp]
+        public void Setup()
         {
-            MedianPrice = 10,
-            Volume = 10,
-            Auction = new SaveAuction()
+            sampleFlip = new FlipInstance()
             {
-                Bin = false,
-                Enchantments = new List<Enchantment>(){
+                MedianPrice = 10,
+                Volume = 10,
+                Auction = new SaveAuction()
+                {
+                    Bin = false,
+                    Enchantments = new List<Enchantment>(){
                     new Enchantment(Enchantment.EnchantmentType.critical,4)
                 },
-                FlatenedNBT = new Dictionary<string, string>() { { "candy", "3" } }
-            }
-        };
+                    FlatenedNBT = new Dictionary<string, string>() { { "candy", "3" } }
+                }
+            };
+        }
         [Test]
         public void IsMatch()
         {
@@ -150,6 +156,21 @@ namespace Coflnet.Sky.Commands.Shared
             sampleFlip.MedianPrice = 1000000;
             sampleFlip.Finder = LowPricedAuction.FinderType.FLIPPER;
             NoMatch(settings, sampleFlip);
+        }
+        [Test]
+        public void MinProfitPercentage()
+        {
+            var settings = new FlipSettings()
+            {
+                MinProfit = 10000,
+                WhiteList = new List<ListEntry>() { new ListEntry() { filter = new Dictionary<string, string>() {
+                    { "ProfitPercentage", ">5" } }
+                } }
+            };
+            sampleFlip.LastKnownCost = 10;
+            sampleFlip.MedianPrice = 10000;
+            System.Console.WriteLine(sampleFlip.ProfitPercentage);
+            Matches(settings, sampleFlip);
         }
 
         private static void Matches(FlipSettings targetSettings, FlipInstance flip)

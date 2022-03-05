@@ -8,7 +8,7 @@ using hypixel;
 
 namespace Coflnet.Sky.Commands.Shared
 {
-    public class NumberDetailedFlipFinder : DetailedFlipFilter
+    public class NumberDetailedFlipFilter : DetailedFlipFilter
     {
         public virtual object[] Options => new object[]{1,100_000_000};
         public FilterType FilterType => FilterType.NUMERICAL | FilterType.LOWER | FilterType.RANGE;
@@ -27,7 +27,7 @@ namespace Coflnet.Sky.Commands.Shared
                 return Sky.Filter.NumberFilter.ExpressionMinMax(selector, 1, value - 1);
             if (content.StartsWith(">"))
             {
-                return Sky.Filter.NumberFilter.ExpressionMinMax(selector, value, 1000);
+                return Sky.Filter.NumberFilter.ExpressionMinMax(selector, value, int.MaxValue);
             }
 
             return Sky.Filter.NumberFilter.ExpressionMinMax(selector, value, value);

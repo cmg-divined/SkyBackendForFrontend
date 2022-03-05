@@ -6,7 +6,7 @@ using hypixel;
 namespace Coflnet.Sky.Commands.Shared
 {
 
-    public class VolumeDetailedFlipFilter : NumberDetailedFlipFinder
+    public class VolumeDetailedFlipFilter : NumberDetailedFlipFilter
     {
         public override object[] Options => new object[]{1,1000};
 
