@@ -42,7 +42,7 @@ namespace hypixel
         public long Profit => MedianPrice - LastKnownCost;
 
         [IgnoreDataMember]
-        public long ProfitPercentage => (Profit * 100 / LastKnownCost);
+        public long ProfitPercentage => (Profit * 100 / (LastKnownCost == 0 ? int.MaxValue : LastKnownCost));
 
         [IgnoreDataMember]
         public Dictionary<string, string> Context { get; set; }
