@@ -44,6 +44,11 @@ namespace hypixel
                         try
                         {
                             var flip = await LowPriced.Reader.ReadAsync(stoppingToken);
+                            if (LowPriced.Reader.Count > 90)
+                            {
+                                Connection.Log("amany flips waiting " + LowPriced.Reader.Count, Microsoft.Extensions.Logging.LogLevel.Error);
+                                flip.AdditionalProps?.TryAdd("long wait", LowPriced.Reader.Count.ToString());
+                            }
                             //await limiter.WaitAsync();
                             await Connection.SendFlip(flip);
                         }
