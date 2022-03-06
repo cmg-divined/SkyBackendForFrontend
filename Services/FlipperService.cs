@@ -580,5 +580,17 @@ namespace hypixel
             var result = JsonConvert.DeserializeObject<List<SaveAuction>>(response.Content);
             return result;
         }
+
+        public List<FlipConWrapper> Connections
+        {
+            get 
+            {
+                var list = new List<FlipConWrapper>();
+                list.AddRange(SuperSubs.Values);
+                list.AddRange(Subs.Values);
+                list.AddRange(SlowSubs.Values);
+                return list;
+            }
+        }
     }
 }

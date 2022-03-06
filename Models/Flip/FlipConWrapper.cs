@@ -17,6 +17,8 @@ namespace hypixel
 
         private CancellationTokenSource cancellationTokenSource = null;
 
+        public int ChannelCount => LowPriced.Reader.Count;
+
         public FlipConWrapper(IFlipConnection connection)
         {
             Connection = connection;

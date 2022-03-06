@@ -80,9 +80,7 @@ namespace Coflnet.Sky.Commands.Shared
             if (match.Item1)
                 return (true, "whitelist " + match.Item2);
 
-            if (AllowedFinders != LowPricedAuction.FinderType.UNKOWN && flip.Finder != LowPricedAuction.FinderType.UNKOWN
-                                    && !AllowedFinders.HasFlag(flip.Finder)
-                                    && (int)flip.Finder != 3)
+            if (IsFinderBlocked(flip.Finder))
                 return (false, "finder " + flip.Finder.ToString());
 
             if (flip.Volume < MinVolume)
@@ -113,6 +111,13 @@ namespace Coflnet.Sky.Commands.Shared
                 filter = new FlipFilter(this.Filters);
 
             return (filter.IsMatch(flip), "general filter");
+        }
+
+        public bool IsFinderBlocked(LowPricedAuction.FinderType finder)
+        {
+            return AllowedFinders != LowPricedAuction.FinderType.UNKOWN && finder != LowPricedAuction.FinderType.UNKOWN
+                                                && !AllowedFinders.HasFlag(finder)
+                                                && (int)finder != 3;
         }
 
         /// <summary>
