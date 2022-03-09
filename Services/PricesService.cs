@@ -49,13 +49,17 @@ namespace Coflnet.Sky.Commands.Shared
             };
         }
 
-        public async Task<PriceSumary> GetSumaryCache(string itemTag)
+        public async Task<PriceSumary> GetSumaryCache(string itemTag, Dictionary<string, string> filters = null)
         {
-            var sumary = await CacheService.Instance.GetFromRedis<PriceSumary>("psum" + itemTag);
+            var filterString = Newtonsoft.Json.JsonConvert.SerializeObject(filters);
+            var key = "psum" + itemTag + filterString;
+            var sumary = await CacheService.Instance.GetFromRedis<PriceSumary>(key);
             if (sumary == default)
             {
-                sumary = await GetSumary(itemTag, new Dictionary<string, string>());
-                await CacheService.Instance.SaveInRedis("psum" + itemTag, sumary, TimeSpan.FromHours(2));
+                if(filters == null)
+                    filters = new Dictionary<string, string>();
+                sumary = await GetSumary(itemTag, filters);
+                await CacheService.Instance.SaveInRedis(key, sumary, TimeSpan.FromHours(2));
             }
             return sumary;
         }

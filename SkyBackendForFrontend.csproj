@@ -44,6 +44,7 @@
     <PackageReference Include="Coflnet.Sky.FlipTracker.Client" Version="0.1.3" />
     <PackageReference Include="Fastenshtein" Version="1.0.0.7" />
     <PackageReference Include="Coflnet.Sky.Settings.Client" Version="0.1.0" />
+    <PackageReference Include="Coflnet.Sky.Crafts.Client" Version="0.0.1" />
 
   </ItemGroup>
 
