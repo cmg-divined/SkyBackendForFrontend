@@ -1,5 +1,8 @@
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Configuration;
+using Coflnet.Payments.Client.Api;
+using System;
+using Coflnet.Payments.Client.Client;
 
 namespace Coflnet.Sky.Commands.Shared
 {
@@ -26,10 +29,22 @@ namespace Coflnet.Sky.Commands.Shared
             });
             services.AddSingleton<SettingsService>();
             services.AddSingleton<GemPriceService>();
-            services.AddHostedService<GemPriceService>(di=>di.GetRequiredService<GemPriceService>());
+            services.AddHostedService<GemPriceService>(di => di.GetRequiredService<GemPriceService>());
             services.AddSingleton<FlipTrackingService>();
+            services.AddPaymentSingleton<ProductsApi>(url => new ProductsApi(url));
+            services.AddPaymentSingleton<UserApi>(url => new UserApi(url));
+            services.AddPaymentSingleton<TopUpApi>(url => new TopUpApi(url));
 
             _servics = services;
+        }
+
+        public static void AddPaymentSingleton<T>(this IServiceCollection services, Func<string, T> creator) where T : class, IApiAccessor
+        {
+            services.AddSingleton<T>(context =>
+            {
+                var config = context.GetRequiredService<IConfiguration>();
+                return creator("http://" + SimplerConfig.Config.Instance["PAYMENTS_HOST"]);
+            });
         }
     }
 }
