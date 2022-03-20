@@ -1,7 +1,10 @@
 
 using System.Collections.Generic;
+using System.Diagnostics;
+using System.IO;
 using System.Linq;
 using hypixel;
+using Newtonsoft.Json;
 using NUnit.Framework;
 
 namespace Coflnet.Sky.Commands.Shared
@@ -27,6 +30,22 @@ namespace Coflnet.Sky.Commands.Shared
                 }
             };
         }
+        [Test]
+        public void FlipFilterLoad()
+        {
+            var settings = JsonConvert.DeserializeObject<FlipSettings>(File.ReadAllText("mock/bigsettings.json"));
+            sampleFlip.LastKnownCost = 10;
+            sampleFlip.MedianPrice = 1000000;
+            sampleFlip.Tag = "DIAMOND_NECRON_HEAD";
+            NoMatch(settings, sampleFlip);
+            var watch = Stopwatch.StartNew();
+            for (int i = 0; i < 5000; i++)
+            {
+                NoMatch(settings, sampleFlip);
+            }
+            Assert.LessOrEqual(watch.ElapsedMilliseconds, 20);
+        }
+
         [Test]
         public void IsMatch()
         {
@@ -199,10 +218,9 @@ namespace Coflnet.Sky.Commands.Shared
                 {
                     Tag = tag,
                     Enchantments = new List<Enchantment>(){
-                    new Enchantment(Enchantment.EnchantmentType.ultimate_one_for_all,1)
+                        new Enchantment(Enchantment.EnchantmentType.ultimate_one_for_all,1)
+                    }
                 }
-                }
-
             };
         }
 

@@ -1,0 +1,1508 @@
+	
+{
+    "filters": {
+        "Bin": "true"
+    },
+    "blacklist": [
+        {
+            "tag": "MUSEUM_TRAVEL_SCROLL",
+            "filter": { }
+        },
+        {
+            "tag": "ASPECT_OF_THE_END",
+            "filter": { }
+        },
+        {
+            "tag": "DIAMOND_CHEST",
+            "filter": { }
+        },
+        {
+            "tag": "EMERALD_CHEST",
+            "filter": { }
+        },
+        {
+            "tag": "LAUNCH_PAD",
+            "filter": { }
+        },
+        {
+            "tag": "TRAINING_DUMMY",
+            "filter": { }
+        },
+        {
+            "tag": "NECROMANCER_LORD_HELMET",
+            "filter": { }
+        },
+        {
+            "tag": "ALPHA_PICK",
+            "filter": { }
+        },
+        {
+            "tag": "ENCHANTED_BOOK",
+            "filter": { }
+        },
+        {
+            "tag": "HYPER_FURNACE",
+            "filter": { }
+        },
+        {
+            "tag": "JERRY_STAFF",
+            "filter": { }
+        },
+        {
+            "tag": "VENOMS_TOUCH",
+            "filter": { }
+        },
+        {
+            "tag": "MAGMA_BOW",
+            "filter": { }
+        },
+        {
+            "tag": "WEREWOLF_BOOTS",
+            "filter": { }
+        },
+        {
+            "tag": "WEREWOLF_HELMET",
+            "filter": { }
+        },
+        {
+            "tag": "ASPECT_OF_THE_DRAGON",
+            "filter": { }
+        },
+        {
+            "tag": "HELMET_OF_THE_PACK",
+            "filter": { }
+        },
+        {
+            "tag": "CHESTPLATE_OF_THE_PACK",
+            "filter": { }
+        },
+        {
+            "tag": "LEGGINGS_OF_THE_PACK",
+            "filter": { }
+        },
+        {
+            "tag": "BOOTS_OF_THE_PACK",
+            "filter": { }
+        },
+        {
+            "tag": "SHRIMP_THE_FISH",
+            "filter": { }
+        },
+        {
+            "tag": "MITHRIL_DRILL_1",
+            "filter": { }
+        },
+        {
+            "tag": "ZOMBIE_KNIGHT_CHESTPLATE",
+            "filter": { }
+        },
+        {
+            "tag": "MENDER_FEDORA",
+            "filter": { }
+        },
+        {
+            "tag": "BOOK_OF_STATS",
+            "filter": { }
+        },
+        {
+            "tag": "SCARECROW",
+            "filter": { }
+        },
+        {
+            "tag": "SCARECROW_PERSONALITY",
+            "filter": { }
+        },
+        {
+            "tag": "ARMOR_STAND",
+            "filter": { }
+        },
+        {
+            "tag": "ARMOR_SHOWCASE",
+            "filter": { }
+        },
+        {
+            "tag": "SHINY_ORB",
+            "filter": { }
+        },
+        {
+            "tag": "BIOFUEL",
+            "filter": { }
+        },
+        {
+            "tag": "MUSHROOM_SOUP",
+            "filter": { }
+        },
+        {
+            "tag": "SUPER_MAGIC_MUSHROOM_SOUP",
+            "filter": { }
+        },
+        {
+            "tag": "SILVER_FANG",
+            "filter": { }
+        },
+        {
+            "tag": "BLUE_ICE_HUNK",
+            "filter": { }
+        },
+        {
+            "tag": "ICE_HUNK",
+            "filter": { }
+        },
+        {
+            "tag": "POTATO",
+            "filter": { }
+        },
+        {
+            "tag": "MIDAS_SWORD",
+            "filter": { }
+        },
+        {
+            "tag": "VOIDEDGE_KATANA",
+            "filter": { }
+        },
+        {
+            "tag": "BUNNY_PERSONALITY",
+            "filter": { }
+        },
+        {
+            "tag": "FLAMEBREAKER_BOOTS",
+            "filter": { }
+        },
+        {
+            "tag": "FLAME_BREAKER_BOOTS",
+            "filter": { }
+        },
+        {
+            "tag": "FLAME_BREAKER_HELMET",
+            "filter": { }
+        },
+        {
+            "tag": "FLAME_BREAKER_LEGGINGS",
+            "filter": { }
+        },
+        {
+            "tag": "FLAME_BREAKER_CHESTPLATE",
+            "filter": { }
+        },
+        {
+            "tag": "HOT_STUFF",
+            "filter": { }
+        },
+        {
+            "tag": "GOLD_CLAWS",
+            "filter": { }
+        },
+        {
+            "tag": "PLASMA",
+            "filter": { }
+        },
+        {
+            "tag": "DEATH_BOW",
+            "filter": { }
+        },
+        {
+            "tag": "PENGUIN_PERSONALITY",
+            "filter": { }
+        },
+        {
+            "tag": "LAPIS_CHEST",
+            "filter": { }
+        },
+        {
+            "tag": "GOLD_CHEST",
+            "filter": { }
+        },
+        {
+            "tag": "EXPERIMENTATION_TABLE",
+            "filter": { }
+        },
+        {
+            "tag": null,
+            "filter": {
+                "Reforge": "Reinforced"
+            }
+        },
+        {
+            "tag": "CAKE_SOUL",
+            "filter": { }
+        },
+        {
+            "tag": "TELEPORT_PAD",
+            "filter": { }
+        },
+        {
+            "tag": "SIMPLE_CARROT_CANDY",
+            "filter": { }
+        },
+        {
+            "tag": "GREAT_CARROT_CANDY",
+            "filter": { }
+        },
+        {
+            "tag": "NETHER_WART_ISLAND",
+            "filter": { }
+        },
+        {
+            "tag": "ISLAND_NPC",
+            "filter": { }
+        },
+        {
+            "tag": "MINING_1_TRAVEL_SCROLL",
+            "filter": { }
+        },
+        {
+            "tag": "FARMING_1_TRAVEL_SCROLL",
+            "filter": { }
+        },
+        {
+            "tag": "SINFUL_DICE",
+            "filter": { }
+        },
+        {
+            "tag": "RUBY_POWER_SCROLL",
+            "filter": { }
+        },
+        {
+            "tag": "ENCHANTING_PLUS",
+            "filter": { }
+        },
+        {
+            "tag": "ENCHANTING_PLUS",
+            "filter": { }
+        },
+        {
+            "tag": "POTION_enchanting_xp_boost",
+            "filter": { }
+        },
+        {
+            "tag": "PET_GRIFFIN",
+            "filter": { }
+        },
+        {
+            "tag": "GRIFFIN_UPGRADE_STONE_LEGENDARY",
+            "filter": { }
+        },
+        {
+            "tag": "ARACHNE_CRYSTAL",
+            "filter": { }
+        },
+        {
+            "tag": "SHADOW_GOGGLES",
+            "filter": { }
+        },
+        {
+            "tag": "SWORD_OF_REVELATIONS",
+            "filter": { }
+        },
+        {
+            "tag": "BLAZE_LEGGINGS",
+            "filter": { }
+        },
+        {
+            "tag": "BLAZE_HELMET",
+            "filter": { }
+        },
+        {
+            "tag": "BLAZE_BOOTS",
+            "filter": { }
+        },
+        {
+            "tag": "PICKONIMBUS",
+            "filter": { }
+        },
+        {
+            "tag": "GEMSTONE_DRILL_1",
+            "filter": { }
+        },
+        {
+            "tag": "MITHRIL_DRILL_1",
+            "filter": { }
+        },
+        {
+            "tag": null,
+            "filter": {
+                "EnchantLvl": "1",
+                "Enchantment": "pristine"
+            }
+        },
+        {
+            "tag": "BAT_FIREWORK",
+            "filter": { }
+        },
+        {
+            "tag": "STICK",
+            "filter": { }
+        },
+        {
+            "tag": "DUNGEON_DECOY",
+            "filter": { }
+        },
+        {
+            "tag": null,
+            "filter": {
+                "EnchantLvl": "6",
+                "Enchantment": "lure"
+            }
+        },
+        {
+            "tag": null,
+            "filter": {
+                "EnchantLvl": "4",
+                "Enchantment": "ultimate_wise"
+            }
+        },
+        {
+            "tag": null,
+            "filter": {
+                "Rarity": "COMMON"
+            }
+        },
+        {
+            "tag": null,
+            "filter": {
+                "Rarity": "UNCOMMON"
+            }
+        },
+        {
+            "tag": "WEAK_WOLF_CATALYST",
+            "filter": { }
+        },
+        {
+            "tag": null,
+            "filter": { }
+        },
+        {
+            "tag": "LARGE_ENCHANTED_CHEST",
+            "filter": { }
+        },
+        {
+            "tag": "SMALL_ENCHANTED_CHEST",
+            "filter": { }
+        },
+        {
+            "tag": "MEDIUM_ENCHANTED_CHEST",
+            "filter": { }
+        },
+        {
+            "tag": "XLARGE_ENCHANTED_CHEST",
+            "filter": { }
+        },
+        {
+            "tag": "VOLTA",
+            "filter": { }
+        },
+        {
+            "tag": "ARACHNE_CRYSTAL",
+            "filter": { }
+        },
+        {
+            "tag": "ARACHNE_FRAGMENT",
+            "filter": { }
+        },
+        {
+            "tag": "ARACHNE_KEEPER_FRAGMENT",
+            "filter": { }
+        },
+        {
+            "tag": "DIVER_LEGGINGS",
+            "filter": { }
+        },
+        {
+            "tag": "PERFECT_CHESTPLATE_12",
+            "filter": { }
+        },
+        {
+            "tag": "BONZO_FRAGMENT",
+            "filter": { }
+        },
+        {
+            "tag": "DIVER_HELMET",
+            "filter": { }
+        },
+        {
+            "tag": "DIVER_BOOTS",
+            "filter": { }
+        },
+        {
+            "tag": "DIVER_CHESTPLATE",
+            "filter": { }
+        },
+        {
+            "tag": "ENDER_PLUS",
+            "filter": { }
+        },
+        {
+            "tag": "LIVID_FRAGMENT",
+            "filter": { }
+        },
+        {
+            "tag": "FTX_3070",
+            "filter": { }
+        },
+        {
+            "tag": "SUPERLITE_MOTOR",
+            "filter": { }
+        },
+        {
+            "tag": "CONTROL_SWITCH",
+            "filter": { }
+        },
+        {
+            "tag": "SYNTHETIC_HEART",
+            "filter": { }
+        },
+        {
+            "tag": "VOIDEDGE_KATANA",
+            "filter": { }
+        },
+        {
+            "tag": "GEMSTONE_DRILL_2",
+            "filter": { }
+        },
+        {
+            "tag": "PET_SILVERFISH",
+            "filter": { }
+        },
+        {
+            "tag": "EMBER_FRAGMENT",
+            "filter": { }
+        },
+        {
+            "tag": "GOD_POTION",
+            "filter": { }
+        },
+        {
+            "tag": "GOD_POTION_2",
+            "filter": { }
+        },
+        {
+            "tag": "GIANT_FRAGMENT_BIGFOOT",
+            "filter": { }
+        },
+        {
+            "tag": "GIANT_FRAGMENT_BOULDER",
+            "filter": { }
+        },
+        {
+            "tag": "GIANT_FRAGMENT_LASER",
+            "filter": { }
+        },
+        {
+            "tag": "PET_SKIN_PHOENIX_ICE",
+            "filter": { }
+        },
+        {
+            "tag": null,
+            "filter": {
+                "EnchantLvl": "1",
+                "Enchantment": "ultimate_no_pain_no_gain"
+            }
+        },
+        {
+            "tag": "ELECTRON_TRANSMITTER",
+            "filter": { }
+        },
+        {
+            "tag": "GOLD_BONZO_HEAD",
+            "filter": { }
+        },
+        {
+            "tag": "UNSTABLE_DRAGON_CHESTPLATE",
+            "filter": { }
+        },
+        {
+            "tag": "UNSTABLE_DRAGON_HELMET",
+            "filter": { }
+        },
+        {
+            "tag": "UNSTABLE_DRAGON_BOOTS",
+            "filter": { }
+        },
+        {
+            "tag": "UNSTABLE_DRAGON_LEGGINGS",
+            "filter": { }
+        },
+        {
+            "tag": "ADAPTIVE_HELMET",
+            "filter": { }
+        },
+        {
+            "tag": "ADAPTIVE_LEGGINGS",
+            "filter": { }
+        },
+        {
+            "tag": "ADAPTIVE_BOOTS",
+            "filter": { }
+        },
+        {
+            "tag": "SPEED_ARTIFACT",
+            "filter": { }
+        },
+        {
+            "tag": "DANGER_3_TRAVEL_SCROLL",
+            "filter": { }
+        },
+        {
+            "tag": "FLOWER_POT_ITEM",
+            "filter": { }
+        },
+        {
+            "tag": "FANCY_FLOWER_POT",
+            "filter": { }
+        },
+        {
+            "tag": "SUPERBOOM_TNT",
+            "filter": { }
+        },
+        {
+            "tag": "HORSEMAN_CANDLE",
+            "filter": { }
+        },
+        {
+            "tag": "SCYTHE_BLADE",
+            "filter": { }
+        },
+        {
+            "tag": "JUNGLE_KEY",
+            "filter": { }
+        },
+        {
+            "tag": "LESSER_SOULFLOW_ENGINE",
+            "filter": { }
+        },
+        {
+            "tag": "VENOMS_TOUCH",
+            "filter": { }
+        },
+        {
+            "tag": "STARRED_VENOMS_TOUCH",
+            "filter": { }
+        },
+        {
+            "tag": "TARANTULA_TALISMAN",
+            "filter": { }
+        },
+        {
+            "tag": "PET_SPIDER",
+            "filter": { }
+        },
+        {
+            "tag": "DARK_QUEENS_SOUL_DROP",
+            "filter": { }
+        },
+        {
+            "tag": "PET_JELLYFISH",
+            "filter": { }
+        },
+        {
+            "tag": "GLACITE_JEWEL",
+            "filter": { }
+        },
+        {
+            "tag": "PET_SPIRIT",
+            "filter": { }
+        },
+        {
+            "tag": "NECROMANCER_SWORD",
+            "filter": { }
+        },
+        {
+            "tag": "THORNS_BOOTS",
+            "filter": { }
+        },
+        {
+            "tag": "REVIVED_HEART",
+            "filter": { }
+        },
+        {
+            "tag": "PET_SHEEP",
+            "filter": { }
+        },
+        {
+            "tag": "SCARF_FRAGMENT",
+            "filter": { }
+        },
+        {
+            "tag": "BONZO_FRAGMENT",
+            "filter": { }
+        },
+        {
+            "tag": "PET_PIGMAN",
+            "filter": { }
+        },
+        {
+            "tag": "LEGEND_ROD",
+            "filter": { }
+        },
+        {
+            "tag": "ROCK_GEMSTONE",
+            "filter": { }
+        },
+        {
+            "tag": "XXLARGE_ENCHANTED_CHEST",
+            "filter": { }
+        },
+        {
+            "tag": "ELEGANT_TUXEDO_LEGGINGS",
+            "filter": { }
+        },
+        {
+            "tag": "MINING_1_TRAVEL_SCROLL",
+            "filter": { }
+        },
+        {
+            "tag": "CANDY_ARTIFACT",
+            "filter": { }
+        },
+        {
+            "tag": "GRIFFIN_UPGRADE_STONE_EPIC",
+            "filter": { }
+        },
+        {
+            "tag": "GRIFFIN_UPGRADE_STONE_LEGENDARY",
+            "filter": { }
+        },
+        {
+            "tag": null,
+            "filter": {
+                "EnchantLvl": "6",
+                "Enchantment": "blast_protection"
+            }
+        },
+        {
+            "tag": "VAMPIRE_MASK",
+            "filter": { }
+        },
+        {
+            "tag": null,
+            "filter": {
+                "EnchantLvl": "2",
+                "Enchantment": "ultimate_no_pain_no_gain"
+            }
+        },
+        {
+            "tag": null,
+            "filter": {
+                "EnchantLvl": "9",
+                "Enchantment": "compact"
+            }
+        },
+        {
+            "tag": "VAMPIRE_WITCH_MASK",
+            "filter": { }
+        },
+        {
+            "tag": "NECROMANCER_BROOCH",
+            "filter": { }
+        },
+        {
+            "tag": null,
+            "filter": {
+                "EnchantLvl": "1",
+                "Enchantment": "true_protection"
+            }
+        },
+        {
+            "tag": "YOUNG_DRAGON_CHESTPLATE",
+            "filter": { }
+        },
+        {
+            "tag": "TITANIUM_FUEL_TANK",
+            "filter": { }
+        },
+        {
+            "tag": null,
+            "filter": {
+                "EnchantLvl": "1",
+                "Enchantment": "dragon_hunter"
+            }
+        },
+        {
+            "tag": "DAEDALUS_AXE",
+            "filter": { }
+        },
+        {
+            "tag": "CRYPT_DREADLORD_SWORD",
+            "filter": { }
+        },
+        {
+            "tag": "ROD_OF_THE_SEA",
+            "filter": { }
+        },
+        {
+            "tag": "CHAMP_ROD",
+            "filter": { }
+        },
+        {
+            "tag": "WAND_OF_MENDING",
+            "filter": { }
+        },
+        {
+            "tag": "DUNGEON_STONE",
+            "filter": { }
+        },
+        {
+            "tag": "DIVAN_HELMET",
+            "filter": { }
+        },
+        {
+            "tag": "DIVAN_LEGGINGS",
+            "filter": { }
+        },
+        {
+            "tag": "DIVAN_CHESTPLATE",
+            "filter": { }
+        },
+        {
+            "tag": "DIVAN_BOOTS",
+            "filter": { }
+        },
+        {
+            "tag": "IMPLOSION_SCROLL",
+            "filter": { }
+        },
+        {
+            "tag": "JASPER_CRYSTAL",
+            "filter": { }
+        },
+        {
+            "tag": "JASPER_CRYSTAL",
+            "filter": { }
+        },
+        {
+            "tag": "WITHER_SHIELD_SCROLL",
+            "filter": { }
+        },
+        {
+            "tag": "SHADOW_WARP_SCROLL",
+            "filter": { }
+        },
+        {
+            "tag": "GOBLIN_OMELETTE_SUNNY_SIDE",
+            "filter": { }
+        },
+        {
+            "tag": null,
+            "filter": { }
+        },
+        {
+            "tag": "JUJU_SHORTBOW",
+            "filter": {
+                "EnchantLvl": "4",
+                "Enchantment": "dragon_hunter"
+            }
+        },
+        {
+            "tag": "JUJU_SHORTBOW",
+            "filter": {
+                "EnchantLvl": "5",
+                "Enchantment": "dragon_hunter"
+            }
+        },
+        {
+            "tag": "SHARK_SCALE_CHESTPLATE",
+            "filter": {
+                "Reforge": "submerged"
+            }
+        },
+        {
+            "tag": "SHARK_SCALE_LEGGINGS",
+            "filter": {
+                "Reforge": "submerged"
+            }
+        },
+        {
+            "tag": "SHARK_SCALE_BOOTS",
+            "filter": {
+                "Reforge": "submerged"
+            }
+        },
+        {
+            "tag": "SHARK_SCALE_HELMET",
+            "filter": {
+                "Reforge": "submerged"
+            }
+        },
+        {
+            "tag": "JADERALD",
+            "filter": { }
+        },
+        {
+            "tag": "PET_AMMONITE",
+            "filter": { }
+        },
+        {
+            "tag": "MITHRIL_DRILL_ENGINE",
+            "filter": { }
+        },
+        {
+            "tag": "MINING_PUMPKIN",
+            "filter": { }
+        },
+        {
+            "tag": "TANK_WITHER_HELMET",
+            "filter": { }
+        },
+        {
+            "tag": "SCYTHE_BLADE",
+            "filter": { }
+        },
+        {
+            "tag": "SURVIVOR_CUBE",
+            "filter": { }
+        },
+        {
+            "tag": "PET_ARMADILLO",
+            "filter": { }
+        },
+        {
+            "tag": "WISE_DRAGON_HELMET",
+            "filter": {
+                "Rarity": "MYTHIC"
+            }
+        },
+        {
+            "tag": "GEMSTONE_FUEL_TANK",
+            "filter": { }
+        },
+        {
+            "tag": "PERFECTLY_CUT_FUEL_TANK",
+            "filter": { }
+        },
+        {
+            "tag": "REAPER_BOOTS",
+            "filter": { }
+        },
+        {
+            "tag": "MITHRIL_DRILL_2",
+            "filter": { }
+        },
+        {
+            "tag": "PET_MITHRIL_GOLEM",
+            "filter": { }
+        },
+        {
+            "tag": "MITHRIL_FUEL_TANK",
+            "filter": { }
+        },
+        {
+            "tag": "TITANIUM_DRILL_ENGINE",
+            "filter": { }
+        },
+        {
+            "tag": "AMBER_POLISHED_DRILL_ENGINE",
+            "filter": { }
+        },
+        {
+            "tag": "MITHRIL_FUEL_TANK",
+            "filter": { }
+        },
+        {
+            "tag": "REAPER_LEGGINGS",
+            "filter": { }
+        },
+        {
+            "tag": "FROZEN_BLAZE_HELMET",
+            "filter": { }
+        },
+        {
+            "tag": "ASPECT_OF_THE_DRAGON",
+            "filter": { }
+        },
+        {
+            "tag": "TITANIUM_DRILL_4",
+            "filter": { }
+        },
+        {
+            "tag": "SORROW_BOOTS",
+            "filter": {
+                "Reforge": "jaded"
+            }
+        },
+        {
+            "tag": "ASPECT_OF_THE_DRAGON",
+            "filter": {
+                "EnchantLvl": "1",
+                "Enchantment": "ultimate_one_for_all"
+            }
+        },
+        {
+            "tag": "PET_OCELOT",
+            "filter": { }
+        },
+        {
+            "tag": "RUBY_POLISHED_DRILL_ENGINE",
+            "filter": { }
+        },
+        {
+            "tag": "FROZEN_BLAZE_BOOTS",
+            "filter": { }
+        },
+        {
+            "tag": "NEW_YEAR_CAKE",
+            "filter": { }
+        },
+        {
+            "tag": "REAPER_CHESTPLATE",
+            "filter": { }
+        },
+        {
+            "tag": "PET_BAL",
+            "filter": { }
+        },
+        {
+            "tag": "REAPER_SWORD",
+            "filter": {
+                "EnchantLvl": "1",
+                "Enchantment": "ultimate_one_for_all"
+            }
+        },
+        {
+            "tag": "PET_OCELOT",
+            "filter": { }
+        },
+        {
+            "tag": "REAPER_SWORD",
+            "filter": { }
+        },
+        {
+            "tag": "SORROW_HELMET",
+            "filter": {
+                "Reforge": "jaded"
+            }
+        },
+        {
+            "tag": "PET_WOLF",
+            "filter": { }
+        },
+        {
+            "tag": "SORROW_CHESTPLATE",
+            "filter": {
+                "Reforge": "jaded"
+            }
+        },
+        {
+            "tag": "SORROW_CHESTPLATE",
+            "filter": {
+                "Reforge": "Necrotic"
+            }
+        },
+        {
+            "tag": "PET_BLACK_CAT",
+            "filter": { }
+        },
+        {
+            "tag": "PET_TIGER",
+            "filter": {
+                "Rarity": "LEGENDARY"
+            }
+        },
+        {
+            "tag": "SORROW_HELMET",
+            "filter": {
+                "Reforge": "Renowned"
+            }
+        },
+        {
+            "tag": "TITANIUM_DRILL_1",
+            "filter": { }
+        },
+        {
+            "tag": "PET_SKIN_HOUND_BEAGLE",
+            "filter": { }
+        },
+        {
+            "tag": "FROZEN_BLAZE_BOOTS",
+            "filter": { }
+        },
+        {
+            "tag": "FROZEN_BLAZE_HELMET",
+            "filter": { }
+        },
+        {
+            "tag": "FROZEN_BLAZE_CHESTPLATE",
+            "filter": { }
+        },
+        {
+            "tag": "FROZEN_BLAZE_LEGGINGS",
+            "filter": { }
+        },
+        {
+            "tag": "PET_BLAZE",
+            "filter": { }
+        },
+        {
+            "tag": "PET_SQUID",
+            "filter": { }
+        },
+        {
+            "tag": "BINGO_CARD",
+            "filter": { }
+        },
+        {
+            "tag": "SORROW_LEGGINGS",
+            "filter": {
+                "Reforge": "jaded"
+            }
+        },
+        {
+            "tag": "REAPER_SCYTHE",
+            "filter": { }
+        },
+        {
+            "tag": "ROBOTRON_REFLECTOR",
+            "filter": { }
+        },
+        {
+            "tag": "CANDY_RELIC",
+            "filter": { }
+        },
+        {
+            "tag": "JERRY_TALISMAN_GREEN",
+            "filter": { }
+        },
+        {
+            "tag": "JERRY_TALISMAN_BLUE",
+            "filter": { }
+        },
+        {
+            "tag": "JERRY_TALISMAN_GOLDEN",
+            "filter": { }
+        },
+        {
+            "tag": "JERRY_TALISMAN_PURPLE",
+            "filter": { }
+        },
+        {
+            "tag": "PET_BAT",
+            "filter": { }
+        },
+        {
+            "tag": "BAT_PERSON_ARTIFACT",
+            "filter": { }
+        },
+        {
+            "tag": "SUPERIOR_SHIMMER",
+            "filter": { }
+        },
+        {
+            "tag": "PET_DOLPHIN",
+            "filter": {
+                "Rarity": "LEGENDARY",
+                "PetLevel": "100"
+            }
+        },
+        {
+            "tag": "SORROW_HELMET",
+            "filter": {
+                "Reforge": "ancient"
+            }
+        },
+        {
+            "tag": "PET_PHOENIX",
+            "filter": {
+                "PetItem": "PET_ITEM_TIER_BOOST"
+            }
+        },
+        {
+            "tag": "FINAL_DESTINATION_HELMET",
+            "filter": { }
+        },
+        {
+            "tag": "YOUNG_SHIMMER",
+            "filter": { }
+        },
+        {
+            "tag": "SECRET_DUNGEON_REDSTONE_KEY",
+            "filter": { }
+        },
+        {
+            "tag": "DUST_THE_FISH",
+            "filter": { }
+        },
+        {
+            "tag": "FINAL_DESTINATION_BOOTS",
+            "filter": { }
+        },
+        {
+            "tag": "FINAL_DESTINATION_HELMET",
+            "filter": { }
+        },
+        {
+            "tag": "THE_SHREDDER",
+            "filter": { }
+        },
+        {
+            "tag": "DWARF_TURTLE_SHELMET",
+            "filter": { }
+        },
+        {
+            "tag": "SWORD_OF_REVELATIONS",
+            "filter": { }
+        },
+        {
+            "tag": "ELEGANT_TUXEDO_BOOTS",
+            "filter": { }
+        },
+        {
+            "tag": "WATER",
+            "filter": { }
+        },
+        {
+            "tag": "PET_SKIN_DOLPHIN_SNUBNOSE_GREEN",
+            "filter": { }
+        },
+        {
+            "tag": "FANCY_TUXEDO_CHESTPLATE",
+            "filter": { }
+        },
+        {
+            "tag": "FANCY_TUXEDO_LEGGINGS",
+            "filter": { }
+        },
+        {
+            "tag": "FANCY_TUXEDO_BOOTS",
+            "filter": { }
+        },
+        {
+            "tag": null,
+            "filter": {
+                "Reforge": "Renowned"
+            }
+        },
+        {
+            "tag": "GEMSTONE_DRILL_3",
+            "filter": { }
+        },
+        {
+            "tag": "FINAL_DESTINATION_LEGGINGS",
+            "filter": { }
+        },
+        {
+            "tag": null,
+            "filter": {
+                "PetSkin": "PET_SKIN_DOLPHIN_SNUBNOSE_PURPLE"
+            }
+        },
+        {
+            "tag": null,
+            "filter": {
+                "PetSkin": "PET_SKIN_DOLPHIN_SNUBNOSE_GREEN"
+            }
+        },
+        {
+            "tag": null,
+            "filter": {
+                "PetSkin": "PET_SKIN_DOLPHIN_SNUBNOSE_RED"
+            }
+        },
+        {
+            "tag": null,
+            "filter": {
+                "PetSkin": "PET_SKIN_DOLPHIN_SNUBFIN"
+            }
+        },
+        {
+            "tag": "DRAGON_HORN",
+            "filter": { }
+        },
+        {
+            "tag": "BEDROCK",
+            "filter": { }
+        },
+        {
+            "tag": "SUPERIOR_SHIMMER",
+            "filter": { }
+        },
+        {
+            "tag": "WISE_SHIMMER",
+            "filter": { }
+        },
+        {
+            "tag": "YOUNG_SHIMMER",
+            "filter": { }
+        },
+        {
+            "tag": "OLD_SHIMMER",
+            "filter": { }
+        },
+        {
+            "tag": "HOLY_SHIMMER",
+            "filter": { }
+        },
+        {
+            "tag": null,
+            "filter": {
+                "DragonArmorSkin": "STRONG_SHIMMER"
+            }
+        },
+        {
+            "tag": null,
+            "filter": {
+                "PetSkin": "any"
+            }
+        },
+        {
+            "tag": "GIANTS_SWORD",
+            "filter": { }
+        },
+        {
+            "tag": null,
+            "filter": {
+                "EnchantLvl": "1",
+                "Enchantment": "ultimate_one_for_all"
+            }
+        },
+        {
+            "tag": "PET_BABY_YETI",
+            "filter": { }
+        },
+        {
+            "tag": null,
+            "filter": {
+                "PetSkin": "PET_SKIN_DOLPHIN_SNUBFIN"
+            }
+        },
+        {
+            "tag": "PET_WITHER_SKELETON",
+            "filter": { }
+        },
+        {
+            "tag": "PET_TIGER",
+            "filter": { }
+        },
+        {
+            "tag": "STONK_PICKAXE",
+            "filter": {
+                "EnchantLvl": "10",
+                "Enchantment": "compact"
+            }
+        },
+        {
+            "tag": null,
+            "filter": {
+                "EnchantLvl": "6",
+                "Enchantment": "efficiency"
+            }
+        },
+        {
+            "tag": "GEMSTONE_GAUNTLET",
+            "filter": { }
+        },
+        {
+            "tag": "ALPHA_PICK",
+            "filter": {
+                "EnchantLvl": "10",
+                "Enchantment": "compact"
+            }
+        },
+        {
+            "tag": "ENCHANTED_BOOK",
+            "filter": {
+                "EnchantLvl": "5",
+                "Enchantment": "vicious"
+            }
+        },
+        {
+            "tag": "BEJEWELED_HANDLE",
+            "filter": {
+                "Rarity": "EPIC"
+            }
+        },
+        {
+            "tag": "GOLD_BARDING",
+            "filter": { }
+        },
+        {
+            "tag": "IRON_BARDING",
+            "filter": { }
+        },
+        {
+            "tag": "PET_ITEM_QUICK_CLAW",
+            "filter": { }
+        },
+        {
+            "tag": "AUGER_ROD",
+            "filter": { }
+        },
+        {
+            "tag": "MAGMA_CORE",
+            "filter": { }
+        },
+        {
+            "tag": "RUNE_COUTURE",
+            "filter": { }
+        },
+        {
+            "tag": "AUTO_RECOMBOBULATOR",
+            "filter": { }
+        },
+        {
+            "tag": "SKELETON_MASTER_CHESTPLATE",
+            "filter": { }
+        },
+        {
+            "tag": "WARDEN_HELMET",
+            "filter": { }
+        },
+        {
+            "tag": "PET_SCATHA",
+            "filter": { }
+        },
+        {
+            "tag": "GEMSTONE_DRILL_4",
+            "filter": { }
+        },
+        {
+            "tag": "DIAMOND_NECRON_HEAD",
+            "filter": { }
+        }
+    ],
+    "whitelist": [
+        {
+            "tag": "ENCHANTED_BOOK",
+            "filter": {
+                "Enchantment": "snipe",
+                "EnchantLvl": "4"
+            }
+        },
+        {
+            "tag": "ENCHANTED_BOOK",
+            "filter": {
+                "EnchantLvl": "7",
+                "Enchantment": "growth"
+            }
+        },
+        {
+            "tag": "ENCHANTED_BOOK",
+            "filter": {
+                "EnchantLvl": "5",
+                "Enchantment": "ultimate_soul_eater"
+            }
+        },
+        {
+            "tag": "ENCHANTED_BOOK",
+            "filter": {
+                "EnchantLvl": "5",
+                "Enchantment": "ultimate_legion"
+            }
+        },
+        {
+            "tag": "PET_BLUE_WHALE",
+            "filter": {
+                "PetLevel": "100"
+            }
+        },
+        {
+            "tag": "PET_BAL",
+            "filter": {
+                "PetLevel": "9x"
+            }
+        },
+        {
+            "tag": "ENCHANTED_BOOK",
+            "filter": {
+                "EnchantLvl": "7",
+                "Enchantment": "protection"
+            }
+        },
+        {
+            "tag": "ENCHANTED_BOOK",
+            "filter": {
+                "EnchantLvl": "4",
+                "Enchantment": "snipe"
+            }
+        },
+        {
+            "tag": "ENCHANTED_BOOK",
+            "filter": {
+                "EnchantLvl": "3",
+                "Enchantment": "big_brain"
+            }
+        },
+        {
+            "tag": "ENCHANTED_BOOK",
+            "filter": {
+                "EnchantLvl": "5",
+                "Enchantment": "first_strike"
+            }
+        },
+        {
+            "tag": "ENCHANTED_BOOK",
+            "filter": {
+                "EnchantLvl": "5",
+                "Enchantment": "ultimate_legion"
+            }
+        },
+        {
+            "tag": "ENCHANTED_BOOK",
+            "filter": {
+                "EnchantLvl": "7",
+                "Enchantment": "power"
+            }
+        },
+        {
+            "tag": "ENCHANTED_BOOK",
+            "filter": {
+                "EnchantLvl": "5",
+                "Enchantment": "ultimate_soul_eater"
+            }
+        },
+        {
+            "tag": "ENCHANTED_BOOK",
+            "filter": {
+                "EnchantLvl": "5",
+                "Enchantment": "ultimate_wisdom"
+            }
+        },
+        {
+            "tag": "ENCHANTED_BOOK",
+            "filter": {
+                "EnchantLvl": "5",
+                "Enchantment": "ultimate_wise"
+            }
+        },
+        {
+            "tag": null,
+            "filter": {
+                "EnchantLvl": "7",
+                "Enchantment": "critical"
+            }
+        },
+        {
+            "tag": "PET_SHEEP",
+            "filter": { }
+        }
+    ],
+    "lbin": false,
+    "visibility": {
+        "cost": true,
+        "estProfit": false,
+        "lbin": false,
+        "slbin": false,
+        "medPrice": true,
+        "seller": false,
+        "volume": false,
+        "extraFields": 1,
+        "avgSellTime": false,
+        "profitPercent": false,
+        "profit": false,
+        "sellerOpenBtn": true,
+        "lore": true
+    },
+    "mod": {
+        "justProfit": false,
+        "soundOnFlip": true,
+        "shortNumbers": false,
+        "blockTenSecMsg": false,
+        "format": null,
+        "chat": true
+    },
+    "finders": 1,
+    "fastMode": false,
+    "changer": null,
+    "minProfit": 2000000,
+    "minProfitPercent": 23,
+    "minVolume": 0,
+    "maxCost": 1500000000
+}

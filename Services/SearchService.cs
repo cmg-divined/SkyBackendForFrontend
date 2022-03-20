@@ -219,11 +219,12 @@ namespace hypixel
                 {
                     var auction = await context.Auctions.Where(a => a.UId == uid).Include(a => a.NBTLookup).FirstOrDefaultAsync();
                     Console.WriteLine(Newtonsoft.Json.JsonConvert.SerializeObject(auction));
-                    try 
+                    try
                     {
-                    AddAuctionAsResult(Results, auction);
+                        AddAuctionAsResult(Results, auction);
 
-                    } catch(Exception e)
+                    }
+                    catch (Exception e)
                     {
                         dev.Logger.Instance.Error(e, "adding auction");
                     }
@@ -240,13 +241,16 @@ namespace hypixel
                 var val = NBT.UidToLong(search);
                 using (var context = new HypixelContext())
                 {
-                    var auction = await context.Auctions
+                    var auctions = await context.Auctions
                                 .Where(a => a.NBTLookup.Where(l => l.KeyId == key && l.Value == val).Any())
                                 .Include(a => a.NBTLookup)
-                                .FirstOrDefaultAsync();
-                    if (auction == null)
+                                .ToListAsync();
+                    if (auctions.Count == 0)
                         return;
-                    AddAuctionAsResult(Results, auction);
+                    foreach (var auction in auctions.GroupBy(a=>a.Tag).Select(a=>a.First()))
+                    {
+                        AddAuctionAsResult(Results, auction);
+                    }
                 }
             }
         }
