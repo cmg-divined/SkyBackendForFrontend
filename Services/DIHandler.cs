@@ -27,6 +27,14 @@ namespace Coflnet.Sky.Commands.Shared
                 var config = context.GetRequiredService<IConfiguration>();
                 return new PlayerName.Client.Api.PlayerNameApi(config["PLAYERNAME_URL"] ?? "http://" + config["PLAYERNAME_HOST"]);
             });
+            services.AddSingleton<Bazaar.Client.Api.BazaarApi>(context =>
+            {
+                var config = context.GetRequiredService<IConfiguration>();
+                var url = config["BAZAAR_BASE_URL"];
+                if(url == null)
+                    throw new Exception("config option BAZAAR_BASE_URL is not set");
+                return new Bazaar.Client.Api.BazaarApi(url);
+            });
             services.AddSingleton<SettingsService>();
             services.AddSingleton<GemPriceService>();
             services.AddHostedService<GemPriceService>(di => di.GetRequiredService<GemPriceService>());
