@@ -227,6 +227,7 @@ namespace Coflnet.Sky.Commands
                         b.Auction.End,
                         b.Auction.Tag,
                         b.Amount,
+                        Enchants = b.Auction.Enchantments,
                         Nbt = b.Auction.NBTLookup
                     }).GroupBy(b => b.Uuid)
                     .Select(bid => new
@@ -236,7 +237,8 @@ namespace Coflnet.Sky.Commands
                         HighestOwnBid = bid.Max(b => b.Amount),
                         End = bid.Max(b => b.End),
                         Tag = bid.First().Tag,
-                        Nbt = bid.OrderByDescending(b => b.Amount).First().Nbt
+                        Nbt = bid.OrderByDescending(b => b.Amount).First().Nbt,
+                        Enchants = bid.First().Enchants
                     })
                     //.ThenInclude (b => b.Auction)
                     .ToListAsync();
@@ -254,8 +256,12 @@ namespace Coflnet.Sky.Commands
                             .FirstOrDefault();
                     var soldFor = sell
                             ?.HighestBidAmount;
-
-                    var profit = b.Tag != sell.Tag ? 0 : gemPriceService.GetGemWrthFromLookup(b.Nbt)
+                    
+                    var enchantsBad = b.Tag == "ENCHANTED_BOOK" && b.Enchants.Count == 1 && (sell.HighestBidAmount  - b.HighestOwnBid) > 1_000_000;
+                    var profit = 0L;
+                    if(b.Tag == sell.Tag
+                        && !enchantsBad)
+                        profit = gemPriceService.GetGemWrthFromLookup(b.Nbt)
                         - gemPriceService.GetGemWrthFromLookup(sell.NBTLookup)
                         + sell.HighestBidAmount
                         - b.HighestOwnBid;
