@@ -27,7 +27,8 @@ namespace Coflnet.Sky.Commands.Shared
                     new Enchantment(Enchantment.EnchantmentType.critical,4)
                 },
                     FlatenedNBT = new Dictionary<string, string>() { { "candy", "3" } }
-                }
+                },
+                Context = new Dictionary<string, string>()
             };
         }
         [Test]
@@ -164,6 +165,23 @@ namespace Coflnet.Sky.Commands.Shared
             var matches3 = settings.MatchesSettings(sampleFlip);
             Assert.IsTrue(matches3.Item1, matches3.Item2);
         }
+        [Test]
+        [TestCase("1", true)]
+        [TestCase("2", false)]
+        public void ReferenceAgeFilterMatch(string val, bool result)
+        {
+            var settings = new FlipSettings()
+            {
+                MinProfit = 100,
+            };
+            settings.WhiteList = new List<ListEntry>() { new ListEntry() { filter = new Dictionary<string, string>() { { "ReferenceAge", "<2" } } } };
+            sampleFlip.Context["refAge"] = val;
+            var matches3 = settings.MatchesSettings(sampleFlip);
+            Assert.AreEqual(result, matches3.Item1, matches3.Item2);
+        }
+
+
+        
 
         [Test]
         public void FlipFilterFinderCustomMinProfitNoBinMatch()
