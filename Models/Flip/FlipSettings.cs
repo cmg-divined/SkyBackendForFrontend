@@ -19,7 +19,7 @@ namespace Coflnet.Sky.Commands.Shared
         public int MinProfitPercent;
 
         [DataMember(Name = "minVolume")]
-        public int MinVolume;
+        public double MinVolume;
 
         [DataMember(Name = "maxCost")]
         public int MaxCost;

@@ -553,7 +553,7 @@ namespace hypixel
 
         public static int DelayTimeFor(int queueSize)
         {
-            return (int)Math.Min((TimeSpan.FromMinutes(5) / (Math.Max(queueSize, 1))).TotalMilliseconds, 10000);
+            return (int)Math.Min((TimeSpan.FromMinutes(3) / (Math.Max(queueSize, 1))).TotalMilliseconds, 10000);
         }
 
         /// <summary>

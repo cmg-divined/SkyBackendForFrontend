@@ -7,9 +7,9 @@ namespace Coflnet.Sky.Commands.Shared
 {
     public class ProfitDetailedFlipFilter : NumberDetailedFlipFilter
     {
-        protected override Expression<Func<FlipInstance, long>> GetSelector()
+        protected override Expression<Func<FlipInstance, double>> GetSelector()
         {
-            return (f) => (long)f.Profit;
+            return (f) => f.Profit;
         }
     }
     

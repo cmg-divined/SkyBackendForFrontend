@@ -132,6 +132,39 @@ namespace Coflnet.Sky.Commands.Shared
         }
 
 
+
+        [Test]
+        public void VolumeDeciamalFilterMatch()
+        {
+            NBT.Instance = new NBTMock();
+            sampleFlip.Auction.NBTLookup = new List<NBTLookup>() { new NBTLookup(1, 2) };
+            var settings = new FlipSettings()
+            {
+                MinProfit = 1,
+                MinVolume = 0.5,
+
+            };
+            sampleFlip.Volume = 0.8f;
+            var matches = settings.MatchesSettings(sampleFlip);
+            Assert.IsTrue(matches.Item1, matches.Item2);
+            sampleFlip.Volume = 0.2f;
+            var matches2 = settings.MatchesSettings(sampleFlip);
+            Assert.False(matches2.Item1, matches2.Item2);
+        }
+
+        [Test]
+        public void VolumeDeciamalFilterWhitelistMatch()
+        {
+            var settings = new FlipSettings()
+            {
+                MinProfit = 1,
+                MinVolume = 0.5,
+            };
+            settings.WhiteList = new List<ListEntry>() { new ListEntry() { filter = new Dictionary<string, string>() { { "Volume", "<0,5" } } } };
+            var matches3 = settings.MatchesSettings(sampleFlip);
+            Assert.IsTrue(matches3.Item1, matches3.Item2);
+        }
+
         [Test]
         public void FlipFilterFinderCustomMinProfitNoBinMatch()
         {

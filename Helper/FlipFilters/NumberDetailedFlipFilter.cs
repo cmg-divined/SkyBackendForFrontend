@@ -17,26 +17,42 @@ namespace Coflnet.Sky.Commands.Shared
             var selector = GetSelector();
             if (content.Contains("-"))
             {
-                var parts = content.Split("-").Select(a => long.Parse(a)).ToArray();
+                var parts = content.Split("-").Select(a => double.Parse(a)).ToArray();
                 var min = parts[0];
                 var max = parts[1];
-                return Sky.Filter.NumberFilter.ExpressionMinMax(selector, min, max);
+                return ExpressionMinMax(selector, min, max);
             }
-            var value = long.Parse(content.Replace("<", "").Replace(">", ""));
+            var value = double.Parse(content.Replace("<", "").Replace(">", ""));
+            Console.WriteLine(value);
             if (content.StartsWith("<"))
-                return Sky.Filter.NumberFilter.ExpressionMinMax(selector, 1, value - 1);
+                return ExpressionMinMax(selector, 1, value - 1);
             if (content.StartsWith(">"))
             {
-                return Sky.Filter.NumberFilter.ExpressionMinMax(selector, value, int.MaxValue);
+                return ExpressionMinMax(selector, value, int.MaxValue);
             }
 
-            return Sky.Filter.NumberFilter.ExpressionMinMax(selector, value, value);
+            return ExpressionMinMax(selector, value, value);
             //return flip => flip.ProfitPercentage > min;
         }
 
-        protected virtual Expression<Func<FlipInstance, long>> GetSelector()
+        protected virtual Expression<Func<FlipInstance, double>> GetSelector()
         {
-            return (f) => (long)f.Volume;
+            return (f) => (double)f.Volume;
+        }
+
+
+        public static Expression<Func<T, bool>> ExpressionMinMax<T>(Expression<Func<T, double>> selector, double min, double max)
+        {
+            return Expression.Lambda<Func<T, bool>>(
+                Expression.And(
+                    Expression.GreaterThanOrEqual(
+                    Expression.Constant(max, typeof(double)),
+                    selector.Body),
+                    Expression.GreaterThanOrEqual(
+                    selector.Body,
+                    Expression.Constant(min, typeof(double))
+                )), selector.Parameters
+            );
         }
     }
     
