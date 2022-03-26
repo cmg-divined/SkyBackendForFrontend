@@ -4,7 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Coflnet.Sky.FlipTracker.Client.Api;
 using Confluent.Kafka;
-using hypixel;
+using Coflnet.Sky.Core;
 using Microsoft.EntityFrameworkCore;
 using Coflnet.Sky.Commands.Shared;
 using Coflnet.Sky.FlipTracker.Client.Model;
@@ -39,7 +39,7 @@ namespace Coflnet.Sky.Commands
                 BootstrapServers = SimplerConfig.Config.Instance["KAFKA_HOST"],
                 CancellationDelayMaxMs = 1000
             })
-                    .SetValueSerializer(hypixel.SerializerFactory.GetSerializer<FlipTracker.Client.Model.FlipEvent>()).Build();
+                    .SetValueSerializer(SerializerFactory.GetSerializer<FlipTracker.Client.Model.FlipEvent>()).Build();
             flipTracking = new TrackerApi("http://" + SimplerConfig.Config.Instance["FLIPTRACKER_HOST"]);
             flipAnalyse = new AnalyseApi("http://" + SimplerConfig.Config.Instance["FLIPTRACKER_HOST"]);
             this.gemPriceService = gemPriceService;
@@ -89,9 +89,9 @@ namespace Coflnet.Sky.Commands
             var flipEvent = new FlipTracker.Client.Model.FlipEvent()
             {
                 Type = type,
-                PlayerId = hypixel.AuctionService.Instance.GetId(playerId),
-                AuctionId = hypixel.AuctionService.Instance.GetId(auctionId),
-                Timestamp = System.DateTime.Now
+                PlayerId = AuctionService.Instance.GetId(playerId),
+                AuctionId = AuctionService.Instance.GetId(auctionId),
+                Timestamp = System.DateTime.UtcNow
             };
 
             producer.Produce(ProduceTopic, new Message<string, FlipTracker.Client.Model.FlipEvent>() { Value = flipEvent });

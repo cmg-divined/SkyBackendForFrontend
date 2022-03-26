@@ -2,9 +2,8 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.Serialization;
-using Coflnet.Sky.Commands.Shared;
 
-namespace hypixel
+namespace Coflnet.Sky.Commands.Shared
 {
     [DataContract]
     public class SettingsChange

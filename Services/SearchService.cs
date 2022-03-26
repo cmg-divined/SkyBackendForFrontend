@@ -10,12 +10,12 @@ using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
 using dev;
-using MessagePack;
+using Coflnet.Sky.Core;
 using Microsoft.EntityFrameworkCore;
 using RestSharp;
 using System.Threading.Channels;
 
-namespace hypixel
+namespace Coflnet.Sky.Commands.Shared
 {
     public class SearchService
     {

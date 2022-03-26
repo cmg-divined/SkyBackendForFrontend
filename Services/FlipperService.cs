@@ -13,8 +13,9 @@ using OpenTracing.Propagation;
 using Microsoft.Extensions.DependencyInjection;
 using RestSharp;
 using Newtonsoft.Json;
+using Coflnet.Sky.Core;
 
-namespace hypixel
+namespace Coflnet.Sky.Commands.Shared
 {
 
     /// <summary>
@@ -245,13 +246,13 @@ namespace hypixel
         public static async Task<List<ItemPrices.AuctionPreview>> GetLowestBin(SaveAuction auction)
         {
             var filters = new Dictionary<string, string>();
-            var ulti = auction.Enchantments.Where(e => Coflnet.Sky.Constants.RelevantEnchants.Where(rel => rel.Type == e.Type && rel.Level <= e.Level).Any()).FirstOrDefault();
+            var ulti = auction.Enchantments.Where(e => Coflnet.Sky.Core.Constants.RelevantEnchants.Where(rel => rel.Type == e.Type && rel.Level <= e.Level).Any()).FirstOrDefault();
             if (ulti != null)
             {
                 filters["Enchantment"] = ulti.Type.ToString();
                 filters["EnchantLvl"] = ulti.Level.ToString();
             }
-            if (Coflnet.Sky.Constants.RelevantReforges.Contains(auction.Reforge))
+            if (Coflnet.Sky.Core.Constants.RelevantReforges.Contains(auction.Reforge))
             {
                 filters["Reforge"] = auction.Reforge.ToString();
             }

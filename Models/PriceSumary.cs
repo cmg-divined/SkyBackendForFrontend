@@ -1,6 +1,6 @@
 using System.Runtime.Serialization;
 
-namespace hypixel
+namespace Coflnet.Sky.Commands.Shared
 {
     [DataContract]
     public class PriceSumary

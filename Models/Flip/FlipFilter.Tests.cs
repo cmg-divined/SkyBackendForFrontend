@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
-using hypixel;
+using Coflnet.Sky.Core;
 using Newtonsoft.Json;
 using NUnit.Framework;
 

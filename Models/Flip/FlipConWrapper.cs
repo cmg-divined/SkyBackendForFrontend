@@ -5,9 +5,9 @@ using System.Threading;
 using System.Threading.Channels;
 using System.Threading.Tasks;
 using Coflnet.Sky;
-using Coflnet.Sky.Commands;
+using Coflnet.Sky.Core;
 
-namespace hypixel
+namespace Coflnet.Sky.Commands.Shared
 {
     public class FlipConWrapper
     {

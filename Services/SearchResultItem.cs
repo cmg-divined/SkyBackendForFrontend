@@ -1,8 +1,9 @@
 using System;
 using System.Runtime.Serialization;
+using Coflnet.Sky.Core;
 using MessagePack;
 
-namespace hypixel
+namespace Coflnet.Sky.Commands.Shared
 {
     [DataContract]
         public class SearchResultItem

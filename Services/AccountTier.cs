@@ -1,4 +1,4 @@
-namespace hypixel
+namespace Coflnet.Sky.Commands.Shared
 {
     public enum AccountTier
     {

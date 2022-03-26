@@ -1,6 +1,6 @@
 using System.Linq;
 using Newtonsoft.Json;
-using hypixel;
+using Coflnet.Sky.Core;
 using RestSharp;
 using System.Threading.Tasks;
 using System.Runtime.Serialization;

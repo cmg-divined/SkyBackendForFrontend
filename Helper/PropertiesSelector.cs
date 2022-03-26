@@ -1,7 +1,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.Serialization;
-using hypixel;
+using Coflnet.Sky.Core;
 
 namespace Coflnet.Sky.Commands.Helper
 {
@@ -38,7 +38,7 @@ namespace Coflnet.Sky.Commands.Helper
             var properties = new List<Property>();
 
             if (RelEnchantLookup == null)
-                RelEnchantLookup = Sky.Constants.RelevantEnchants.ToDictionary(r => r.Type, r => r.Level);
+                RelEnchantLookup = Coflnet.Sky.Core.Constants.RelevantEnchants.ToDictionary(r => r.Type, r => r.Level);
 
 
             var data = auction.FlatenedNBT;

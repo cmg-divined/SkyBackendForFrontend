@@ -3,7 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq.Expressions;
 using Coflnet.Sky.Filter;
-using hypixel;
+using Coflnet.Sky.Core;
 
 namespace Coflnet.Sky.Commands.Shared
 {

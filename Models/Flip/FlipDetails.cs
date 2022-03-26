@@ -1,4 +1,5 @@
 using System;
+using Coflnet.Sky.Core;
 
 namespace Coflnet.Sky.Commands.Shared
 {

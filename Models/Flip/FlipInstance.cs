@@ -1,8 +1,9 @@
 using System.Collections.Generic;
 using System.Runtime.Serialization;
 using Coflnet.Sky;
+using Coflnet.Sky.Core;
 
-namespace hypixel
+namespace Coflnet.Sky.Commands.Shared
 {
     [DataContract]
     public class FlipInstance

@@ -1,4 +1,5 @@
 using System.Linq;
+using Coflnet.Sky.Core;
 using NUnit.Framework;
 
 namespace Coflnet.Sky.Commands.Helper
@@ -8,10 +9,10 @@ namespace Coflnet.Sky.Commands.Helper
         [Test]
         public void DragonHunter()
         {
-            var auction = new hypixel.SaveAuction()
+            var auction = new SaveAuction()
             {
-                Enchantments = new System.Collections.Generic.List<hypixel.Enchantment>() {
-                    new hypixel.Enchantment(hypixel.Enchantment.EnchantmentType.dragon_hunter, 5)
+                Enchantments = new System.Collections.Generic.List<Enchantment>() {
+                    new Enchantment(Enchantment.EnchantmentType.dragon_hunter, 5)
                     }
             };
             var prop = PropertiesSelector.GetProperties(auction).Select(p=>p.Value).First();

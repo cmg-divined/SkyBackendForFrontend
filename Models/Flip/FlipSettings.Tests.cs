@@ -1,5 +1,5 @@
 using NUnit.Framework;
-using hypixel;
+using Coflnet.Sky.Core;
 using System.Diagnostics;
 
 namespace Coflnet.Sky.Commands.Shared
@@ -16,26 +16,26 @@ namespace Coflnet.Sky.Commands.Shared
         [SetUp]
         public void Setup()
         {
-            flipA = new hypixel.FlipInstance()
+            flipA = new FlipInstance()
             {
-                Auction = new hypixel.SaveAuction()
+                Auction = new SaveAuction()
                 {
-                    Enchantments = new System.Collections.Generic.List<hypixel.Enchantment>()
+                    Enchantments = new System.Collections.Generic.List<Enchantment>()
                     {
-                        new hypixel.Enchantment(hypixel.Enchantment.EnchantmentType.critical,6)
+                        new Enchantment(Enchantment.EnchantmentType.critical,6)
                     },
                     Tag = SwordTag
                 },
                 MedianPrice = 1000
             };
 
-            flipB = new hypixel.FlipInstance()
+            flipB = new FlipInstance()
             {
-                Auction = new hypixel.SaveAuction()
+                Auction = new SaveAuction()
                 {
-                    Enchantments = new System.Collections.Generic.List<hypixel.Enchantment>()
+                    Enchantments = new System.Collections.Generic.List<Enchantment>()
                     {
-                        new hypixel.Enchantment(hypixel.Enchantment.EnchantmentType.sharpness,6)
+                        new Enchantment(Enchantment.EnchantmentType.sharpness,6)
                     },
                     Tag = SwordTag
                 },

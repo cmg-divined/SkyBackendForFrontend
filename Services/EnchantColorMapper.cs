@@ -1,6 +1,6 @@
 using System.Linq;
 using Newtonsoft.Json;
-using hypixel;
+using Coflnet.Sky.Core;
 using System.Collections.Generic;
 using Coflnet.Sky.Commands.MC;
 

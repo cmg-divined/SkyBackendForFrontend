@@ -4,7 +4,7 @@ using Newtonsoft.Json;
 using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.Serialization;
-using hypixel;
+using Coflnet.Sky.Core;
 
 namespace Coflnet.Sky.Commands.Shared
 {
