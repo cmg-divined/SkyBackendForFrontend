@@ -56,7 +56,6 @@ namespace Coflnet.Sky.Commands.Shared
                         }
                         catch (OperationCanceledException)
                         {
-                            Connection.Log("canceled", Microsoft.Extensions.Logging.LogLevel.Error);
                             return;
                         }
                         catch (Exception e)
