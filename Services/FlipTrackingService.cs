@@ -109,6 +109,17 @@ namespace Coflnet.Sky.Commands
             });
         }
 
+        /// <summary>
+        /// Recomended delay for a given player
+        /// </summary>
+        /// <param name="playerId">The uuid of the player to test</param>
+        /// <returns></returns>
+        public async Task<System.TimeSpan> GetRecommendedPenalty(string playerId)
+        {
+            var breakdown = await flipAnalyse.AnalysePlayerPlayerIdSpeedGetAsync(playerId);
+            return System.TimeSpan.FromSeconds(breakdown.Penalty.TotalSeconds);
+        }
+
         public async Task<int> ActiveFlipperCount()
         {
             return await flipAnalyse.UsersActiveCountGetAsync();
@@ -122,7 +133,7 @@ namespace Coflnet.Sky.Commands
                 end = start;
                 start = tmp;
             }
-            if (start < end - TimeSpan.FromDays(1))
+            if (start < end - System.TimeSpan.FromDays(1))
                 throw new CoflnetException("span_to_large", "Querying for more than a day is not supported");
 
             var idTask = flipAnalyse.AnalyseFinderFinderTypeGetAsync(Enum.Parse<FinderType>(type.ToString(), true), start, end);
@@ -197,7 +208,7 @@ namespace Coflnet.Sky.Commands
 
         }
 
-        public async Task<FlipSumary> GetPlayerFlips(string uuid, TimeSpan timeSpan)
+        public async Task<FlipSumary> GetPlayerFlips(string uuid, System.TimeSpan timeSpan)
         {
             using (var context = new HypixelContext())
             {
@@ -217,7 +228,7 @@ namespace Coflnet.Sky.Commands
                     }).ToList();
                 var SalesUidLookup = sells.Select(a => a.Key).ToHashSet();
                 var sales = await context.NBTLookups.Where(b => b.KeyId == uidKey && SalesUidLookup.Contains(b.Value)).Select(n => n.AuctionId).ToListAsync();
-                var playerBids = await context.Bids.Where(b => b.BidderId == playerId && sales.Contains(b.Auction.Id) && b.Timestamp > startTime.Subtract(TimeSpan.FromDays(14)))
+                var playerBids = await context.Bids.Where(b => b.BidderId == playerId && sales.Contains(b.Auction.Id) && b.Timestamp > startTime.Subtract(System.TimeSpan.FromDays(14)))
                     //.Where(b => b.Auction.NBTLookup.Where(b => b.KeyId == uidKey && SalesUidLookup.Contains(b.Value)).Any())
                     // filtering
                     .OrderByDescending(bid => bid.Id)
