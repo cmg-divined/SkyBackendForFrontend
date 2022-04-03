@@ -98,8 +98,6 @@ namespace Coflnet.Sky.Commands.Shared
                 return (false, "auction not set");
 
 
-
-
             if (BlackListMatcher == null)
                 BlackListMatcher = new ListMatcher(BlackList);
             match = BlackListMatcher.IsMatch(flip);

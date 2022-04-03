@@ -16,6 +16,6 @@ namespace Coflnet.Sky.Commands.Shared
         [DataMember(Name = "mode")]
         public long Mode;
         [DataMember(Name = "volume")]
-        public long Volume;
+        public double Volume;
     }
 }

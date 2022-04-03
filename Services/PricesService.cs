@@ -32,7 +32,8 @@ namespace Coflnet.Sky.Commands.Shared
         public async Task<PriceSumary> GetSumary(string itemTag, Dictionary<string, string> filter)
         {
             int id = GetItemId(itemTag);
-            var minTime = DateTime.Now.Subtract(TimeSpan.FromDays(1));
+            var days = 2;
+            var minTime = DateTime.Now.Subtract(TimeSpan.FromDays(days));
             var mainSelect = context.Auctions.Where(a => a.ItemId == id && a.End < DateTime.Now && a.End > minTime && a.HighestBidAmount > 0);
             filter["ItemId"] = id.ToString();
             var auctions = (await FilterEngine.AddFilters(mainSelect, filter)
@@ -45,7 +46,7 @@ namespace Coflnet.Sky.Commands.Shared
                 Min = auctions.LastOrDefault(),
                 Mean = auctions.Count > 0 ? auctions.Average() : 0,
                 Mode = mode?.Key ?? 0,
-                Volume = auctions.Count > 0 ? auctions.Count() : 0
+                Volume = auctions.Count > 0 ? ((double)auctions.Count())/days : 0
             };
         }
 
@@ -66,7 +67,7 @@ namespace Coflnet.Sky.Commands.Shared
 
         private static int GetItemId(string itemTag, bool forceget = true)
         {
-            return ItemDetails.Instance.GetItemIdForName(itemTag, forceget);
+            return ItemDetails.Instance.GetItemIdForTag(itemTag, forceget);
         }
 
         public async Task<IEnumerable<AveragePrice>> GetHistory(string itemTag, DateTime start, DateTime end, Dictionary<string, string> filters)
