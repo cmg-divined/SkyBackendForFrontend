@@ -18,6 +18,8 @@ namespace Coflnet.Sky.Commands
 
         public ColorSaveAuction AddColors(SaveAuction auction)
         {
+            if(auction == null)
+                return null;
             var cauction = new ColorSaveAuction(auction);
             if (auction?.Enchantments != null)
                 cauction.Enchantments = auction.Enchantments.Select(e => new ColorEnchant(e)).ToList();
