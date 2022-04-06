@@ -3,6 +3,7 @@ using Microsoft.Extensions.Configuration;
 using Coflnet.Payments.Client.Api;
 using System;
 using Coflnet.Payments.Client.Client;
+using Coflnet.Sky.Items.Client.Api;
 
 namespace Coflnet.Sky.Commands.Shared
 {
@@ -42,6 +43,11 @@ namespace Coflnet.Sky.Commands.Shared
             services.AddPaymentSingleton<ProductsApi>(url => new ProductsApi(url));
             services.AddPaymentSingleton<UserApi>(url => new UserApi(url));
             services.AddPaymentSingleton<TopUpApi>(url => new TopUpApi(url));
+            services.AddSingleton<IItemsApi>(context =>
+            {
+                var config = context.GetRequiredService<IConfiguration>();
+                return new ItemsApi(config["ITEMS_BASE_URL"]);
+            });
 
             _servics = services;
         }
