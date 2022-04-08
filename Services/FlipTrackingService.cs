@@ -140,9 +140,9 @@ namespace Coflnet.Sky.Commands
             using (var context = new HypixelContext())
             {
                 var receivedFlips = await idTask;
-                if(receivedFlips == null)
+                if (receivedFlips == null)
                     throw new CoflnetException("retrieve_failed", "Could not retrieve data from the flip tracker");
-                var flips = receivedFlips.GroupBy(r=>r.AuctionId).Select(g=>g.First()).ToDictionary(f=>f.AuctionId);
+                var flips = receivedFlips.GroupBy(r => r.AuctionId).Select(g => g.First()).ToDictionary(f => f.AuctionId);
                 var ids = flips.Keys;
                 var buyList = await context.Auctions.Where(a => ids.Contains(a.UId) && a.HighestBidAmount > 0)
                     .Include(a => a.NBTLookup)
@@ -176,7 +176,7 @@ namespace Coflnet.Sky.Commands
                     // make sure that this is the correct sell of this flip
                     if (buy.End > s.End)
                         return null;
-                    if(buy.HighestBidAmount == 0)
+                    if (buy.HighestBidAmount == 0)
                         return null;
 
                     var profit = gemPriceService.GetGemWrthFromLookup(buy.NBTLookup)
@@ -267,10 +267,10 @@ namespace Coflnet.Sky.Commands
                             .FirstOrDefault();
                     var soldFor = sell
                             ?.HighestBidAmount;
-                    
-                    var enchantsBad = b.Tag == "ENCHANTED_BOOK" && b.Enchants.Count == 1 && (sell.HighestBidAmount  - b.HighestOwnBid) > 1_000_000;
+
+                    var enchantsBad = b.Tag == "ENCHANTED_BOOK" && b.Enchants.Count == 1 && (sell.HighestBidAmount - b.HighestOwnBid) > 1_000_000;
                     var profit = 0L;
-                    if(b.Tag == sell.Tag
+                    if (b.Tag == sell.Tag
                         && !enchantsBad)
                         profit = gemPriceService.GetGemWrthFromLookup(b.Nbt)
                         - gemPriceService.GetGemWrthFromLookup(sell.NBTLookup)
@@ -280,7 +280,7 @@ namespace Coflnet.Sky.Commands
 
                     return new FlipDetails()
                     {
-                        Finder = (first == null ? LowPricedAuction.FinderType.UNKOWN : (LowPricedAuction.FinderType)first.FinderType),
+                        Finder = (first == null ? LowPricedAuction.FinderType.UNKOWN : Enum.Parse<LowPricedAuction.FinderType>(first.FinderType.ToString(), true)),
                         OriginAuction = b.Key,
                         ItemTag = sell.Tag,
                         Tier = sell.Tier.ToString(),
