@@ -280,7 +280,8 @@ namespace Coflnet.Sky.Commands
 
                     return new FlipDetails()
                     {
-                        Finder = (first == null ? LowPricedAuction.FinderType.UNKOWN : Enum.Parse<LowPricedAuction.FinderType>(first.FinderType.ToString(), true)),
+                        Finder = (first == null ? LowPricedAuction.FinderType.UNKOWN : Enum.Parse<LowPricedAuction.FinderType>(
+                            first.FinderType.ToString().Replace("SNIPERMEDIAN","SNIPER_MEDIAN"), true)),
                         OriginAuction = b.Key,
                         ItemTag = sell.Tag,
                         Tier = sell.Tier.ToString(),
