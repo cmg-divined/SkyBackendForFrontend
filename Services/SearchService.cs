@@ -52,7 +52,6 @@ namespace Coflnet.Sky.Commands.Shared
             if (search.Length > 40)
                 return Task.FromResult(Channel.CreateBounded<SearchResultItem>(0));
             return CreateResponse(search, token);
-
         }
 
         static SearchService()
@@ -216,7 +215,7 @@ namespace Coflnet.Sky.Commands.Shared
             var itemsResult = await items.ItemsSearchTermGetAsync(term, resultAmount);
             return itemsResult?.Select(i => new ItemDetails.ItemSearchResult()
             {
-                Name = i.Text + (i.Flags.Value.HasFlag(Sky.Items.Client.Model.ItemFlags.BAZAAR) ? " - bazaar" 
+                Name = i.Text + (i.Flags.Value.HasFlag(Sky.Items.Client.Model.ItemFlags.BAZAAR) ? " - bazaar"
                         : i.Flags.Value.HasFlag(Sky.Items.Client.Model.ItemFlags.AUCTION) ? "" : " - not on ah"),
                 Tag = i.Tag,
                 IconUrl = "https://sky.coflnet.com/static/icon/" + i.Tag,
@@ -264,7 +263,7 @@ namespace Coflnet.Sky.Commands.Shared
                                 .ToListAsync();
                     if (auctions.Count == 0)
                         return;
-                    foreach (var auction in auctions.GroupBy(a=>a.Tag).Select(a=>a.First()))
+                    foreach (var auction in auctions.GroupBy(a => a.Tag).Select(a => a.First()))
                     {
                         AddAuctionAsResult(Results, auction);
                     }
@@ -274,7 +273,7 @@ namespace Coflnet.Sky.Commands.Shared
 
         private static void AddAuctionAsResult(Channel<SearchResultItem> Results, SaveAuction auction)
         {
-            if(auction == null)
+            if (auction == null)
                 return;
             Results.Writer.TryWrite(new SearchResultItem
             {
@@ -290,9 +289,18 @@ namespace Coflnet.Sky.Commands.Shared
             AddFilterResult(Results, filter, auction.ItemName + " (Sells)", auction.Tag, 100_000);
         }
 
-        private static async Task FindItems(string search, Task<IEnumerable<ItemDetails.ItemSearchResult>> itemTask, Channel<SearchResultItem> Results)
+        private async Task FindItems(string search, Task<IEnumerable<ItemDetails.ItemSearchResult>> itemTask, Channel<SearchResultItem> Results)
         {
-            var items = await itemTask;
+            IEnumerable<ItemDetails.ItemSearchResult> items;
+            try
+            {
+                items = await itemTask;
+            }
+            catch (Exception e)
+            {
+                dev.Logger.Instance.Error(e, "searching for items");
+                items = await GetItems(search, 12);
+            }
             if (items.Count() == 0 && !IsHex(search))
                 items = await ItemDetails.Instance.FindClosest(search);
 
@@ -407,7 +415,7 @@ namespace Coflnet.Sky.Commands.Shared
                                 - (Fastenshtein.Levenshtein.Distance(lower, search) <= 1 ? 40 : 0) // just one mutation off maybe a typo
                                 + Fastenshtein.Levenshtein.Distance(lower.PadRight(search.Length), search) / 2 // distance to search
                                 + Fastenshtein.Levenshtein.Distance(lower.Truncate(search.Length), search)
-                                - (r.Type == "item" ? (search.Length < 5 ? 300 : 50)  : 0),
+                                - (r.Type == "item" ? (search.Length < 5 ? 300 : 50) : 0),
                                     r
                                 };
                             })
