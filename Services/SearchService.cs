@@ -14,6 +14,8 @@ using Coflnet.Sky.Core;
 using Microsoft.EntityFrameworkCore;
 using RestSharp;
 using System.Threading.Channels;
+using Microsoft.Extensions.DependencyInjection;
+
 
 namespace Coflnet.Sky.Commands.Shared
 {
@@ -171,12 +173,12 @@ namespace Coflnet.Sky.Commands.Shared
                 }*/
 
         private static Regex RomanNumber = new Regex("^[IVX]+$");
-        private static Task<Channel<SearchResultItem>> CreateResponse(string search, CancellationToken token)
+        private Task<Channel<SearchResultItem>> CreateResponse(string search, CancellationToken token)
         {
             var result = new List<SearchResultItem>();
 
             //var singlePlayer = PlayerSearch.Instance.FindDirect(search);
-            var itemTask = ItemDetails.Instance.Search(search, 12);
+            var itemTask = GetItems(search, 12);
             var playersTask = PlayerSearch.Instance.Search(search, targetAmount, false);
 
             var Results = Channel.CreateBounded<SearchResultItem>(50);
@@ -206,6 +208,21 @@ namespace Coflnet.Sky.Commands.Shared
 
             return Task.FromResult(Results);
             // return result.OrderBy(r => r.Name?.Length / 2 - r.HitCount - (r.Name?.ToLower() == search.ToLower() ? 10000000 : 0)).Take(targetAmount).ToList();
+        }
+
+        private async Task<IEnumerable<ItemDetails.ItemSearchResult>> GetItems(string term, int resultAmount)
+        {
+            var items = DiHandler.ServiceProvider.GetService<Sky.Items.Client.Api.IItemsApi>();
+            var itemsResult = await items.ItemsSearchTermGetAsync(term, resultAmount);
+            return itemsResult?.Select(i => new ItemDetails.ItemSearchResult()
+            {
+                Name = i.Text + (i.Flags.Value.HasFlag(Sky.Items.Client.Model.ItemFlags.BAZAAR) ? " - bazaar" 
+                        : i.Flags.Value.HasFlag(Sky.Items.Client.Model.ItemFlags.AUCTION) ? "" : " - not on ah"),
+                Tag = i.Tag,
+                IconUrl = "https://sky.coflnet.com/static/icon/" + i.Tag,
+                HitCount = i.Tag == "CAKE_SOUL" ? 2 : 30 // items higher base hit count
+
+            }).ToList();
         }
 
         private static async Task SearchForAuctions(string search, Channel<SearchResultItem> Results, string[] searchWords)

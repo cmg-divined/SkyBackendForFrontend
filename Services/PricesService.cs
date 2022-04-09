@@ -12,7 +12,7 @@ namespace Coflnet.Sky.Commands.Shared
     public class PricesService
     {
         private HypixelContext context;
-        private FilterEngine FilterEngine = new FilterEngine();
+        static private FilterEngine FilterEngine = new FilterEngine();
 
         /// <summary>
         /// Creates a new 
