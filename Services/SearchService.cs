@@ -274,6 +274,8 @@ namespace Coflnet.Sky.Commands.Shared
 
         private static void AddAuctionAsResult(Channel<SearchResultItem> Results, SaveAuction auction)
         {
+            if(auction == null)
+                return;
             Results.Writer.TryWrite(new SearchResultItem
             {
                 HitCount = 100_000, // account for "Enchantment" suffix
@@ -405,7 +407,7 @@ namespace Coflnet.Sky.Commands.Shared
                                 - (Fastenshtein.Levenshtein.Distance(lower, search) <= 1 ? 40 : 0) // just one mutation off maybe a typo
                                 + Fastenshtein.Levenshtein.Distance(lower.PadRight(search.Length), search) / 2 // distance to search
                                 + Fastenshtein.Levenshtein.Distance(lower.Truncate(search.Length), search)
-                                - (r.Type == "item" ? 50 : 0),
+                                - (r.Type == "item" ? (search.Length < 5 ? 300 : 50)  : 0),
                                     r
                                 };
                             })
@@ -414,7 +416,7 @@ namespace Coflnet.Sky.Commands.Shared
                         .ToList()
                         .Select(r => r.r)
                         .Distinct(new SearchService.SearchResultComparer())
-                        .Take(5)
+                        .Take(10)
                         .ToList();
             return orderedResult;
         }
