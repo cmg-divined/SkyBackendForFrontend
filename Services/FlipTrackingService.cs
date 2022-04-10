@@ -181,7 +181,7 @@ namespace Coflnet.Sky.Commands
 
                     var profit = gemPriceService.GetGemWrthFromLookup(buy.NBTLookup)
                                 - gemPriceService.GetGemWrthFromLookup(s.NBTLookup)
-                                + s.HighestBidAmount
+                                + s.HighestBidAmount * 98 / 100
                                 - buy.HighestBidAmount;
 
 
