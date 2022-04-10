@@ -181,7 +181,6 @@ namespace Coflnet.Sky.Commands.Shared
         }
 
 
-        
 
         [Test]
         public void FlipFilterFinderCustomMinProfitNoBinMatch()
@@ -213,6 +212,25 @@ namespace Coflnet.Sky.Commands.Shared
             sampleFlip.Finder = LowPricedAuction.FinderType.SNIPER_MEDIAN;
             Matches(settings, sampleFlip);
         }
+
+        [Test]
+        public void RenownedFivestaredMythic()
+        {
+            NBT.Instance = new NBTMock();
+            var filters = new Dictionary<string, string>() { { "Stars", "5" }, { "Reforge", "Renowned" }, { "Rarity", "MYTHIC" } };
+            var matcher = new ListEntry() { filter = filters, ItemTag = "abc" };
+            var result = matcher.GetExpression().Compile()(new FlipInstance()
+            {
+                Auction = new SaveAuction()
+                {
+                    Reforge = ItemReferences.Reforge.Renowned,
+                    Tier = Tier.MYTHIC,
+                    NBTLookup = new List<NBTLookup>() { new NBTLookup(1, 5) }
+                }
+            });
+            Assert.IsTrue(result);
+        }
+
         [Test]
         public void FlipFilterFinderBlacklist()
         {

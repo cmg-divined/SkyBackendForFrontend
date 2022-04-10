@@ -29,5 +29,11 @@ namespace Coflnet.Sky.Commands.Shared
         public string Format;
         [DataMember(Name = "chat")]
         public bool Chat;
+        /// <summary>
+        /// Should a countdown be displayed till the update
+        /// </summary>
+        /// <value></value>
+        [DataMember(Name = "countdown")]
+        public bool DisplayTimer;
     }
 }
