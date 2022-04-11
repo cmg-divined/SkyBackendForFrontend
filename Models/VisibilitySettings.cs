@@ -32,5 +32,20 @@ namespace Coflnet.Sky.Commands.Shared
         public bool SellerOpenButton;
         [DataMember(Name = "lore")]
         public bool Lore;
+        /// <summary>
+        /// this has been disabled in the mod by using {get;set,}
+        /// </summary>
+        [DataMember(Name = "links")]
+        public bool CopyLinkOnFlipClick { get; set; }
+        /// <summary>
+        /// this has been disabled in the mod by using {get;set,}
+        /// </summary>
+        [DataMember(Name = "copySuccessMessage")]
+        public bool CopySuccessMessage { get; set; }
+        /// <summary>
+        /// this has been disabled in the mod by using {get;set,}
+        /// </summary>
+        [DataMember(Name = "hideSold")]
+        public bool HideSoldAuction { get; set; }
     }
 }
