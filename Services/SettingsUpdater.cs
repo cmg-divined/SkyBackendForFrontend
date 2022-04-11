@@ -41,7 +41,13 @@ namespace Coflnet.Sky.Commands.Shared
         {
             if (!options.TryGetValue(key, out string realKey))
                 throw new CoflnetException("invalid_setting", "the passed setting doesn't exist");
-            if (key.StartsWith("show"))
+            if (key == "blacklist")
+                con.Settings.BlackList = JsonConvert.DeserializeObject<List<ListEntry>>(value);
+            else if (key == "whitelist")
+                con.Settings.WhiteList = JsonConvert.DeserializeObject<List<ListEntry>>(value);
+            else if (key == "filter")
+                con.Settings.Filters = JsonConvert.DeserializeObject<Dictionary<string, string>>(value);
+            else if (key.StartsWith("show"))
             {
                 var field = con.Settings.Visibility?.GetType().GetField(realKey);
                 var typedValue = Convert.ChangeType(value, field.FieldType);
