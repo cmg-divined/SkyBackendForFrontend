@@ -39,8 +39,6 @@ namespace Coflnet.Sky.Commands.Shared
         [DataMember(Name = "lbin")]
         public bool BasedOnLBin;
 
-
-
         [DataMember(Name = "visibility")]
         public VisibilitySettings Visibility;
 
@@ -58,7 +56,8 @@ namespace Coflnet.Sky.Commands.Shared
         /// </summary>
         [DataMember(Name = "changer")]
         public string Changer;
-
+        [DataMember(Name = "onlyBin")]
+        public bool OnlyBin;
 
         private FlipFilter filter;
         private List<FlipFilter> blackListFilters;
@@ -103,7 +102,9 @@ namespace Coflnet.Sky.Commands.Shared
             match = BlackListMatcher.IsMatch(flip);
             if (match.Item1)
                 return (false, "blacklist " + match.Item2);
-
+            
+            if (OnlyBin && !flip.Auction.Bin)
+                return (false, "not bin");
 
             if (filter == null)
                 filter = new FlipFilter(this.Filters);
@@ -149,7 +150,7 @@ namespace Coflnet.Sky.Commands.Shared
                    AllowedFinders == settings.AllowedFinders &&
                    FastMode == settings.FastMode &&
                    Changer == settings.Changer &&
-                   EqualityComparer<FlipFilter>.Default.Equals(filter, settings.filter) &&
+                   OnlyBin == settings.OnlyBin &&
                    EqualityComparer<List<FlipFilter>>.Default.Equals(blackListFilters, settings.blackListFilters) &&
                    EqualityComparer<ListMatcher>.Default.Equals(BlackListMatcher, settings.BlackListMatcher) &&
                    EqualityComparer<ListMatcher>.Default.Equals(WhiteListMatcher, settings.WhiteListMatcher);
@@ -171,7 +172,7 @@ namespace Coflnet.Sky.Commands.Shared
             hash.Add(AllowedFinders);
             hash.Add(FastMode);
             hash.Add(Changer);
-            hash.Add(filter);
+            hash.Add(OnlyBin);
             hash.Add(blackListFilters);
             hash.Add(BlackListMatcher);
             hash.Add(WhiteListMatcher);
