@@ -26,7 +26,7 @@ namespace Coflnet.Sky.Commands.Shared
         {
             foreach (var item in fields)
             {
-                if (item.FieldType.IsPrimitive || item.FieldType == typeof(string))
+                if (item.FieldType.IsPrimitive || item.FieldType == typeof(string) || item.FieldType.IsEnum)
                     options.Add(prefix + (item.GetCustomAttributes(typeof(DataMemberAttribute), true).First() as DataMemberAttribute).Name, item.Name);
             }
             options.Remove("changer");
@@ -45,7 +45,7 @@ namespace Coflnet.Sky.Commands.Shared
                 con.Settings.WhiteList = JsonConvert.DeserializeObject<List<ListEntry>>(value);
             else if (key == "filter")
                 con.Settings.Filters = JsonConvert.DeserializeObject<Dictionary<string, string>>(value);
-            
+
             else if (!options.TryGetValue(key, out string realKey))
                 throw new CoflnetException("invalid_setting", "the passed setting doesn't exist");
             else if (key.StartsWith("show"))
@@ -63,7 +63,11 @@ namespace Coflnet.Sky.Commands.Shared
             else
             {
                 var field = con.Settings.GetType().GetField(realKey);
-                var typedValue = Convert.ChangeType(value, field.FieldType);
+                object typedValue;
+                if (field.FieldType.IsEnum)
+                    typedValue = Enum.Parse(field.FieldType, value);
+                else
+                    typedValue = Convert.ChangeType(value, field.FieldType);
                 Console.WriteLine(JsonConvert.SerializeObject(typedValue));
                 field.SetValue(con.Settings, typedValue);
             }
