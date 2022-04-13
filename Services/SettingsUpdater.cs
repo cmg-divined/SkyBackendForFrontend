@@ -46,7 +46,7 @@ namespace Coflnet.Sky.Commands.Shared
             else if (key == "filter")
                 con.Settings.Filters = JsonConvert.DeserializeObject<Dictionary<string, string>>(value);
             
-            if (!options.TryGetValue(key, out string realKey))
+            else if (!options.TryGetValue(key, out string realKey))
                 throw new CoflnetException("invalid_setting", "the passed setting doesn't exist");
             else if (key.StartsWith("show"))
             {
