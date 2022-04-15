@@ -274,14 +274,14 @@ namespace Coflnet.Sky.Commands
                         && !enchantsBad)
                         profit = gemPriceService.GetGemWrthFromLookup(b.Nbt)
                         - gemPriceService.GetGemWrthFromLookup(sell.NBTLookup)
-                        + sell.HighestBidAmount
+                        + s.HighestBidAmount * 98 / 100
                         - b.HighestOwnBid;
 
 
                     return new FlipDetails()
                     {
                         Finder = (first == null ? LowPricedAuction.FinderType.UNKOWN : Enum.Parse<LowPricedAuction.FinderType>(
-                            first.FinderType.ToString().Replace("SNIPERMEDIAN","SNIPER_MEDIAN"), true)),
+                            first.FinderType.ToString().Replace("SNIPERMEDIAN", "SNIPER_MEDIAN"), true)),
                         OriginAuction = b.Key,
                         ItemTag = sell.Tag,
                         Tier = sell.Tier.ToString(),
