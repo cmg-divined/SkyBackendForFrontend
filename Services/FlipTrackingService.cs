@@ -274,7 +274,7 @@ namespace Coflnet.Sky.Commands
                         && !enchantsBad)
                         profit = gemPriceService.GetGemWrthFromLookup(b.Nbt)
                         - gemPriceService.GetGemWrthFromLookup(sell.NBTLookup)
-                        + s.HighestBidAmount * 98 / 100
+                        + sell.HighestBidAmount * 98 / 100
                         - b.HighestOwnBid;
 
 
