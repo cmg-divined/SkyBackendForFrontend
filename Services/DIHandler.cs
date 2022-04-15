@@ -4,6 +4,7 @@ using Coflnet.Payments.Client.Api;
 using System;
 using Coflnet.Payments.Client.Client;
 using Coflnet.Sky.Items.Client.Api;
+using Coflnet.Sky.Referral.Client.Api;
 
 namespace Coflnet.Sky.Commands.Shared
 {
@@ -47,6 +48,11 @@ namespace Coflnet.Sky.Commands.Shared
             {
                 var config = context.GetRequiredService<IConfiguration>();
                 return new ItemsApi(config["ITEMS_BASE_URL"]);
+            });
+            services.AddSingleton<IReferralApi>(context =>
+            {
+                var config = context.GetRequiredService<IConfiguration>();
+                return new ReferralApi(config["REFERRAL_BASE_URL"]);
             });
 
             _servics = services;
