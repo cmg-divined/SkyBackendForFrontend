@@ -218,6 +218,7 @@ namespace Coflnet.Sky.Commands
                 var sellList = await context.Auctions.Where(a => a.SellerId == playerId)
                     .Where(a => a.End > startTime && a.End < DateTime.Now && a.HighestBidAmount > 0 && a.Bin)
                     .Include(a => a.NBTLookup)
+                    .Include(a => a.Enchantments)
                     .ToListAsync();
 
                 var sells = sellList
@@ -268,7 +269,8 @@ namespace Coflnet.Sky.Commands
                     var soldFor = sell
                             ?.HighestBidAmount;
 
-                    var enchantsBad = b.Tag == "ENCHANTED_BOOK" && b.Enchants.Count == 1 && (sell.HighestBidAmount - b.HighestOwnBid) > 1_000_000;
+                    var enchantsBad = b.Tag == "ENCHANTED_BOOK" && b.Enchants.Count == 1 && sell.Enchantments.Count != 1 
+                                        && (sell.HighestBidAmount - b.HighestOwnBid) > 1_000_000;
                     var profit = 0L;
                     if (b.Tag == sell.Tag
                         && !enchantsBad)
