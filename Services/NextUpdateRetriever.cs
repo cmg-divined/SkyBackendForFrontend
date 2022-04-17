@@ -16,7 +16,7 @@ namespace Coflnet.Sky.Commands.MC
                 {
                     last = (await client.ExecuteAsync<DateTime>(new RestRequest("/api/time"))).Data;
                 }
-                var next = last + TimeSpan.FromSeconds(57);
+                var next = last + TimeSpan.FromSeconds(60);
                 while (next < DateTime.Now)
                     next += TimeSpan.FromMinutes(1);
                 return next;
