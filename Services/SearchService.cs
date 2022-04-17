@@ -251,7 +251,7 @@ namespace Coflnet.Sky.Commands.Shared
                 var auction = await AuctionService.Instance.GetAuctionAsync(search, a => a.Include(a => a.NBTLookup));
                 AddAuctionAsResult(Results, auction);
             }
-            else if (search.Length == 12)
+            else if (search.Length == 12 || search.Length == 36)
             {
                 var key = NBT.GetLookupKey("uid");
                 var val = NBT.UidToLong(search);
