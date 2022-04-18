@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.Serialization;
 using Coflnet.Sky.Core;
+using System.Reflection;
 
 namespace Coflnet.Sky.Commands.Shared
 {
@@ -37,7 +38,7 @@ namespace Coflnet.Sky.Commands.Shared
         {
             return options.Keys.ToArray();
         }
-        public async Task Update(IFlipConnection con, string key, string value)
+        public async Task<object> Update(IFlipConnection con, string key, string value)
         {
             if (key == "blacklist")
                 con.Settings.BlackList = JsonConvert.DeserializeObject<List<ListEntry>>(value);
@@ -50,28 +51,40 @@ namespace Coflnet.Sky.Commands.Shared
                 throw new CoflnetException("invalid_setting", "the passed setting doesn't exist");
             else if (key.StartsWith("show"))
             {
-                var field = con.Settings.Visibility?.GetType().GetField(realKey);
-                var typedValue = Convert.ChangeType(value, field.FieldType);
-                field.SetValue(con.Settings.Visibility, typedValue);
+                return UpdateValueOnObject(value, realKey, con.Settings.Visibility);
             }
             else if (key.StartsWith("mod"))
             {
-                var field = con.Settings.ModSettings?.GetType().GetField(realKey);
-                var typedValue = Convert.ChangeType(value, field.FieldType);
-                field.SetValue(con.Settings.ModSettings, typedValue);
+                return UpdateValueOnObject(value, realKey, con.Settings.ModSettings);
             }
             else
             {
-                var field = con.Settings.GetType().GetField(realKey);
-                object typedValue;
-                if (field.FieldType.IsEnum)
-                    typedValue = Enum.Parse(field.FieldType, value);
-                else
-                    typedValue = Convert.ChangeType(value, field.FieldType);
-                Console.WriteLine(JsonConvert.SerializeObject(typedValue));
-                field.SetValue(con.Settings, typedValue);
+                UpdateValueOnObject(value,realKey, con.Settings);
             }
+            return value;
         }
 
+        private static object UpdateValueOnObject(string value, string realKey, object obj)
+        {
+            var field = obj.GetType().GetField(realKey);
+            if (value.ToLower().EndsWith('m') && field.FieldType.IsPrimitive)
+                value = value.ToLower().Replace("m", "000000");
+            if (value.ToLower().EndsWith('k') && field.FieldType.IsPrimitive)
+                value = value.ToLower().Replace("k", "000");
+            object newValue;
+            // if no value is provided and its a bool toggle it
+            if (string.IsNullOrEmpty(value) && field.FieldType == typeof(bool))
+            {
+                newValue = !(bool)field.GetValue(obj);
+            }
+            else if (field.FieldType.IsEnum)
+                newValue = Enum.Parse(field.FieldType, value);
+            else
+                newValue = Convert.ChangeType(value, field.FieldType);
+
+            field.SetValue(obj, newValue);
+
+            return newValue;
+        }
     }
 }

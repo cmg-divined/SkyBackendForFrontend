@@ -35,5 +35,7 @@ namespace Coflnet.Sky.Commands.Shared
         /// <value></value>
         [DataMember(Name = "countdown")]
         public bool DisplayTimer;
+        [DataMember(Name = "hideNoBestFlip")]
+        public bool HideNoBestFlip;
     }
 }
