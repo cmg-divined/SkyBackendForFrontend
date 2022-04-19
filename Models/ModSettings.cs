@@ -37,5 +37,15 @@ namespace Coflnet.Sky.Commands.Shared
         public bool DisplayTimer;
         [DataMember(Name = "hideNoBestFlip")]
         public bool HideNoBestFlip;
+        [DataMember(Name = "timerX")]
+        public int TimerX;
+        [DataMember(Name = "timerY")]
+        public int TimerY;
+        [DataMember(Name = "timerSeconds")]
+        public int TimerSeconds;
+        [DataMember(Name = "timerScale")]
+        public float TimerScale;
+        [DataMember(Name = "timerPrefix")]
+        public string TimerPrefix;
     }
 }
