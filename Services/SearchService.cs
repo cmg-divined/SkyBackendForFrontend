@@ -321,9 +321,9 @@ namespace Coflnet.Sky.Commands.Shared
 
         private static async Task FindSimilarSearches(string search, Channel<SearchResultItem> Results, string[] searchWords)
         {
-            if (search.Length <= 2 || IsHex(search))
+            if (search.Length <= 8 || IsHex(search))
                 return;
-            await Task.Delay(1);
+            await Task.Delay(20);
             foreach (var item in await CoreServer.ExecuteCommandWithCache<string, List<SearchResultItem>>("fullSearch", search.Substring(0, search.Length - 2)))
                 await Results.Writer.WriteAsync(item);
             if (searchWords.Count() == 1 || String.IsNullOrWhiteSpace(searchWords.Last()))
