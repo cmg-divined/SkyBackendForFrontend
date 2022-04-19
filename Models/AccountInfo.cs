@@ -20,5 +20,7 @@ namespace Coflnet.Sky.Commands.Shared
         public AccountTier Tier;
         [DataMember(Name = "expires")]
         public DateTime ExpiresAt;
+        [DataMember(Name = "activeCon")]
+        public string ActiveConnectionId;
     }
 }
