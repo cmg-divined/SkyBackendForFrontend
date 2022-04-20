@@ -36,7 +36,7 @@ namespace Coflnet.Sky.Commands
         }
         public async Task<Coflnet.Sky.McConnect.Models.User> GetUserId(string mcId)
         {
-            return await ExecuteUserRequest(new RestRequest("connect/minecraft/{mcId}", Method.POST)
+            return await ExecuteUserRequest(new RestRequest("connect/minecraft/{mcId}", Method.GET)
                                 .AddUrlSegment("mcId", mcId));
 
         }
