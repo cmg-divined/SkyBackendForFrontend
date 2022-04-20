@@ -84,7 +84,7 @@ namespace Coflnet.Sky.Commands.Shared
         public (bool, string) MatchesSettings(FlipInstance flip)
         {
             if (ForcedBlackListMatcher == null)
-                ForcedBlackListMatcher = new ListMatcher(BlackList.Where(b=>b.filter.Where(f=>f.Key == "ForceBlacklist").Any()).ToList());
+                ForcedBlackListMatcher = new ListMatcher(BlackList?.Where(b=>b.filter?.Where(f=>f.Key == "ForceBlacklist").Any() ?? false).ToList());
             var forceBlacklistMatch = ForcedBlackListMatcher.IsMatch(flip);
             if (forceBlacklistMatch.Item1)
                 return (false, "forced blacklist " + forceBlacklistMatch.Item2);
