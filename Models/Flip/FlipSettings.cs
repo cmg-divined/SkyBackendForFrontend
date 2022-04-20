@@ -13,14 +13,18 @@ namespace Coflnet.Sky.Commands.Shared
     public class FlipFilters
     {
         [DataMember(Name = "minProfit")]
+        [SettingsDoc("Minimum profit of flips")]
         public int MinProfit;
 
         [DataMember(Name = "minProfitPercent")]
+        [SettingsDoc("Minimum profit Percentage")]
         public int MinProfitPercent;
 
+        [SettingsDoc("The minimum sales per 24 hours (has decimals)")]
         [DataMember(Name = "minVolume")]
         public double MinVolume;
 
+        [SettingsDoc("Maximium cost of flips")]
         [DataMember(Name = "maxCost")]
         public int MaxCost;
     }
@@ -37,6 +41,7 @@ namespace Coflnet.Sky.Commands.Shared
         public List<ListEntry> WhiteList;
 
         [DataMember(Name = "lbin")]
+        [SettingsDoc("Calculate profit based on lowest bin")]
         public bool BasedOnLBin;
 
         [DataMember(Name = "visibility")]
@@ -46,17 +51,21 @@ namespace Coflnet.Sky.Commands.Shared
         public ModSettings ModSettings;
 
         [DataMember(Name = "finders")]
+        [SettingsDoc("Calculate profit based on lowest bin")]
         public LowPricedAuction.FinderType AllowedFinders;
 
         [DataMember(Name = "fastMode")]
+        [SettingsDoc("Use the fast lane flips", true)]
         public bool FastMode;
 
         /// <summary>
         /// The initiating party that sent the change
         /// </summary>
         [DataMember(Name = "changer")]
+        [SettingsDoc("The last changer of the settings", true)]
         public string Changer;
         [DataMember(Name = "onlyBin")]
+        [SettingsDoc("Hide all auctions")]
         public bool OnlyBin;
 
         private FlipFilter filter;
@@ -102,7 +111,7 @@ namespace Coflnet.Sky.Commands.Shared
             match = BlackListMatcher.IsMatch(flip);
             if (match.Item1)
                 return (false, "blacklist " + match.Item2);
-            
+
             if (OnlyBin && !flip.Auction.Bin)
                 return (false, "not bin");
 

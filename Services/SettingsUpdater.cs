@@ -14,7 +14,17 @@ namespace Coflnet.Sky.Commands.Shared
     /// </summary>
     public class SettingsUpdater
     {
-        private Dictionary<string, string> options = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
+        private Dictionary<string, SettingDoc> options = new Dictionary<string, SettingDoc>(StringComparer.OrdinalIgnoreCase);
+
+        public class SettingDoc
+        {
+            public string RealName;
+            public string Info;
+            public bool Hide;
+            public string ShortHand;
+
+            public string Prefix { get; set; }
+        }
 
         public SettingsUpdater()
         {
@@ -28,16 +38,37 @@ namespace Coflnet.Sky.Commands.Shared
             foreach (var item in fields)
             {
                 if (item.FieldType.IsPrimitive || item.FieldType == typeof(string) || item.FieldType.IsEnum)
-                    options.Add(prefix + (item.GetCustomAttributes(typeof(DataMemberAttribute), true).First() as DataMemberAttribute).Name, item.Name);
+                {
+                    var commandSlug = (item.GetCustomAttributes(typeof(DataMemberAttribute), true).First() as DataMemberAttribute).Name;
+                    var doc = (item.GetCustomAttributes(typeof(SettingsDocAttribute), true).FirstOrDefault() as SettingsDocAttribute);
+                    SettingDoc desc = GetDesc(item, doc, prefix);
+                    options.Add(prefix + commandSlug, GetDesc(item, doc, prefix));
+                    if (doc?.ShortHand != null)
+                        options.Add(doc?.ShortHand, GetDesc(item, doc, prefix, true));
+                }
+
             }
-            options.Remove("changer");
-            options.Remove("showavgSellTime");
+        }
+
+        private SettingDoc GetDesc(FieldInfo item, SettingsDocAttribute doc, string prefix, bool isShortHand = false)
+        {
+            return new SettingDoc()
+            {
+                RealName = item.Name,
+                Prefix = prefix,
+                Info = doc?.Description,
+                Hide = (doc?.Hide ?? false) || isShortHand,
+                ShortHand = doc?.ShortHand
+            };
         }
 
         public string[] Options()
         {
             return options.Keys.ToArray();
         }
+
+        public IEnumerable<KeyValuePair<string,SettingDoc>> ModOptions => options;
+
         public async Task<object> Update(IFlipConnection con, string key, string value)
         {
             if (key == "blacklist")
@@ -47,19 +78,22 @@ namespace Coflnet.Sky.Commands.Shared
             else if (key == "filter")
                 con.Settings.Filters = JsonConvert.DeserializeObject<Dictionary<string, string>>(value);
 
-            else if (!options.TryGetValue(key, out string realKey))
-                throw new CoflnetException("invalid_setting", "the passed setting doesn't exist");
-            else if (key.StartsWith("show"))
+            else if (!options.TryGetValue(key, out SettingDoc doc))
             {
-                return UpdateValueOnObject(value, realKey, con.Settings.Visibility);
+                var closest = options.Keys.OrderBy(k => Fastenshtein.Levenshtein.Distance(k.ToLower(), key.ToLower())).First();
+                throw new CoflnetException("invalid_setting", $"the setting {key} doesn't exist, most similar is {closest}");
             }
-            else if (key.StartsWith("mod"))
+            else if (doc.Prefix == "show")
             {
-                return UpdateValueOnObject(value, realKey, con.Settings.ModSettings);
+                return UpdateValueOnObject(value, doc.RealName, con.Settings.Visibility);
+            }
+            else if (doc.Prefix == "mod")
+            {
+                return UpdateValueOnObject(value, doc.RealName, con.Settings.ModSettings);
             }
             else
             {
-                UpdateValueOnObject(value,realKey, con.Settings);
+                UpdateValueOnObject(value, doc.RealName, con.Settings);
             }
             return value;
         }
@@ -78,7 +112,7 @@ namespace Coflnet.Sky.Commands.Shared
                 newValue = !(bool)field.GetValue(obj);
             }
             else if (field.FieldType.IsEnum)
-                newValue = Enum.Parse(field.FieldType, value);
+                newValue = Enum.Parse(field.FieldType, value, true);
             else
                 newValue = Convert.ChangeType(value, field.FieldType);
 
