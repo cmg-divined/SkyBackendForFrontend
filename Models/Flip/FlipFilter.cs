@@ -28,6 +28,7 @@ namespace Coflnet.Sky.Commands.Shared
             AdditionalFilters.Add<ItemCategoryDetailedFlipFilter>();
             AdditionalFilters.Add<MinProfitDetailedFlipFilter>();
             AdditionalFilters.Add<ReferenceAgeDetailedFlipFilter>();
+            AdditionalFilters.Add<ForceBlacklistDetailedFlipFilter>();
         }
 
         public FlipFilter(Dictionary<string, string> originalf)
@@ -49,7 +50,7 @@ namespace Coflnet.Sky.Commands.Shared
                         var newPart = AdditionalFilters[item].GetExpression(filters, match.Value);
                         if (expression == null)
                             expression = newPart;
-                        else
+                        else if(newPart == null)
                             expression = newPart.And(expression);
                     }
                 }

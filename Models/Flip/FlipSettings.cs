@@ -6,6 +6,7 @@ using System.Runtime.Serialization;
 using Coflnet.Sky.Core;
 using Coflnet.Sky.Filter;
 using System.Collections.Concurrent;
+using System.Linq;
 
 namespace Coflnet.Sky.Commands.Shared
 {
@@ -71,6 +72,7 @@ namespace Coflnet.Sky.Commands.Shared
         private FlipFilter filter;
         private List<FlipFilter> blackListFilters;
         private ListMatcher BlackListMatcher;
+        private ListMatcher ForcedBlackListMatcher;
         private ListMatcher WhiteListMatcher;
         private Func<FlipInstance, bool> generalFilter;
 
@@ -81,6 +83,11 @@ namespace Coflnet.Sky.Commands.Shared
         /// <returns>true if it matches</returns>
         public (bool, string) MatchesSettings(FlipInstance flip)
         {
+            if (ForcedBlackListMatcher == null)
+                ForcedBlackListMatcher = new ListMatcher(BlackList.Where(b=>b.filter.Where(f=>f.Key == "ForceBlacklist").Any()).ToList());
+            var forceBlacklistMatch = ForcedBlackListMatcher.IsMatch(flip);
+            if (forceBlacklistMatch.Item1)
+                return (false, "forced blacklist " + forceBlacklistMatch.Item2);
 
             if (WhiteListMatcher == null)
                 WhiteListMatcher = new ListMatcher(WhiteList);
