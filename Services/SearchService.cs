@@ -301,8 +301,6 @@ namespace Coflnet.Sky.Commands.Shared
                 dev.Logger.Instance.Error(e, "searching for items");
                 items = await GetItems(search, 12);
             }
-            if (items.Count() == 0 && !IsHex(search))
-                items = await ItemDetails.Instance.FindClosest(search);
 
             foreach (var item in items.Select(item => new SearchResultItem(item)))
             {
