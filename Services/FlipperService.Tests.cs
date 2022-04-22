@@ -17,7 +17,7 @@ namespace Coflnet.Sky.Commands.Tests
             var service = new FlipperService();
             var con = new MockConnection();
             service.AddConnection(con);
-            for (int i = 0; i < 20; i++)
+            for (int i = 0; i < 10; i++)
                 service.AddConnection(new MockConnection());
             var auction = new SaveAuction() { NbtData = new NbtData(), Enchantments = new System.Collections.Generic.List<Enchantment>() };
             var watch = Stopwatch.StartNew();
@@ -57,6 +57,7 @@ namespace Coflnet.Sky.Commands.Tests
             public Task<bool> SendFlip(FlipInstance flip)
             {
                 LastFlip = flip;
+                Console.WriteLine("sending a flip");
                 return Task.FromResult(true);
             }
 

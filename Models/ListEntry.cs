@@ -28,7 +28,7 @@ namespace Coflnet.Sky.Commands.Shared
         public Expression<Func<FlipInstance,bool>> GetExpression()
         {
             var filterCache = new FlipFilter(this.filter);
-            Expression<Func<FlipInstance,bool>> normal = (flip) => (ItemTag == null || ItemTag == flip.Auction.Tag);
+       //     Expression<Func<FlipInstance,bool>> normal = (flip) => (ItemTag == null || ItemTag == flip.Auction.Tag);
             return filterCache.GetExpression();
         }
     }

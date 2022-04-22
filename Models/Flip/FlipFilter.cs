@@ -50,7 +50,7 @@ namespace Coflnet.Sky.Commands.Shared
                         var newPart = AdditionalFilters[item].GetExpression(filters, match.Value);
                         if (expression == null)
                             expression = newPart;
-                        else if(newPart == null)
+                        else if(newPart != null)
                             expression = newPart.And(expression);
                     }
                 }

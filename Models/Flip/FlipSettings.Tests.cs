@@ -138,7 +138,7 @@ namespace Coflnet.Sky.Commands.Shared
                 if(!settings.MatchesSettings(flipB).Item1)
                     matchCount++;
             }
-            Assert.Greater(15, stopWatch.ElapsedMilliseconds, "matching blacklist is too slow");
+            Assert.Greater(16, stopWatch.ElapsedMilliseconds, "matching blacklist is too slow");
             Assert.AreEqual(iterations* 2,matchCount );
         }
 

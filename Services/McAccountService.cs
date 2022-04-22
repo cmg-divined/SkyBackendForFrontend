@@ -38,7 +38,6 @@ namespace Coflnet.Sky.Commands
         {
             return await ExecuteUserRequest(new RestRequest("connect/minecraft/{mcId}", Method.GET)
                                 .AddUrlSegment("mcId", mcId));
-
         }
 
         [DataContract]

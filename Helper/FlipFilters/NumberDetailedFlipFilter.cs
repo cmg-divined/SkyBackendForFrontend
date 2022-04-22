@@ -5,6 +5,7 @@ using System.Linq;
 using System.Linq.Expressions;
 using Coflnet.Sky.Filter;
 using Coflnet.Sky.Core;
+using System.Globalization;
 
 namespace Coflnet.Sky.Commands.Shared
 {
@@ -22,10 +23,9 @@ namespace Coflnet.Sky.Commands.Shared
                 var max = parts[1];
                 return ExpressionMinMax(selector, min, max);
             }
-            var value = double.Parse(content.Replace("<", "").Replace(">", ""));
-            Console.WriteLine(value);
+            var value = double.Parse(content.Replace("<", "").Replace(">", "").Replace(',','.'), NumberStyles.Any, CultureInfo.InvariantCulture);
             if (content.StartsWith("<"))
-                return ExpressionMinMax(selector, 1, value - 1);
+                return ExpressionMinMax(selector, 0, value - 0.0000001);
             if (content.StartsWith(">"))
             {
                 return ExpressionMinMax(selector, value, int.MaxValue);

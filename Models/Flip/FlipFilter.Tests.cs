@@ -159,11 +159,27 @@ namespace Coflnet.Sky.Commands.Shared
             var settings = new FlipSettings()
             {
                 MinProfit = 1,
-                MinVolume = 0.5,
+                MinVolume = 50,
             };
-            settings.WhiteList = new List<ListEntry>() { new ListEntry() { filter = new Dictionary<string, string>() { { "Volume", "<0,5" } } } };
+            settings.WhiteList = new List<ListEntry>() { new ListEntry() { filter = new Dictionary<string, string>() { { "Volume", "<0.5" } } } };
+            sampleFlip.Volume = 0.1f;
             var matches3 = settings.MatchesSettings(sampleFlip);
             Assert.IsTrue(matches3.Item1, matches3.Item2);
+            sampleFlip.Volume = 1;
+            var notMatch = settings.MatchesSettings(sampleFlip);
+            Assert.IsFalse(notMatch.Item1, notMatch.Item2);
+        }
+
+        [Test]
+        [TestCase("1", 1, true)]
+        [TestCase("<1", 0.5f, true)]
+        [TestCase(">1", 0.5f, false)]
+        [TestCase("<0.5", 0.1f, true)]
+        public void VolumeDeciamalFilterSingleMatch(string val, float vol, bool result)
+        {
+            var volumeFilter = new VolumeDetailedFlipFilter();
+            var exp = volumeFilter.GetExpression(null, val);
+            Assert.AreEqual(exp.Compile().Invoke(new FlipInstance() { Volume = vol }), result);
         }
         [Test]
         [TestCase("1", true)]
@@ -229,6 +245,23 @@ namespace Coflnet.Sky.Commands.Shared
                 }
             });
             Assert.IsTrue(result);
+        }
+
+
+        [Test]
+        public void ForceBlacklistOverwritesWhitelist()
+        {
+            var settings = new FlipSettings()
+            {
+                MinProfit = 0,
+                MinVolume = 0,
+            };
+            settings.WhiteList = new List<ListEntry>() { new ListEntry() { filter = new Dictionary<string, string>() { { "Volume", "<0.5" } } } };
+            settings.BlackList = new List<ListEntry>() { new ListEntry() { filter = new Dictionary<string, string>() { { "Volume", "<0.5" }, {"ForceBlacklist", ""} } } };
+            sampleFlip.Volume = 0.1f;
+            var result = settings.MatchesSettings(sampleFlip);
+            
+            Assert.IsFalse(result.Item1, result.Item2);
         }
 
         [Test]

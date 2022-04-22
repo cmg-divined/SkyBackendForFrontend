@@ -53,7 +53,7 @@ namespace Coflnet.Sky.Commands.Shared
 
             private static bool IsPet(ItemDetails.ItemSearchResult item)
             {
-                return (item.Tag.StartsWith("PET") && !item.Tag.StartsWith("PET_SKIN"));
+                return ((item?.Tag?.StartsWith("PET") ?? false) && !item.Tag.StartsWith("PET_SKIN"));
             }
 
             public override bool Equals(object obj)
