@@ -308,6 +308,8 @@ namespace Coflnet.Sky.Commands.Shared
             {
                 await Results.Writer.WriteAsync(item);
             }
+            if (items.Count() == 0)
+                await Results.Writer.WriteAsync(new SearchResultItem() { Type = "internal", Id = "items" });
         }
 
         private static async Task FindPlayers(Task<IEnumerable<PlayerResult>> playersTask, Channel<SearchResultItem> Results)
