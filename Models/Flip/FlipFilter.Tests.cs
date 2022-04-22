@@ -262,6 +262,7 @@ namespace Coflnet.Sky.Commands.Shared
             var result = settings.MatchesSettings(sampleFlip);
             
             Assert.IsFalse(result.Item1, result.Item2);
+            Assert.AreEqual("forced blacklist matched general filter", result.Item2);
         }
 
         [Test]

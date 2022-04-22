@@ -83,6 +83,9 @@ namespace Coflnet.Sky.Commands.Shared
         /// <returns>true if it matches</returns>
         public (bool, string) MatchesSettings(FlipInstance flip)
         {
+            if (IsFinderBlocked(flip.Finder))
+                return (false, "finder " + flip.Finder.ToString());
+
             if (ForcedBlackListMatcher == null)
                 ForcedBlackListMatcher = new ListMatcher(BlackList?.Where(b=>b.filter?.Where(f=>f.Key == "ForceBlacklist").Any() ?? false).ToList());
             var forceBlacklistMatch = ForcedBlackListMatcher.IsMatch(flip);
@@ -94,9 +97,6 @@ namespace Coflnet.Sky.Commands.Shared
             var match = WhiteListMatcher.IsMatch(flip);
             if (match.Item1)
                 return (true, "whitelist " + match.Item2);
-
-            if (IsFinderBlocked(flip.Finder))
-                return (false, "finder " + flip.Finder.ToString());
 
             if (flip.Volume < MinVolume)
                 return (false, "minVolume");
