@@ -11,19 +11,19 @@ namespace Coflnet.Sky.Commands.Shared
 {
     public class NumberDetailedFlipFilter : DetailedFlipFilter
     {
-        public virtual object[] Options => new object[]{1,100_000_000};
+        public virtual object[] Options => new object[]{1,1_000_000_000};
         public FilterType FilterType => FilterType.NUMERICAL | FilterType.LOWER | FilterType.RANGE;
         public Expression<Func<FlipInstance, bool>> GetExpression(Dictionary<string, string> filters, string content)
         {
             var selector = GetSelector();
             if (content.Contains("-"))
             {
-                var parts = content.Split("-").Select(a => double.Parse(a)).ToArray();
+                var parts = content.Split("-").Select(a => NumberParser.Double(a)).ToArray();
                 var min = parts[0];
                 var max = parts[1];
                 return ExpressionMinMax(selector, min, max);
             }
-            var value = double.Parse(content.Replace("<", "").Replace(">", "").Replace(',','.'), NumberStyles.Any, CultureInfo.InvariantCulture);
+            var value = NumberParser.Double(content.Replace("<", "").Replace(">", ""));
             if (content.StartsWith("<"))
                 return ExpressionMinMax(selector, 0, value - 0.0000001);
             if (content.StartsWith(">"))

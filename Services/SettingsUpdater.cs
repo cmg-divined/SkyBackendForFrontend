@@ -101,10 +101,6 @@ namespace Coflnet.Sky.Commands.Shared
         private static object UpdateValueOnObject(string value, string realKey, object obj)
         {
             var field = obj.GetType().GetField(realKey);
-            if (value.ToLower().EndsWith('m') && field.FieldType.IsPrimitive)
-                value = value.ToLower().Replace("m", "000000");
-            if (value.ToLower().EndsWith('k') && field.FieldType.IsPrimitive)
-                value = value.ToLower().Replace("k", "000");
             object newValue;
             // if no value is provided and its a bool toggle it
             if (string.IsNullOrEmpty(value) && field.FieldType == typeof(bool))
@@ -113,6 +109,8 @@ namespace Coflnet.Sky.Commands.Shared
             }
             else if (field.FieldType.IsEnum)
                 newValue = Enum.Parse(field.FieldType, value, true);
+            else if(field.FieldType.IsPrimitive)
+                newValue = Convert.ChangeType(NumberParser.Double(value), field.FieldType);
             else
                 newValue = Convert.ChangeType(value, field.FieldType);
 

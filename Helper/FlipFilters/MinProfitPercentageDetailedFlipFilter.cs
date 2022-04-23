@@ -13,10 +13,8 @@ namespace Coflnet.Sky.Commands.Shared
         public FilterType FilterType => FilterType.NUMERICAL | FilterType.LOWER | FilterType.RANGE;
         public Expression<Func<FlipInstance, bool>> GetExpression(Dictionary<string, string> filters, string val)
         {
-            var min = long.Parse(val);
+            var min = NumberParser.Long(val);
             return flip => flip.ProfitPercentage > min;
         }
     }
-    
-
 }

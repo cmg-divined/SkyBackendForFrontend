@@ -15,7 +15,7 @@ namespace Coflnet.Sky.Commands.Shared
 
         public  Expression<Func<FlipInstance, bool>> GetExpression(Dictionary<string, string> filters, string val)
         {
-            var min = long.Parse(val);
+            var min = NumberParser.Long(val);
             return flip => flip.Profit > min;
         }
     }
