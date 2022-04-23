@@ -109,7 +109,7 @@ namespace Coflnet.Sky.Commands.Shared
             }
             else if (field.FieldType.IsEnum)
                 newValue = Enum.Parse(field.FieldType, value, true);
-            else if(field.FieldType.IsPrimitive)
+            else if(field.FieldType.IsPrimitive && field.FieldType != typeof(bool))
                 newValue = Convert.ChangeType(NumberParser.Double(value), field.FieldType);
             else
                 newValue = Convert.ChangeType(value, field.FieldType);
