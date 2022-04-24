@@ -172,7 +172,7 @@ namespace Coflnet.Sky.Commands.Shared
                 }*/
 
         private static Regex RomanNumber = new Regex("^[IVX]+$");
-        private Task<Channel<SearchResultItem>> CreateResponse(string search, CancellationToken token)
+        private async Task<Channel<SearchResultItem>> CreateResponse(string search, CancellationToken token)
         {
             var result = new List<SearchResultItem>();
 
@@ -205,7 +205,10 @@ namespace Coflnet.Sky.Commands.Shared
             }, token).ConfigureAwait(false);
             ComputeEnchantments(search, Results, searchWords);
 
-            return Task.FromResult(Results);
+            if(search.StartsWith("item") || search.Contains("pet"))
+                await searchTasks[0];
+
+            return Results;
             // return result.OrderBy(r => r.Name?.Length / 2 - r.HitCount - (r.Name?.ToLower() == search.ToLower() ? 10000000 : 0)).Take(targetAmount).ToList();
         }
 
@@ -306,8 +309,7 @@ namespace Coflnet.Sky.Commands.Shared
             {
                 await Results.Writer.WriteAsync(item);
             }
-            if (items.Count() == 0)
-                await Results.Writer.WriteAsync(new SearchResultItem() { Type = "internal", Id = "items" });
+            await Results.Writer.WriteAsync(new SearchResultItem() { Type = "internal", Id = "items" });
         }
 
         private static async Task FindPlayers(Task<IEnumerable<PlayerResult>> playersTask, Channel<SearchResultItem> Results)
@@ -324,7 +326,7 @@ namespace Coflnet.Sky.Commands.Shared
             if (search.Length <= 8 || IsHex(search))
                 return;
             await Task.Delay(20);
-            foreach (var item in await CoreServer.ExecuteCommandWithCache<string, List<SearchResultItem>>("fullSearch", search.Substring(0, search.Length - 2)))
+            foreach (var item in await CoreServer.ExecuteCommandWithCache<string, List<SearchResultItem>>("fullSearch", search.Substring(1, search.Length - 2)))
                 await Results.Writer.WriteAsync(item);
             if (searchWords.Count() == 1 || String.IsNullOrWhiteSpace(searchWords.Last()))
                 return;
