@@ -16,6 +16,7 @@ using RestSharp;
 using System.Threading.Channels;
 using Microsoft.Extensions.DependencyInjection;
 using System.Globalization;
+using Newtonsoft.Json;
 
 namespace Coflnet.Sky.Commands.Shared
 {
@@ -175,6 +176,8 @@ namespace Coflnet.Sky.Commands.Shared
         private async Task<Channel<SearchResultItem>> CreateResponse(string search, CancellationToken token)
         {
             var result = new List<SearchResultItem>();
+            var tracer = OpenTracing.Util.GlobalTracer.Instance;
+            var searchSpan = tracer.ActiveSpan;
 
             //var singlePlayer = PlayerSearch.Instance.FindDirect(search);
             var itemTask = GetItems(ReplaceStart(search,"item"), 12);
@@ -187,7 +190,8 @@ namespace Coflnet.Sky.Commands.Shared
 
             searchTasks[0] = Task.Run(async () =>
             {
-                await FindItems(search, itemTask, Results);
+                using var itemSpan = tracer.BuildSpan("itemSearch").AsChildOf(searchSpan).StartActive();
+                await FindItems(search, itemTask, Results, itemSpan);
             }, token).ConfigureAwait(false);
 
             searchTasks[1] = Task.Run(async () =>
@@ -295,7 +299,7 @@ namespace Coflnet.Sky.Commands.Shared
             AddFilterResult(Results, filter, auction.ItemName + " (Sells)", auction.Tag, 100_000);
         }
 
-        private async Task FindItems(string search, Task<IEnumerable<ItemDetails.ItemSearchResult>> itemTask, Channel<SearchResultItem> Results)
+        private async Task FindItems(string search, Task<IEnumerable<ItemDetails.ItemSearchResult>> itemTask, Channel<SearchResultItem> Results, OpenTracing.IScope itemSpan)
         {
             IEnumerable<ItemDetails.ItemSearchResult> items;
             try
@@ -308,6 +312,7 @@ namespace Coflnet.Sky.Commands.Shared
                 items = await GetItems(search, 12);
             }
 
+            itemSpan.Span?.Log("received Items " + JsonConvert.SerializeObject(items));
             foreach (var item in items.Select(item => new SearchResultItem(item)))
             {
                 await Results.Writer.WriteAsync(item);
@@ -413,7 +418,6 @@ namespace Coflnet.Sky.Commands.Shared
                             .Select(r =>
                             {
                                 var lower = r.Name.ToLower();
-                                Console.WriteLine("ranking " + r.Name);
                                 return new
                                 {
                                     rating = String.IsNullOrEmpty(r.Name) ? 0 :
@@ -429,9 +433,10 @@ namespace Coflnet.Sky.Commands.Shared
                                 };
                             })
                             .OrderBy(r => r.rating)
-                        .Where(r => r.rating < 10)
                         .ToList()
-                        .Select(r => r.r)
+                        .Select(r => {
+                            Console.WriteLine(r.r.Name + " " + r.rating);
+                            return r.r;})
                         .Distinct(new SearchService.SearchResultComparer())
                         .Take(10)
                         .ToList();

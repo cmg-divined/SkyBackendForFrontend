@@ -18,6 +18,8 @@ namespace Coflnet.Sky.Commands.Shared
 
         public static CamelCaseNameDictionary<DetailedFlipFilter> AdditionalFilters { private set; get; } = new();
 
+        public static IEnumerable<string> AllFilters => FilterEngine.AvailableFilters.Select(f=>f.Name).Concat(AdditionalFilters.Keys);
+
         static FlipFilter()
         {
             AdditionalFilters.Add<VolumeDetailedFlipFilter>();

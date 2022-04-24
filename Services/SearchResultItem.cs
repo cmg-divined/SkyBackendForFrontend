@@ -42,7 +42,7 @@ namespace Coflnet.Sky.Commands.Shared
                     IconUrl = "https://sky.shiiyu.moe/item/" + item.Tag;
                 else
                     this.IconUrl = item.IconUrl;
-                if (isPet && !Name.Contains("Pet"))
+                if (isPet && !Name.Contains("Pet") && Name != null)
                     this.Name += " Pet";
 
                 this.HitCount = item.HitCount + ITEM_EXTRA_IMPORTANCE;
