@@ -269,9 +269,9 @@ namespace Coflnet.Sky.Commands
                     var soldFor = sell
                             ?.HighestBidAmount;
 
-                    var enchantsBad = b.Tag == "ENCHANTED_BOOK" && b.Enchants.Count == 1 && sell.Enchantments.Count != 1 
+                    var enchantsBad = b.Tag == "ENCHANTED_BOOK" && (b.Enchants.Count == 1 && sell.Enchantments.Count != 1 || b.Enchants.First().Level != sell.Enchantments.First().Level)
                                         && (sell.HighestBidAmount - b.HighestOwnBid) > 1_000_000;
-                    var profit = 0L;
+                    var profit = 1L;
                     if (b.Tag == sell.Tag
                         && !enchantsBad)
                         profit = gemPriceService.GetGemWrthFromLookup(b.Nbt)
