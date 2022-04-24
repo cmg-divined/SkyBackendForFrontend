@@ -13,6 +13,8 @@ namespace Coflnet.Sky.Commands.Shared
     {
         [DataMember(Name = "tag")]
         public string ItemTag;
+        [DataMember(Name = "displayName")]
+        public string DisplayName;
         [DataMember(Name = "filter")]
         public Dictionary<string, string> filter;
 
