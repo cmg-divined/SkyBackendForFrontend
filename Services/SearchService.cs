@@ -15,7 +15,7 @@ using Microsoft.EntityFrameworkCore;
 using RestSharp;
 using System.Threading.Channels;
 using Microsoft.Extensions.DependencyInjection;
-
+using System.Globalization;
 
 namespace Coflnet.Sky.Commands.Shared
 {
@@ -177,12 +177,13 @@ namespace Coflnet.Sky.Commands.Shared
             var result = new List<SearchResultItem>();
 
             //var singlePlayer = PlayerSearch.Instance.FindDirect(search);
-            var itemTask = GetItems(search, 12);
-            var playersTask = PlayerSearch.Instance.Search(search, targetAmount, false);
+            var itemTask = GetItems(ReplaceStart(search,"item"), 12);
+            var playersTask = PlayerSearch.Instance.Search(ReplaceStart(search, "player"), targetAmount, false);
 
             var Results = Channel.CreateBounded<SearchResultItem>(50);
             var searchTasks = new ConfiguredTaskAwaitable[4];
             var searchWords = search.Split(' ');
+            var isSpecialSearch = search.StartsWith("item") || search.StartsWith("player");
 
             searchTasks[0] = Task.Run(async () =>
             {
@@ -196,6 +197,8 @@ namespace Coflnet.Sky.Commands.Shared
 
             searchTasks[2] = Task.Run(async () =>
             {
+                if(isSpecialSearch)
+                    return;
                 await FindSimilarSearches(search, Results, searchWords);
             }, token).ConfigureAwait(false);
             searchTasks[3] = Task.Run(async () =>
@@ -205,7 +208,7 @@ namespace Coflnet.Sky.Commands.Shared
             }, token).ConfigureAwait(false);
             ComputeEnchantments(search, Results, searchWords);
 
-            if(search.StartsWith("item") || search.Contains("pet"))
+            if (search.StartsWith("item") || search.Contains("pet"))
                 await searchTasks[0];
 
             return Results;
@@ -403,10 +406,14 @@ namespace Coflnet.Sky.Commands.Shared
 
         public List<SearchResultItem> RankSearchResults(string search, IEnumerable<SearchResultItem> result)
         {
+            // remove special search indicators
+            search = ReplaceStart(search, "player");
+            search = ReplaceStart(search, "item");
             var orderedResult = result.Where(r => r.Name != null)
                             .Select(r =>
                             {
                                 var lower = r.Name.ToLower();
+                                Console.WriteLine("ranking " + r.Name);
                                 return new
                                 {
                                     rating = String.IsNullOrEmpty(r.Name) ? 0 :
@@ -429,6 +436,13 @@ namespace Coflnet.Sky.Commands.Shared
                         .Take(10)
                         .ToList();
             return orderedResult;
+        }
+
+        private static string ReplaceStart(string lower, string start)
+        {
+            if (lower.StartsWith(start))
+                lower = lower.Replace(start, "", true, CultureInfo.InvariantCulture).TrimStart(' ', ':');
+            return lower;
         }
 
         public class SearchResultComparer : IEqualityComparer<SearchResultItem>
