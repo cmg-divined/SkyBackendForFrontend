@@ -38,7 +38,7 @@ namespace Coflnet.Sky.Commands.Shared
                 this.Id = item.Tag;
                 this.Type = "item";
                 var isPet = IsPet(item);
-                if (!item.Tag.StartsWith("POTION") && !isPet && !item.Tag.StartsWith("RUNE"))
+                if (item.Tag != null && !item.Tag.StartsWith("POTION") && !isPet && !item.Tag.StartsWith("RUNE"))
                     IconUrl = "https://sky.shiiyu.moe/item/" + item.Tag;
                 else
                     this.IconUrl = item.IconUrl;
