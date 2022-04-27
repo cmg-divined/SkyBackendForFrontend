@@ -40,6 +40,11 @@ namespace Coflnet.Sky.Commands.Shared
             return (f) => (double)f.Volume;
         }
 
+        public static bool IsValidInput(string input)
+        {
+            return NumberParser.TryDouble(input.Replace("<", "").Replace(">", "").Split("-")[0], out _);
+        }
+
 
         public static Expression<Func<T, bool>> ExpressionMinMax<T>(Expression<Func<T, double>> selector, double min, double max)
         {

@@ -38,6 +38,7 @@ namespace Coflnet.Sky.Commands.Shared
             sampleFlip.LastKnownCost = 10;
             sampleFlip.MedianPrice = 1000000;
             sampleFlip.Tag = "DIAMOND_NECRON_HEAD";
+            sampleFlip.Auction.ItemName = "hi";
             NoMatch(settings, sampleFlip);
             var watch = Stopwatch.StartNew();
             for (int i = 0; i < 5000; i++)
