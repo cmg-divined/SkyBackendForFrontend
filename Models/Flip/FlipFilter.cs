@@ -10,7 +10,7 @@ namespace Coflnet.Sky.Commands.Shared
 {
     public class FlipFilter
     {
-        private static FilterEngine FilterEngine = new FilterEngine();
+        public static FilterEngine FilterEngine { get; } = new FilterEngine();
 
         private Func<SaveAuction, bool> Filters;
         private Func<FlipInstance, bool> FlipFilters = null;
@@ -18,7 +18,7 @@ namespace Coflnet.Sky.Commands.Shared
 
         public static CamelCaseNameDictionary<DetailedFlipFilter> AdditionalFilters { private set; get; } = new();
 
-        public static IEnumerable<string> AllFilters => FilterEngine.AvailableFilters.Select(f=>f.Name).Concat(AdditionalFilters.Keys);
+        public static IEnumerable<string> AllFilters => FilterEngine.AvailableFilters.Select(f => f.Name).Concat(AdditionalFilters.Keys);
 
         static FlipFilter()
         {
@@ -52,7 +52,7 @@ namespace Coflnet.Sky.Commands.Shared
                         var newPart = AdditionalFilters[item].GetExpression(filters, match.Value);
                         if (expression == null)
                             expression = newPart;
-                        else if(newPart != null)
+                        else if (newPart != null)
                             expression = newPart.And(expression);
                     }
                 }
