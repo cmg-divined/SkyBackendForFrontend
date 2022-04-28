@@ -117,7 +117,7 @@ namespace Coflnet.Sky.Commands
         public async Task<System.TimeSpan> GetRecommendedPenalty(string playerId)
         {
             var breakdown = await flipAnalyse.PlayerPlayerIdSpeedGetAsync(playerId);
-            return System.TimeSpan.FromSeconds(breakdown.Penalty);
+            return System.TimeSpan.FromSeconds(breakdown?.Penalty ?? 0);
         }
 
         public async Task<int> ActiveFlipperCount()

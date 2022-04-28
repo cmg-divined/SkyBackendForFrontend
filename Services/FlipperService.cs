@@ -409,8 +409,7 @@ namespace Coflnet.Sky.Commands.Shared
         {
             GroupId = System.Net.Dns.GetHostName(),
             BootstrapServers = Program.KafkaHost,
-            AutoOffsetReset = AutoOffsetReset.Latest,
-
+            AutoOffsetReset = AutoOffsetReset.Latest
         };
 
 
@@ -431,7 +430,7 @@ namespace Coflnet.Sky.Commands.Shared
             string[] topics = new string[] { ConsumeTopic };
 
             Console.WriteLine("starting to listen for new auctions via topic " + ConsumeTopic);
-            
+
             await ConsumeBatch<FlipInstance>(topics, flip =>
             {
                 if (flip.MedianPrice - flip.LastKnownCost < 50_000)
@@ -466,7 +465,7 @@ namespace Coflnet.Sky.Commands.Shared
 
             await ConsumeBatch<LowPricedAuction>(topics, flip =>
             {
-                if (flip.Auction.Start.ToUniversalTime() < DateTime.Now.ToUniversalTime() - TimeSpan.FromMinutes(4) 
+                if (flip.Auction.Start.ToUniversalTime() < DateTime.Now.ToUniversalTime() - TimeSpan.FromMinutes(4)
                     && flip.Auction.Bin || flip.Auction.End < DateTime.UtcNow)
                     return;
 
@@ -536,7 +535,7 @@ namespace Coflnet.Sky.Commands.Shared
                         {
                             dev.Logger.Instance.Error(e, "flipper consume batch " + topics[0]);
                         }
-                        if (batch.Count > batchSize)
+                        if (batch.Count >= batchSize)
                         {
                             // tell kafka that we stored the batch
                             c.Commit(batch);
@@ -584,7 +583,7 @@ namespace Coflnet.Sky.Commands.Shared
 
         public List<FlipConWrapper> Connections
         {
-            get 
+            get
             {
                 var list = new List<FlipConWrapper>();
                 list.AddRange(SuperSubs.Values);
