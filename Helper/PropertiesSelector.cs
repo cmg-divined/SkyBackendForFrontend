@@ -66,7 +66,7 @@ namespace Coflnet.Sky.Commands.Helper
             if (data.ContainsKey("zombie_kills"))
                 properties.Add(new Property($"Kills: {ItemDetails.TagToName(data["zombie_kills"])}", 15));
             if(data.ContainsKey("unlocked_slots"))
-                properties.Add(new Property($"Unlocked: {data["unlocked_slots"].Length / 20}", 15));
+                properties.Add(new Property($"Unlocked: {(data["unlocked_slots"].Sum(c=>c == ',' ? 1 : 0) + 1)}", 15));
 
             properties.AddRange(data.Where(p => p.Value == "PERFECT" || p.Value == "FLAWLESS").Select(p => new Property($"{p.Value} gem", p.Value == "PERFECT" ? 14 : 7)));
 

@@ -230,7 +230,7 @@ namespace Coflnet.Sky.Commands.Shared
         {
             if (settings == null || settings.Visibility == null)
                 return;
-            var timeOut = new System.Threading.CancellationTokenSource(12000);
+            var timeOut = new System.Threading.CancellationTokenSource(5000);
             if (settings.Visibility.Seller && flip.SellerName == null)
                 flip.SellerName = (await DiHandler.ServiceProvider.GetRequiredService<Coflnet.Sky.PlayerName.Client.Api.PlayerNameApi>()
                     .PlayerNameNameUuidGetAsync(flip.Auction.AuctioneerId, timeOut.Token))?.Trim('"');
