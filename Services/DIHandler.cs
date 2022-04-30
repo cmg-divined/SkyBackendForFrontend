@@ -34,7 +34,7 @@ namespace Coflnet.Sky.Commands.Shared
             {
                 var config = context.GetRequiredService<IConfiguration>();
                 var url = config["BAZAAR_BASE_URL"];
-                if(url == null)
+                if (url == null)
                     throw new Exception("config option BAZAAR_BASE_URL is not set");
                 return new Bazaar.Client.Api.BazaarApi(url);
             });

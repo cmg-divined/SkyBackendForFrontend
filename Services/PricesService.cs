@@ -6,21 +6,24 @@ using Coflnet.Sky;
 using Coflnet.Sky.Filter;
 using Coflnet.Sky.Core;
 using Microsoft.EntityFrameworkCore;
+using Coflnet.Sky.Bazaar.Client.Api;
 
 namespace Coflnet.Sky.Commands.Shared
 {
     public class PricesService
     {
         private HypixelContext context;
+        private BazaarApi bazaarClient;
         static private FilterEngine FilterEngine = new FilterEngine();
 
         /// <summary>
         /// Creates a new 
         /// </summary>
         /// <param name="context"></param>
-        public PricesService(HypixelContext context)
+        public PricesService(HypixelContext context, BazaarApi bazaarClient)
         {
             this.context = context;
+            this.bazaarClient = bazaarClient;
         }
 
         /// <summary>
@@ -46,7 +49,7 @@ namespace Coflnet.Sky.Commands.Shared
                 Min = auctions.LastOrDefault(),
                 Mean = auctions.Count > 0 ? auctions.Average() : 0,
                 Mode = mode?.Key ?? 0,
-                Volume = auctions.Count > 0 ? ((double)auctions.Count())/days : 0
+                Volume = auctions.Count > 0 ? ((double)auctions.Count()) / days : 0
             };
         }
 
@@ -57,7 +60,7 @@ namespace Coflnet.Sky.Commands.Shared
             var sumary = await CacheService.Instance.GetFromRedis<PriceSumary>(key);
             if (sumary == default)
             {
-                if(filters == null)
+                if (filters == null)
                     filters = new Dictionary<string, string>();
                 sumary = await GetSumary(itemTag, filters);
                 await CacheService.Instance.SaveInRedis(key, sumary, TimeSpan.FromHours(2));
@@ -97,6 +100,20 @@ namespace Coflnet.Sky.Commands.Shared
                         Min = (int)item.Min(a => ((int)a.HighestBidAmount) / a.Count),
                         Count = item.Sum(a => a.Count)
                     }).ToListAsync();
+
+            if (dbResult.Count == 0)
+            {
+                var result = await bazaarClient.ApiBazaarItemIdHistoryGetAsync(itemTag, start, end);
+                return result.Select(i => new AveragePrice()
+                {
+                    Volume = (int)i.BuyVolume,
+                    Avg = (i.MaxBuy + i.MinSell) / 2,
+                    Max = i.MaxBuy,
+                    Min = i.MinSell,
+                    Date = i.Timestamp,
+                    ItemId = itemId
+                });
+            }
 
             return dbResult
                 .Select(i => new AveragePrice()
