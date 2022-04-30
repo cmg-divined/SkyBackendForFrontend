@@ -63,5 +63,8 @@ namespace Coflnet.Sky.Commands.Shared
         [DataMember(Name = "timerPercision")]
         [SettingsDoc("How many digits the timer should target (3)")]
         public int TimerPercision;
+        [DataMember(Name = "blockedMsg")]
+        [SettingsDoc("How many minutes to have pass before showing the x amounts of flips blocked message again")]
+        public sbyte MinutesBetweenBlocked;
     }
 }

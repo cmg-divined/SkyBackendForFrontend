@@ -48,6 +48,7 @@
     <PackageReference Include="Coflnet.Sky.Bazaar.Client" Version="0.1.1" />
     <PackageReference Include="Coflnet.Sky.Referral.Client" Version="0.0.1" />
     <PackageReference Include="Coflnet.Sky.Items.Client" Version="0.4.0" />
+    <PackageReference Include="Coflnet.Sky.Sniper.Client" Version="0.0.1" />
 
   </ItemGroup>
 

@@ -5,6 +5,7 @@ using System;
 using Coflnet.Payments.Client.Client;
 using Coflnet.Sky.Items.Client.Api;
 using Coflnet.Sky.Referral.Client.Api;
+using Coflnet.Sky.Sniper.Client.Api;
 
 namespace Coflnet.Sky.Commands.Shared
 {
@@ -53,6 +54,11 @@ namespace Coflnet.Sky.Commands.Shared
             {
                 var config = context.GetRequiredService<IConfiguration>();
                 return new ReferralApi(config["REFERRAL_BASE_URL"]);
+            });
+            services.AddSingleton<ISniperApi>(context =>
+            {
+                var config = context.GetRequiredService<IConfiguration>();
+                return new SniperApi(config["SNIPER_BASE_URL"]);
             });
 
             _servics = services;
