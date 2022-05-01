@@ -6,6 +6,7 @@ using Coflnet.Payments.Client.Client;
 using Coflnet.Sky.Items.Client.Api;
 using Coflnet.Sky.Referral.Client.Api;
 using Coflnet.Sky.Sniper.Client.Api;
+using Coflnet.Sky.Crafts.Client.Api;
 
 namespace Coflnet.Sky.Commands.Shared
 {
@@ -59,6 +60,16 @@ namespace Coflnet.Sky.Commands.Shared
             {
                 var config = context.GetRequiredService<IConfiguration>();
                 return new SniperApi(config["SNIPER_BASE_URL"]);
+            });
+            services.AddSingleton<ICraftsApi>(context =>
+            {
+                var config = context.GetRequiredService<IConfiguration>();
+                return new CraftsApi("http://" + config["CRAFTS_HOST"]);
+            });
+            services.AddSingleton<IKatApi>(context =>
+            {
+                var config = context.GetRequiredService<IConfiguration>();
+                return new KatApi("http://" + config["CRAFTS_HOST"]);
             });
 
             _servics = services;
