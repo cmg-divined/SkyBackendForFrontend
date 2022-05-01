@@ -85,6 +85,9 @@ namespace Coflnet.Sky.Commands.Shared
         {
             if (IsFinderBlocked(flip.Finder))
                 return (false, "finder " + flip.Finder.ToString());
+            
+            if (OnlyBin && !flip.Auction.Bin)
+                return (false, "not bin");
 
             if (ForcedBlackListMatcher == null)
                 ForcedBlackListMatcher = new ListMatcher(BlackList?.Where(b=>b.filter?.Where(f=>f.Key == "ForceBlacklist").Any() ?? false).ToList());
@@ -118,9 +121,6 @@ namespace Coflnet.Sky.Commands.Shared
             match = BlackListMatcher.IsMatch(flip);
             if (match.Item1)
                 return (false, "blacklist " + match.Item2);
-
-            if (OnlyBin && !flip.Auction.Bin)
-                return (false, "not bin");
 
             if (filter == null)
                 filter = new FlipFilter(this.Filters);
