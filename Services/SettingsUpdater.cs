@@ -81,7 +81,7 @@ namespace Coflnet.Sky.Commands.Shared
             else if (!options.TryGetValue(key, out SettingDoc doc))
             {
                 var closest = options.Keys.OrderBy(k => Fastenshtein.Levenshtein.Distance(k.ToLower(), key.ToLower())).First();
-                throw new CoflnetException("invalid_setting", $"the setting {key} doesn't exist, most similar is {closest}");
+                throw new UnkownSettingException(key, closest);
             }
             else if (doc.Prefix == "show")
             {
@@ -96,6 +96,18 @@ namespace Coflnet.Sky.Commands.Shared
                 UpdateValueOnObject(value, doc.RealName, con.Settings);
             }
             return value;
+        }
+
+        public class UnkownSettingException : CoflnetException
+        {
+            public string Passed;
+            public string Closest;
+
+            public UnkownSettingException(string passed, string closest) : base("invalid_setting", $"the setting {passed} doesn't exist, most similar is {closest}")
+            {
+                Passed = passed;
+                Closest = closest;
+            }
         }
 
         private static object UpdateValueOnObject(string value, string realKey, object obj)
