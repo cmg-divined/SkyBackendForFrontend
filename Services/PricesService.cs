@@ -7,6 +7,7 @@ using Coflnet.Sky.Filter;
 using Coflnet.Sky.Core;
 using Microsoft.EntityFrameworkCore;
 using Coflnet.Sky.Bazaar.Client.Api;
+using Coflnet.Sky.Items.Client.Api;
 
 namespace Coflnet.Sky.Commands.Shared
 {
@@ -14,16 +15,18 @@ namespace Coflnet.Sky.Commands.Shared
     {
         private HypixelContext context;
         private BazaarApi bazaarClient;
+        private IItemsApi itemClient;
         static private FilterEngine FilterEngine = new FilterEngine();
 
         /// <summary>
         /// Creates a new 
         /// </summary>
         /// <param name="context"></param>
-        public PricesService(HypixelContext context, BazaarApi bazaarClient)
+        public PricesService(HypixelContext context, BazaarApi bazaarClient, IItemsApi itemClient)
         {
             this.context = context;
             this.bazaarClient = bazaarClient;
+            this.itemClient = itemClient;
         }
 
         /// <summary>
@@ -138,24 +141,16 @@ namespace Coflnet.Sky.Commands.Shared
             int id = GetItemId(itemTag, false);
             if (id == 0)
                 return new CurrentPrice() { Available = -1 };
-            var item = await ItemDetails.Instance.GetDetailsWithCache(itemTag);
-            if (item?.IsBazaar ?? false)
+            var bazaarItems = await itemClient.ItemsBazaarTagsGetAsync();
+            if (bazaarItems?.Contains(itemTag) ?? false)
             {
-                var product = await context.BazaarPrices
-                    .Where(p => p.ProductId == itemTag)
-                    .Where(p => p.BuySummery.Count() > 3)
-                    .OrderByDescending(p => p.Id)
-                    .Include(p => p.BuySummery)
-                    .Include(p => p.QuickStatus)
-                    .FirstOrDefaultAsync();
-                if (count == 1)
-                    return new CurrentPrice() { Buy = product.QuickStatus.BuyPrice, Sell = product.QuickStatus.SellPrice };
+                var val = await bazaarClient.ApiBazaarItemIdSnapshotGetAsync(itemTag, DateTime.UtcNow);
 
                 return new CurrentPrice()
                 {
-                    Buy = GetBazaarCostForCount(product.BuySummery, count),
-                    Sell = product.QuickStatus.SellPrice,
-                    Available = product.BuySummery.Sum(b => b.Amount)
+                    Buy = GetBazaarCostForCount(val.BuyOrders, count),
+                    Sell = val.SellOrders.Min(s => s.PricePerUnit),
+                    Available = val.BuyOrders.Sum(b => b.Amount)
                 };
             }
             else
@@ -172,7 +167,7 @@ namespace Coflnet.Sky.Commands.Shared
             }
         }
 
-        public double GetBazaarCostForCount(List<dev.BuyOrder> orders, int count)
+        public double GetBazaarCostForCount(List<Bazaar.Client.Model.BuyOrder> orders, int count)
         {
             var totalCost = 0d;
             var alreadyAddedCount = 0;
