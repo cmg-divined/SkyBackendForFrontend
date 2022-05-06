@@ -228,9 +228,10 @@ namespace Coflnet.Sky.Commands.Shared
                 Name = i.Text + (i.Flags.Value.HasFlag(Sky.Items.Client.Model.ItemFlags.BAZAAR) ? " - bazaar"
                         : i.Flags.Value.HasFlag(Sky.Items.Client.Model.ItemFlags.AUCTION) ? "" : " - not on ah"),
                 Tag = i.Tag,
+                Tier = (Coflnet.Sky.Core.Tier)i.Tier,
                 IconUrl = "https://sky.coflnet.com/static/icon/" + i.Tag,
                 HitCount = i.Tag == "CAKE_SOUL" ? 2 : 30 // items higher base hit count
-
+                
             }).ToList();
         }
 
