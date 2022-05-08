@@ -39,7 +39,9 @@ namespace Coflnet.Sky.Commands.Shared
             {
                 if (item.FieldType.IsPrimitive || item.FieldType == typeof(string) || item.FieldType.IsEnum)
                 {
-                    var commandSlug = (item.GetCustomAttributes(typeof(DataMemberAttribute), true).First() as DataMemberAttribute).Name;
+                    var commandSlug = (item.GetCustomAttributes(typeof(DataMemberAttribute), true).FirstOrDefault() as DataMemberAttribute)?.Name;
+                    if(commandSlug == null)
+                        commandSlug = item.Name;
                     var doc = (item.GetCustomAttributes(typeof(SettingsDocAttribute), true).FirstOrDefault() as SettingsDocAttribute);
                     SettingDoc desc = GetDesc(item, doc, prefix);
                     options.Add(prefix + commandSlug, GetDesc(item, doc, prefix));

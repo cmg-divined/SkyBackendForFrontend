@@ -76,6 +76,9 @@ namespace Coflnet.Sky.Commands.Shared
         private ListMatcher WhiteListMatcher;
         private Func<FlipInstance, bool> generalFilter;
 
+        [SettingsDoc("Stop receiving any flips (just use other features) also stops the timer")]
+        public bool DisableFlips;
+
         /// <summary>
         /// Determines if a flip matches a the <see cref="Filters"/>> of this instance
         /// </summary>
