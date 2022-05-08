@@ -23,17 +23,7 @@ namespace Coflnet.Sky.Commands.Shared
             {
                 // subscribe, get then process subscription to not loose any update
                 var subTask = con.GetSubscriber().SubscribeAsync(GetSubKey(userId, key));
-                var value = await api.SettingsUserIdSettingKeyGetAsync(userId, key);
-                T val;
-                if (value == null)
-                {
-                    if (defaultGetter != null)
-                        val = defaultGetter();
-                    else
-                        val = default(T);
-                }
-                else
-                    val = Deserialize<T>(value);
+                T val = await GetCurrentValue(userId, key, defaultGetter);
                 update(val);
                 var sub = await subTask;
                 sub.OnMessage(a =>
@@ -46,6 +36,22 @@ namespace Coflnet.Sky.Commands.Shared
             {
                 throw new Exception("Could not subscribe to setting ", e);
             }
+        }
+
+        public async Task<T> GetCurrentValue<T>(string userId, string key, Func<T> defaultGetter)
+        {
+            var value = await api.SettingsUserIdSettingKeyGetAsync(userId, key);
+            T val;
+            if (value == null)
+            {
+                if (defaultGetter != null)
+                    val = defaultGetter();
+                else
+                    val = default(T);
+            }
+            else
+                val = Deserialize<T>(value);
+            return val;
         }
 
         private static string GetSubKey(string userId, string key)

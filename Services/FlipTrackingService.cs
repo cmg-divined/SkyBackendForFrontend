@@ -46,11 +46,11 @@ namespace Coflnet.Sky.Commands
         }
 
 
-        public async Task ReceiveFlip(string auctionId, string playerId)
+        public async Task ReceiveFlip(string auctionId, string playerId, DateTime when = default)
         {
             try
             {
-                await SendEvent(auctionId, playerId, FlipTracker.Client.Model.FlipEventType.FLIPRECEIVE);
+                await SendEvent(auctionId, playerId, FlipTracker.Client.Model.FlipEventType.FLIPRECEIVE, when);
             }
             catch (System.Exception e)
             {
@@ -84,14 +84,14 @@ namespace Coflnet.Sky.Commands
             await SendEvent(auctionId, playerId, FlipTracker.Client.Model.FlipEventType.DOWNVOTE);
         }
 
-        private Task SendEvent(string auctionId, string playerId, FlipTracker.Client.Model.FlipEventType type)
+        private Task SendEvent(string auctionId, string playerId, FlipTracker.Client.Model.FlipEventType type, DateTime when = default)
         {
             var flipEvent = new FlipTracker.Client.Model.FlipEvent()
             {
                 Type = type,
                 PlayerId = AuctionService.Instance.GetId(playerId),
                 AuctionId = AuctionService.Instance.GetId(auctionId),
-                Timestamp = System.DateTime.UtcNow
+                Timestamp = when == default ? System.DateTime.UtcNow : when
             };
 
             producer.Produce(ProduceTopic, new Message<string, FlipTracker.Client.Model.FlipEvent>() { Value = flipEvent });
