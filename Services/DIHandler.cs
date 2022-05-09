@@ -71,6 +71,7 @@ namespace Coflnet.Sky.Commands.Shared
                 var config = context.GetRequiredService<IConfiguration>();
                 return new KatApi("http://" + config["CRAFTS_HOST"]);
             });
+            services.AddSingleton<PremiumService>();
 
             _servics = services;
         }
