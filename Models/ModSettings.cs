@@ -66,5 +66,9 @@ namespace Coflnet.Sky.Commands.Shared
         [DataMember(Name = "blockedMsg")]
         [SettingsDoc("How many minutes to have pass before showing the x amounts of flips blocked message again")]
         public sbyte MinutesBetweenBlocked;
+
+        [DataMember(Name = "noAdjustToPurse")]
+        [SettingsDoc("Stop your max cost from being auto-adjusted to your purse", "ap")]
+        public bool NoAdjustToPurse;
     }
 }
