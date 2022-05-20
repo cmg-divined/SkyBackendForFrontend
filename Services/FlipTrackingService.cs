@@ -114,9 +114,9 @@ namespace Coflnet.Sky.Commands
         /// </summary>
         /// <param name="playerId">The uuid of the player to test</param>
         /// <returns></returns>
-        public async Task<System.TimeSpan> GetRecommendedPenalty(string playerId)
+        public async Task<System.TimeSpan> GetRecommendedPenalty(IEnumerable<string> playerIds)
         {
-            var breakdown = await flipAnalyse.PlayerPlayerIdSpeedGetAsync(playerId);
+            var breakdown = await flipAnalyse.PlayersSpeedPostAsync(new SpeedCheckRequest(playerIds.ToList()));
             return System.TimeSpan.FromSeconds(breakdown?.Penalty ?? 0);
         }
 
@@ -207,15 +207,19 @@ namespace Coflnet.Sky.Commands
             }
 
         }
-
         public async Task<FlipSumary> GetPlayerFlips(string uuid, System.TimeSpan timeSpan)
+        {
+            return await GetPlayerFlips(new string[]{ uuid }, timeSpan);
+        }
+
+        public async Task<FlipSumary> GetPlayerFlips(IEnumerable<string> uuids, System.TimeSpan timeSpan)
         {
             using (var context = new HypixelContext())
             {
-                var playerId = await context.Players.Where(p => p.UuId == uuid).Select(p => p.Id).FirstOrDefaultAsync();
+                var playerIds = await context.Players.Where(p => uuids.Contains(p.UuId)).Select(p => p.Id).ToListAsync();
                 var startTime = DateTime.Now - timeSpan;
                 var uidKey = NBT.Instance.GetKeyId("uid");
-                var sellList = await context.Auctions.Where(a => a.SellerId == playerId)
+                var sellList = await context.Auctions.Where(a => playerIds.Contains(a.SellerId))
                     .Where(a => a.End > startTime && a.End < DateTime.Now && a.HighestBidAmount > 0 && a.Bin)
                     .Include(a => a.NBTLookup)
                     .Include(a => a.Enchantments)
@@ -229,7 +233,7 @@ namespace Coflnet.Sky.Commands
                     }).ToList();
                 var SalesUidLookup = sells.Select(a => a.Key).ToHashSet();
                 var sales = await context.NBTLookups.Where(b => b.KeyId == uidKey && SalesUidLookup.Contains(b.Value)).Select(n => n.AuctionId).ToListAsync();
-                var playerBids = await context.Bids.Where(b => b.BidderId == playerId && sales.Contains(b.Auction.Id) && b.Timestamp > startTime.Subtract(System.TimeSpan.FromDays(14)))
+                var playerBids = await context.Bids.Where(b => playerIds.Contains(b.BidderId) && sales.Contains(b.Auction.Id) && b.Timestamp > startTime.Subtract(System.TimeSpan.FromDays(14)))
                     //.Where(b => b.Auction.NBTLookup.Where(b => b.KeyId == uidKey && SalesUidLookup.Contains(b.Value)).Any())
                     // filtering
                     .OrderByDescending(bid => bid.Id)

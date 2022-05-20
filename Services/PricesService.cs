@@ -145,6 +145,8 @@ namespace Coflnet.Sky.Commands.Shared
             if (bazaarItems?.Contains(itemTag) ?? false)
             {
                 var val = await bazaarClient.ApiBazaarItemIdSnapshotGetAsync(itemTag, DateTime.UtcNow);
+                if(val == null)
+                    return null;
 
                 return new CurrentPrice()
                 {
