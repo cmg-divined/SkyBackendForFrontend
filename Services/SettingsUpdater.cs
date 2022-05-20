@@ -100,6 +100,13 @@ namespace Coflnet.Sky.Commands.Shared
             return value;
         }
 
+        
+        public SettingDoc GetDocFor(string key)
+        {
+            options.TryGetValue(key, out SettingDoc doc);
+            return doc;
+        }
+
         public class UnkownSettingException : CoflnetException
         {
             public string Passed;
