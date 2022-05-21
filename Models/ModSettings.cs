@@ -60,9 +60,9 @@ namespace Coflnet.Sky.Commands.Shared
         [DataMember(Name = "timerPrefix")]
         [SettingsDoc("Custom text to put in front of the timer")]
         public string TimerPrefix;
-        [DataMember(Name = "timerPercision")]
+        [DataMember(Name = "timerPrecision")]
         [SettingsDoc("How many digits the timer should target (3)")]
-        public int TimerPercision;
+        public int TimerPrecision;
         [DataMember(Name = "blockedMsg")]
         [SettingsDoc("How many minutes to have pass before showing the x amounts of flips blocked message again")]
         public sbyte MinutesBetweenBlocked;
