@@ -42,9 +42,14 @@ namespace Coflnet.Sky.Commands.Shared
 
         public async Task<DateTime> ExpiresWhen(int userId)
         {
+            return await ExpiresWhen(userId.ToString());
+        }
+
+        public async Task<DateTime> ExpiresWhen(string userId)
+        {
             if(GoogleUser.EveryoneIsPremium)
                 return DateTime.Now + TimeSpan.FromDays(30);
-            var until = await userApi.UserUserIdOwnsLongestPostAsync(userId.ToString(), new (){ premiumPlanName, testpremiumPlanName});
+            var until = await userApi.UserUserIdOwnsLongestPostAsync(userId, new (){ premiumPlanName, testpremiumPlanName});
             return until;
         } 
         public async Task<bool> HasPremium(int userId)
