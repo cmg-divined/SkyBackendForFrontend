@@ -13,7 +13,8 @@ namespace Coflnet.Sky.Commands.Shared
     {
         public IFlipConnection Connection;
 
-        private Channel<LowPricedAuction> LowPriced = Channel.CreateBounded<LowPricedAuction>(100);
+        private Channel<LowPricedAuction> LowPriced = Channel.CreateBounded<LowPricedAuction>(
+                new BoundedChannelOptions(100) { FullMode = BoundedChannelFullMode.DropWrite });
 
         private CancellationTokenSource cancellationTokenSource = null;
 
@@ -100,6 +101,7 @@ namespace Coflnet.Sky.Commands.Shared
 
         public void Stop()
         {
+            LowPriced.Writer.TryComplete();
             cancellationTokenSource?.Cancel();
             Connection.Log("canceled by " + Environment.StackTrace);
         }
