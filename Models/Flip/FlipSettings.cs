@@ -79,6 +79,10 @@ namespace Coflnet.Sky.Commands.Shared
         [SettingsDoc("Stop receiving any flips (just use other features) also stops the timer")]
         public bool DisableFlips;
 
+        [DataMember(Name = "lastChange")]
+        [SettingsDoc("", true)]
+        public string LastChanged { get; set; }
+
         /// <summary>
         /// Determines if a flip matches a the <see cref="Filters"/>> of this instance
         /// </summary>
