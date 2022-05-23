@@ -117,7 +117,7 @@ namespace Coflnet.Sky.Commands
         public async Task<(System.TimeSpan, int)> GetRecommendedPenalty(IEnumerable<string> playerIds)
         {
             var breakdown = await flipAnalyse.PlayersSpeedPostAsync(new SpeedCheckRequest(playerIds.ToList()));
-            var hourCount = breakdown.Times.Where(t=>t.TotalSeconds > 1).GroupBy(t=>System.TimeSpan.Parse(t.Age).Hours).Count();
+            var hourCount = breakdown?.Times?.Where(t=>t.TotalSeconds > 1).GroupBy(t=>System.TimeSpan.Parse(t.Age).Hours).Count() ?? 0;
             return (System.TimeSpan.FromSeconds(breakdown?.Penalty ?? 0), hourCount);
         }
 
