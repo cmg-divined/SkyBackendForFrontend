@@ -22,5 +22,8 @@ namespace Coflnet.Sky.Commands.Shared
         public DateTime ExpiresAt;
         [DataMember(Name = "activeCon")]
         public string ActiveConnectionId;
+
+        [DataMember(Name = "lastCaptchaSolve")]
+        public DateTime LastCaptchaSolve { get; set; }
     }
 }

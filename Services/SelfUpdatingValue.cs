@@ -54,6 +54,15 @@ namespace Coflnet.Sky.Commands.Shared
             await GetService().UpdateSetting(UserId, Key, newValue);
         }
 
+        /// <summary>
+        /// Updates the current value
+        /// </summary>
+        /// <returns></returns>
+        public async Task Update()
+        {
+            await Update(Value);
+        }
+
         public static implicit operator T(SelfUpdatingValue<T> val) => val == null ? default(T) : val.Value;
     }
 }
