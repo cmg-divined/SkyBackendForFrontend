@@ -165,7 +165,7 @@ namespace Coflnet.Sky.Commands.Shared
                     return new CurrentPrice() { Buy = sumary.Med, Sell = sumary.Min };
                 }
                 var cost = count == 1 ? lowestBins.FirstOrDefault().Price : lowestBins.Sum(a => a.Price);
-                return new CurrentPrice() { Buy = cost, Sell = lowestBins.FirstOrDefault()?.Price * 0.99 ?? 0, Available = lowestBins.Count };
+                return new CurrentPrice() { Buy = cost, Sell = (lowestBins.FirstOrDefault()?.Price ?? 0) * 0.99 , Available = lowestBins.Count };
             }
         }
 
