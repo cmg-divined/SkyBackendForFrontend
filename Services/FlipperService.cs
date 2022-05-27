@@ -232,8 +232,18 @@ namespace Coflnet.Sky.Commands.Shared
                 return;
             var timeOut = new System.Threading.CancellationTokenSource(5000);
             if (settings.Visibility.Seller && flip.SellerName == null)
-                flip.SellerName = (await DiHandler.ServiceProvider.GetRequiredService<Coflnet.Sky.PlayerName.Client.Api.PlayerNameApi>()
-                    .PlayerNameNameUuidGetAsync(flip.Auction.AuctioneerId, timeOut.Token))?.Trim('"');
+            {
+                try
+                {
+                    flip.SellerName = (await DiHandler.ServiceProvider.GetRequiredService<Coflnet.Sky.PlayerName.Client.Api.PlayerNameApi>()
+                                    .PlayerNameNameUuidGetAsync(flip.Auction.AuctioneerId, timeOut.Token))?.Trim('"');
+                }
+                catch (TaskCanceledException)
+                {
+                    flip.SellerName = $"not-found";
+                }
+            }
+                
 
             if (flip.LowestBin == 0 && (settings.Visibility.LowestBin || settings.Visibility.SecondLowestBin || settings.BasedOnLBin))
             {
