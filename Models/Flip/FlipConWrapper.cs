@@ -17,6 +17,7 @@ namespace Coflnet.Sky.Commands.Shared
                 new BoundedChannelOptions(100) { FullMode = BoundedChannelFullMode.DropWrite });
 
         private CancellationTokenSource cancellationTokenSource = null;
+        private bool stopWrites;
 
         public int ChannelCount => LowPriced.Reader.Count;
 
@@ -73,6 +74,8 @@ namespace Coflnet.Sky.Commands.Shared
 
         public bool AddLowPriced(LowPricedAuction lp)
         {
+            if(stopWrites)
+                return false;
             var copy = new LowPricedAuction()
             {
                 AdditionalProps = lp.AdditionalProps == null ? new Dictionary<string, string>() : new Dictionary<string, string>(lp.AdditionalProps),
@@ -90,7 +93,7 @@ namespace Coflnet.Sky.Commands.Shared
                 {
                     dev.Logger.Instance.Error(e, "fast send ");
                 }
-
+            
             return LowPriced.Writer.TryWrite(copy);
         }
 
@@ -103,6 +106,7 @@ namespace Coflnet.Sky.Commands.Shared
         {
             LowPriced.Writer.TryComplete();
             cancellationTokenSource?.Cancel();
+            stopWrites = true;
             Connection.Log("canceled by " + Environment.StackTrace);
         }
 
