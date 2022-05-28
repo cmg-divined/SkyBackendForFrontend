@@ -4,6 +4,7 @@ using System.Threading.Tasks;
 using Newtonsoft.Json;
 using Microsoft.Extensions.Configuration;
 using Coflnet.Sky.Settings.Client.Api;
+using Microsoft.Extensions.Logging;
 
 namespace Coflnet.Sky.Commands.Shared
 {
@@ -11,9 +12,13 @@ namespace Coflnet.Sky.Commands.Shared
     {
         private ConnectionMultiplexer con;
         private SettingsApi api;
-        public SettingsService(IConfiguration config)
+        public SettingsService(IConfiguration config, ILogger<SettingsService> logger)
         {
-            con = ConnectionMultiplexer.Connect(config["SETTINGS_REDIS_HOST"]);
+            var redis = config["SETTINGS_REDIS_HOST"];
+            if (redis == null)
+                logger.LogWarning("SETTINGS_REDIS_HOST is not set, settings updates will not be received");
+            else
+                con = ConnectionMultiplexer.Connect(redis);
             api = new SettingsApi(config["SETTINGS_BASE_URL"]);
         }
 
@@ -22,9 +27,13 @@ namespace Coflnet.Sky.Commands.Shared
             try
             {
                 // subscribe, get then process subscription to not loose any update
-                var subTask = con.GetSubscriber().SubscribeAsync(GetSubKey(userId, key));
+                var subTask = con?.GetSubscriber().SubscribeAsync(GetSubKey(userId, key));
                 T val = await GetCurrentValue(userId, key, defaultGetter);
                 update(val);
+
+                if (con == null)
+                    return null;
+
                 var sub = await subTask;
                 sub.OnMessage(a =>
                 {
