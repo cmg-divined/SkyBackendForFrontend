@@ -35,7 +35,7 @@ namespace Coflnet.Sky.Commands.Shared
         {
             if(configuration["DBCONNECTION"] == null)
             {
-                logger.LogError("No DBCONNECTION found in configuration, aborting background task"); 
+                logger.LogWarning("No DBCONNECTION found in configuration, aborting background task. This is okay if this service doesn't need gemstone prices"); 
                 return;
             }
             var rarities = new string[] { "PERFECT", "FLAWLESS" };
