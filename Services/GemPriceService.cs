@@ -21,18 +21,25 @@ namespace Coflnet.Sky.Commands.Shared
         private RestSharp.RestClient commandsClient;
         private IServiceScopeFactory scopeFactory;
         private ILogger<GemPriceService> logger;
+        private IConfiguration configuration;
 
-        public GemPriceService(IConfiguration config, IServiceScopeFactory scopeFactory, ILogger<GemPriceService> logger)
+        public GemPriceService(IConfiguration config, IServiceScopeFactory scopeFactory, ILogger<GemPriceService> logger, IConfiguration configuration)
         {
             this.commandsClient = new RestSharp.RestClient(config["API_BASE_URL"]);
             this.scopeFactory = scopeFactory;
             this.logger = logger;
+            this.configuration = configuration;
         }
 
         protected override async Task ExecuteAsync(CancellationToken stoppingToken)
         {
+            if(configuration["DBCONNECTION"] == null)
+            {
+                logger.LogError("No DBCONNECTION found in configuration, aborting background task"); 
+                return;
+            }
             var rarities = new string[] { "PERFECT", "FLAWLESS" };
-            var types = new string[] { "RUBY", "JASPER", "JADE", "TOPAZ", "AMETHYST", "AMBER", "SAPPHIRE" };
+            var types = new string[] { "RUBY", "JASPER", "JADE", "TOPAZ", "AMETHYST", "AMBER", "SAPPHIRE", "OPAL" };
             await LoadNameLookups(rarities, types);
 
             while (!stoppingToken.IsCancellationRequested)
