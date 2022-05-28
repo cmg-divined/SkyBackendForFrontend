@@ -19,6 +19,4 @@ namespace Coflnet.Sky.Commands.Shared
             return flip => flip.Profit > min;
         }
     }
-    
-
 }
