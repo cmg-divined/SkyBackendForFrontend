@@ -28,7 +28,7 @@ namespace Coflnet.Sky.Commands.Helper
                 Start = DateTime.UtcNow.AddSeconds(-10)
             };
             var prop = PropertiesSelector.GetProperties(auction).Select(p => p.Value).First();
-            Assert.AreEqual("Bed: 6s", prop);
+            Assert.AreEqual("Bed: 9s", prop);
         }
     }
 }

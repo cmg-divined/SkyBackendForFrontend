@@ -43,8 +43,8 @@ namespace Coflnet.Sky.Commands.Helper
 
 
             var data = auction.FlatenedNBT;
-            var bedEstimate = (auction.Start + TimeSpan.FromSeconds(17) - DateTime.UtcNow).TotalSeconds;
-            if (auction.Start + TimeSpan.FromSeconds(17) > DateTime.UtcNow)
+            var bedEstimate = (auction.Start + TimeSpan.FromSeconds(20) - DateTime.UtcNow).TotalSeconds;
+            if (bedEstimate > 0 )
             {
                 properties.Add(new Property($"Bed: {((int)bedEstimate)}s", 20));
             }
