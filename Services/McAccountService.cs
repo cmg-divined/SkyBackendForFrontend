@@ -28,7 +28,7 @@ namespace Coflnet.Sky.Commands
             var mcRequest = new RestRequest("connect/user/{userId}")
                                 .AddUrlSegment("userId", userId);
             McConnect.Models.User mcAccounts = await ExecuteUserRequest(mcRequest);
-            return mcAccounts.Accounts?.Where(a => a.Verified).Select(a=>a.AccountUuid);
+            return mcAccounts?.Accounts?.Where(a => a.Verified).Select(a=>a.AccountUuid);
         }
 
         private async Task<McConnect.Models.User> ExecuteUserRequest(IRestRequest mcRequest)
