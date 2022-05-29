@@ -82,7 +82,10 @@ namespace Coflnet.Sky.Commands.Shared
             services.AddSingleton<T>(context =>
             {
                 var config = context.GetRequiredService<IConfiguration>();
-                return creator("http://" + SimplerConfig.Config.Instance["PAYMENTS_HOST"]);
+                var url = SimplerConfig.Config.Instance["PAYMENTS_BASE_URL"];
+                if(url == null)
+                    url = "http://" + SimplerConfig.Config.Instance["PAYMENTS_HOST"];
+                return creator(url);
             });
         }
     }
