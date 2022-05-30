@@ -151,7 +151,7 @@ namespace Coflnet.Sky.Commands.Shared
                 return new CurrentPrice()
                 {
                     Buy = GetBazaarCostForCount(val.BuyOrders, count),
-                    Sell = val.SellOrders.Min(s => s.PricePerUnit),
+                    Sell = val.SellOrders.Max(s => s.PricePerUnit),
                     Available = val.BuyOrders.Sum(b => b.Amount)
                 };
             }
