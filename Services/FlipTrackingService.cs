@@ -283,7 +283,7 @@ namespace Coflnet.Sky.Commands
                     {
                         var gemSumaryBuy = gemPriceService.LookupToGems(b.Nbt);
                         var gemSumarySell = gemPriceService.LookupToGems(sell.NBTLookup);
-                        var gemSumaryDiff = gemSumarySell.Sum(g => g.Effect) - gemSumaryBuy.Sum(g => g.Effect);
+                        var gemSumaryDiff = gemSumaryBuy.Sum(g => g.Effect) - gemSumarySell.Sum(g => g.Effect);
 
                         changeSumary.AddRange(gemSumaryBuy);
                         changeSumary.AddRange(gemSumarySell.Select(g => new PropertyChange()
@@ -295,7 +295,7 @@ namespace Coflnet.Sky.Commands
                         changeSumary.Add(new PropertyChange()
                         {
                             Description = $"2% AH tax for sell",
-                            Effect = tax
+                            Effect = -tax
                         });
 
                         profit = gemSumaryDiff

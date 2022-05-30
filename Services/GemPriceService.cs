@@ -156,7 +156,7 @@ namespace Coflnet.Sky.Commands.Shared
                     {
                         return new PropertyChange()
                         {
-                            Description = $"{key} {value}",
+                            Description = $"{key}",
                             Effect = value
                         };
 
