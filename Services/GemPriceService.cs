@@ -137,9 +137,7 @@ namespace Coflnet.Sky.Commands.Shared
                 if (GemNames.TryGetValue((l.KeyId, l.Value), out string key))
                     if (Prices.TryGetValue(key, out int value))
                     {
-                        Console.WriteLine($"{key} {value}");
                         return value;
-
                     }
                     else 
                         logger.LogDebug("Price for not found " + key);
@@ -147,5 +145,25 @@ namespace Coflnet.Sky.Commands.Shared
                 return 0;
             });
         }
+
+
+        public List<PropertyChange> LookupToGems(List<NBTLookup> lookup)
+        {
+            return lookup.Select(l =>
+            {
+                if (GemNames.TryGetValue((l.KeyId, l.Value), out string key))
+                    if (Prices.TryGetValue(key, out int value))
+                    {
+                        return new PropertyChange()
+                        {
+                            Description = $"{key} {value}",
+                            Effect = value
+                        };
+
+                    }
+                return null;
+            }).Where(u=>u!=null).ToList();
+        }
+
     }
 }

@@ -117,7 +117,7 @@ namespace Coflnet.Sky.Commands
         public async Task<(System.TimeSpan, int)> GetRecommendedPenalty(IEnumerable<string> playerIds)
         {
             var breakdown = await flipAnalyse.PlayersSpeedPostAsync(new SpeedCheckRequest(playerIds.ToList()));
-            var hourCount = breakdown?.Times?.Where(t=>t.TotalSeconds > 1).GroupBy(t=>System.TimeSpan.Parse(t.Age).Hours).Count() ?? 0;
+            var hourCount = breakdown?.Times?.Where(t => t.TotalSeconds > 1).GroupBy(t => System.TimeSpan.Parse(t.Age).Hours).Count() ?? 0;
             return (System.TimeSpan.FromSeconds(breakdown?.Penalty ?? 0), hourCount);
         }
 
@@ -210,7 +210,7 @@ namespace Coflnet.Sky.Commands
         }
         public async Task<FlipSumary> GetPlayerFlips(string uuid, System.TimeSpan timeSpan)
         {
-            return await GetPlayerFlips(new string[]{ uuid }, timeSpan);
+            return await GetPlayerFlips(new string[] { uuid }, timeSpan);
         }
 
         public async Task<FlipSumary> GetPlayerFlips(IEnumerable<string> uuids, System.TimeSpan timeSpan)
@@ -277,12 +277,31 @@ namespace Coflnet.Sky.Commands
                     var enchantsBad = b.Tag == "ENCHANTED_BOOK" && (b.Enchants.Count == 1 && sell.Enchantments.Count != 1 || b.Enchants.First().Level != sell.Enchantments.First().Level)
                                         && (sell.HighestBidAmount - b.HighestOwnBid) > 1_000_000;
                     var profit = 1L;
+                    var changeSumary = new List<PropertyChange>();
                     if (b.Tag == sell.Tag
                         && !enchantsBad)
-                        profit = gemPriceService.GetGemWrthFromLookup(b.Nbt)
-                        - gemPriceService.GetGemWrthFromLookup(sell.NBTLookup)
-                        + sell.HighestBidAmount * 98 / 100
+                    {
+                        var gemSumaryBuy = gemPriceService.LookupToGems(b.Nbt);
+                        var gemSumarySell = gemPriceService.LookupToGems(sell.NBTLookup);
+                        var gemSumaryDiff = gemSumarySell.Sum(g => g.Effect) - gemSumaryBuy.Sum(g => g.Effect);
+
+                        changeSumary.AddRange(gemSumaryBuy);
+                        changeSumary.AddRange(gemSumarySell.Select(g => new PropertyChange()
+                        {
+                            Description = $"Selling with {g.Description}",
+                            Effect = -g.Effect
+                        }));
+                        var tax = sell.HighestBidAmount - sell.HighestBidAmount * 98 / 100;
+                        changeSumary.Add(new PropertyChange()
+                        {
+                            Description = $"2% AH tax for sell",
+                            Effect = tax
+                        });
+
+                        profit = gemSumaryDiff
+                        + sell.HighestBidAmount - tax
                         - b.HighestOwnBid;
+                    }
 
 
                     return new FlipDetails()
@@ -299,7 +318,8 @@ namespace Coflnet.Sky.Commands
                         ItemName = sell?.ItemName,
                         BuyTime = b.End,
                         SellTime = sell.End,
-                        Profit = profit
+                        Profit = profit,
+                        PropertyChanges = changeSumary
                     };
                 }).OrderByDescending(f => f.Profit).ToArray();
 

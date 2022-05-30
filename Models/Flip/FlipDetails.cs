@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using Coflnet.Sky.Core;
 
 namespace Coflnet.Sky.Commands.Shared
@@ -23,6 +24,15 @@ namespace Coflnet.Sky.Commands.Shared
         /// Profit of this flip (takes property changes into account)
         /// </summary>
         public long Profit;
+        /// <summary>
+        /// A list of changes that were applied to the item
+        /// </summary>
+        public List<PropertyChange> PropertyChanges;
     }
 
+    public class PropertyChange
+    {
+        public string Description;
+        public long Effect;
+    }
 }
