@@ -24,7 +24,7 @@ namespace Coflnet.Sky.Commands.Shared
         {
             if (filterCache == null)
                 filterCache = GetExpression().Compile();
-            return filterCache(flip);
+            return (ItemTag == null || ItemTag == flip.Auction.Tag) && filterCache(flip);
         }
 
         public Expression<Func<FlipInstance,bool>> GetExpression()
