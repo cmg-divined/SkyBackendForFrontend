@@ -44,7 +44,7 @@ namespace Coflnet.Sky.Commands.Helper
 
             var data = auction.FlatenedNBT;
             var bedEstimate = (auction.Start + TimeSpan.FromSeconds(20) - DateTime.UtcNow).TotalSeconds;
-            if (bedEstimate > 0 )
+            if (bedEstimate > 0)
             {
                 properties.Add(new Property($"Bed: {((int)bedEstimate)}s", 20));
             }
@@ -70,18 +70,20 @@ namespace Coflnet.Sky.Commands.Helper
                 properties.Add(new Property($"Kills: {ItemDetails.TagToName(data["spider_kills"])}", 15));
             if (data.ContainsKey("zombie_kills"))
                 properties.Add(new Property($"Kills: {ItemDetails.TagToName(data["zombie_kills"])}", 15));
-            if(data.ContainsKey("unlocked_slots"))
-                properties.Add(new Property($"Unlocked: {(data["unlocked_slots"].Sum(c=>c == ',' ? 1 : 0) + 1)}", 15));
+            if (data.ContainsKey("unlocked_slots"))
+                properties.Add(new Property($"Unlocked: {(data["unlocked_slots"].Sum(c => c == ',' ? 1 : 0) + 1)}", 15));
 
             properties.AddRange(data.Where(p => p.Value == "PERFECT" || p.Value == "FLAWLESS").Select(p => new Property($"{p.Value} gem", p.Value == "PERFECT" ? 14 : 7)));
 
             var isBook = auction.Tag == "ENCHANTED_BOOK";
 
-            properties.AddRange(auction.Enchantments?.Where(e => (!RelEnchantLookup.ContainsKey(e.Type) && e.Level >= 6) || (RelEnchantLookup.TryGetValue(e.Type, out byte lvl)) && e.Level >= lvl).Select(e => new Property()
+            var enchants = auction.Enchantments?.Where(e => (!RelEnchantLookup.ContainsKey(e.Type) && e.Level >= 6) || (RelEnchantLookup.TryGetValue(e.Type, out byte lvl)) && e.Level >= lvl).Select(e => new Property()
             {
                 Value = $"{ItemDetails.TagToName(e.Type.ToString())}: {e.Level}",
                 Rating = 2 + e.Level + (e.Type.ToString().StartsWith("ultimate") ? 5 : 0) + (e.Type == Enchantment.EnchantmentType.infinite_quiver ? -3 : 0)
-            }));
+            });
+            if (enchants != null)
+                properties.AddRange(enchants);
 
             return properties;
         }
