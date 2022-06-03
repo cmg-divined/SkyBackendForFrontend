@@ -85,10 +85,15 @@ namespace Coflnet.Sky.Commands.Shared
             {
                 var config = context.GetRequiredService<IConfiguration>();
                 var url = SimplerConfig.Config.Instance["PAYMENTS_BASE_URL"];
-                if(url == null)
+                if (url == null)
                     url = "http://" + SimplerConfig.Config.Instance["PAYMENTS_HOST"];
                 return creator(url);
             });
+        }
+
+        public static T GetService<T>(this MessageData di)
+        {
+            return ServiceProvider.GetService<T>();
         }
     }
 }
