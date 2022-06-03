@@ -91,7 +91,7 @@ namespace Coflnet.Sky.Commands.Shared
             });
         }
 
-        public static T GetService<T>(this MessageData di)
+        public static T GetService<T>()
         {
             return ServiceProvider.GetRequiredService<T>();
         }
