@@ -7,6 +7,8 @@ using Coflnet.Sky.Items.Client.Api;
 using Coflnet.Sky.Referral.Client.Api;
 using Coflnet.Sky.Sniper.Client.Api;
 using Coflnet.Sky.Crafts.Client.Api;
+using Coflnet.Sky.Core;
+using Coflnet.Sky.Commands.Shared;
 
 namespace Coflnet.Sky.Commands.Shared
 {
@@ -87,6 +89,17 @@ namespace Coflnet.Sky.Commands.Shared
                     url = "http://" + SimplerConfig.Config.Instance["PAYMENTS_HOST"];
                 return creator(url);
             });
+        }
+    }
+}
+
+namespace Coflnet.Sky.Core
+{
+    public static class DiExtentions
+    {
+        public static T GetService<T>(this MessageData di)
+        {
+            return DiHandler.ServiceProvider.GetService<T>();
         }
     }
 }
