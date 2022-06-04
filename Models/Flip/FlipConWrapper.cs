@@ -47,7 +47,7 @@ namespace Coflnet.Sky.Commands.Shared
                     {
                         try
                         {
-                            var flip = await LowPriced.Reader.ReadAsync(stoppingToken);
+                            var flip = await LowPriced.Reader.ReadAsync(stoppingToken).ConfigureAwait(false);
                             if (LowPriced.Reader.Count > 90)
                             {
                                 Connection.Log("amany flips waiting " + LowPriced.Reader.Count, Microsoft.Extensions.Logging.LogLevel.Error);

@@ -30,7 +30,7 @@ namespace Coflnet.Sky.Commands.Shared
             {
                 var deserialized = JsonConvert.DeserializeObject<MessageContainer>(msg.Message);
                 onEvent.Invoke(deserialized);
-                Task.Run(async () => await api.MessageConfirmAuctionIdPostAsync(deserialized.Reference));
+                Task.Run(async () => await api.MessageConfirmAuctionIdPostAsync(deserialized.Reference).ConfigureAwait(false));
             });
             return sub;
         }

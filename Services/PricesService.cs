@@ -102,7 +102,7 @@ namespace Coflnet.Sky.Commands.Shared
                         Max = (int)item.Max(a => ((int)a.HighestBidAmount) / a.Count),
                         Min = (int)item.Min(a => ((int)a.HighestBidAmount) / a.Count),
                         Count = item.Sum(a => a.Count)
-                    }).ToListAsync();
+                    }).AsNoTracking().ToListAsync();
 
             if (dbResult.Count == 0)
             {

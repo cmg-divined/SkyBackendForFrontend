@@ -106,7 +106,7 @@ namespace Coflnet.Sky.Commands
                 TargetPrice = flip.TargetPrice,
                 Timestamp = foundAt,
                 AuctionId = flip.UId
-            });
+            }).ConfigureAwait(false);
         }
 
         /// <summary>
@@ -116,14 +116,14 @@ namespace Coflnet.Sky.Commands
         /// <returns></returns>
         public async Task<(System.TimeSpan, int)> GetRecommendedPenalty(IEnumerable<string> playerIds)
         {
-            var breakdown = await flipAnalyse.PlayersSpeedPostAsync(new SpeedCheckRequest(playerIds.ToList()));
+            var breakdown = await flipAnalyse.PlayersSpeedPostAsync(new SpeedCheckRequest(playerIds.ToList())).ConfigureAwait(false);
             var hourCount = breakdown?.Times?.Where(t => t.TotalSeconds > 1).GroupBy(t => System.TimeSpan.Parse(t.Age).Hours).Count() ?? 0;
             return (System.TimeSpan.FromSeconds(breakdown?.Penalty ?? 0), hourCount);
         }
 
         public async Task<int> ActiveFlipperCount()
         {
-            return await flipAnalyse.UsersActiveCountGetAsync();
+            return await flipAnalyse.UsersActiveCountGetAsync().ConfigureAwait(false);
         }
 
         public async Task<List<FlipDetails>> GetFlipsForFinder(LowPricedAuction.FinderType type, DateTime start, DateTime end)
@@ -137,7 +137,7 @@ namespace Coflnet.Sky.Commands
             if (start < end - System.TimeSpan.FromDays(1))
                 throw new CoflnetException("span_to_large", "Querying for more than a day is not supported");
 
-            var idTask = flipAnalyse.AnalyseFinderFinderTypeGetAsync(Enum.Parse<FinderType>(type.ToString(), true), start, end);
+            var idTask = flipAnalyse.AnalyseFinderFinderTypeGetAsync(Enum.Parse<FinderType>(type.ToString(), true), start, end).ConfigureAwait(false);
             using (var context = new HypixelContext())
             {
                 var receivedFlips = await idTask;
@@ -147,7 +147,8 @@ namespace Coflnet.Sky.Commands
                 var ids = flips.Keys;
                 var buyList = await context.Auctions.Where(a => ids.Contains(a.UId) && a.HighestBidAmount > 0)
                     .Include(a => a.NBTLookup)
-                    .ToListAsync();
+                    .AsNoTracking()
+                    .ToListAsync().ConfigureAwait(false);
                 // only include flips that were bought shortly after being reported
                 //buyList = buyList.Where(a => !flips.TryGetValue(a.UId, out Flip f) || f.Timestamp < a.End && f.Timestamp > a.End - TimeSpan.FromSeconds(50)).ToList();
 
@@ -163,10 +164,10 @@ namespace Coflnet.Sky.Commands
                         return a.NBTLookup.Where(l => l.KeyId == uidKey).FirstOrDefault().Value;
                     }).ToDictionary(b => b.Key);
                 var buyUidLookup = buyLookup.Select(a => a.Key).ToHashSet();
-                var sellIds = await context.NBTLookups.Where(b => b.KeyId == uidKey && buyUidLookup.Contains(b.Value)).Select(n => n.AuctionId).ToListAsync();
+                var sellIds = await context.NBTLookups.Where(b => b.KeyId == uidKey && buyUidLookup.Contains(b.Value)).AsNoTracking().Select(n => n.AuctionId).ToListAsync();
                 var buyAuctionUidLookup = buyLookup.Select(a => a.Value.First().UId).ToHashSet();
                 var sells = await context.Auctions.Where(b => sellIds.Contains(b.Id) && !buyAuctionUidLookup.Contains(b.UId) && b.End > start && b.HighestBidAmount > 0 && b.End < DateTime.Now)
-                                        .Select(s => new { s.End, s.HighestBidAmount, s.NBTLookup, s.Uuid }).ToListAsync();
+                                        .Select(s => new { s.End, s.HighestBidAmount, s.NBTLookup, s.Uuid }).AsNoTracking().ToListAsync().ConfigureAwait(false);
 
                 return sells.Select(s =>
                 {
@@ -217,13 +218,14 @@ namespace Coflnet.Sky.Commands
         {
             using (var context = new HypixelContext())
             {
-                var playerIds = await context.Players.Where(p => uuids.Contains(p.UuId)).Select(p => p.Id).ToListAsync();
+                var playerIds = await context.Players.Where(p => uuids.Contains(p.UuId)).AsNoTracking().Select(p => p.Id).ToListAsync();
                 var startTime = DateTime.Now - timeSpan;
                 var uidKey = NBT.Instance.GetKeyId("uid");
                 var sellList = await context.Auctions.Where(a => playerIds.Contains(a.SellerId))
                     .Where(a => a.End > startTime && a.End < DateTime.Now && a.HighestBidAmount > 0 && a.Bin)
                     .Include(a => a.NBTLookup)
                     .Include(a => a.Enchantments)
+                    .AsNoTracking()
                     .ToListAsync();
 
                 var sells = sellList
@@ -233,9 +235,9 @@ namespace Coflnet.Sky.Commands
                         return a.NBTLookup.Where(l => l.KeyId == uidKey).FirstOrDefault().Value;
                     }).ToList();
                 var SalesUidLookup = sells.Select(a => a.Key).ToHashSet();
-                var sales = await context.NBTLookups.Where(b => b.KeyId == uidKey && SalesUidLookup.Contains(b.Value)).Select(n => n.AuctionId).ToListAsync();
+                var sales = await context.NBTLookups.Where(b => b.KeyId == uidKey && SalesUidLookup.Contains(b.Value)).AsNoTracking().Select(n => n.AuctionId).ToListAsync();
                 var playerBids = await context.Bids.Where(b => playerIds.Contains(b.BidderId) && sales.Contains(b.Auction.Id) && b.Timestamp > startTime.Subtract(System.TimeSpan.FromDays(14)))
-                    //.Where(b => b.Auction.NBTLookup.Where(b => b.KeyId == uidKey && SalesUidLookup.Contains(b.Value)).Any())
+                    .AsNoTracking()
                     // filtering
                     .OrderByDescending(bid => bid.Id)
                     .Select(b => new
