@@ -34,6 +34,13 @@ namespace Coflnet.Sky.Commands.Shared
             return instance;
         }
 
+        public static Task<SelfUpdatingValue<T>> CreateNoUpdate(Func<T> valGet)
+        {
+            var instance = new SelfUpdatingValue<T>(null, null);
+            instance.Value = valGet();
+            return Task.FromResult(instance);
+        }
+
         private static SettingsService GetService()
         {
             return DiHandler.ServiceProvider.GetRequiredService<SettingsService>();
@@ -51,6 +58,11 @@ namespace Coflnet.Sky.Commands.Shared
         /// <returns></returns>
         public async Task Update(T newValue)
         {
+            if(UserId == null)
+            {
+                Value = newValue;
+                return;
+            }
             await GetService().UpdateSetting(UserId, Key, newValue);
         }
 
