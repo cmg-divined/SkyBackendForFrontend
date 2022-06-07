@@ -70,7 +70,20 @@ namespace Coflnet.Sky.Commands.Shared
 
         public async Task UpdateSetting<T>(string userId, string key, T data)
         {
-            await api.SettingsUserIdSettingKeyPostAsync(userId, key, JsonConvert.SerializeObject(data));
+            for (int i = 0; i < 3; i++)
+            {
+                try
+                {
+                    await api.SettingsUserIdSettingKeyPostAsync(userId, key, JsonConvert.SerializeObject(data));
+                    return;
+                }
+                catch (System.Exception)
+                {
+                    await Task.Delay(20 * i);
+                    if(i == 2)
+                        throw;
+                }
+            }
         }
 
         private static T Deserialize<T>(string a)
