@@ -292,7 +292,6 @@ namespace Coflnet.Sky.Commands.Shared
             };
             sampleFlip.LastKnownCost = 10;
             sampleFlip.MedianPrice = 10000;
-            System.Console.WriteLine(sampleFlip.ProfitPercentage);
             Matches(settings, sampleFlip);
         }
 
