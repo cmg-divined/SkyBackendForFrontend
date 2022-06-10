@@ -87,10 +87,14 @@ namespace Coflnet.Sky.Commands.Shared
             }
             else if (doc.Prefix == "show")
             {
+                if(con.Settings.Visibility == null)
+                    con.Settings.Visibility = new VisibilitySettings();
                 return UpdateValueOnObject(value, doc.RealName, con.Settings.Visibility);
             }
             else if (doc.Prefix == "mod")
             {
+                if(con.Settings.ModSettings == null)
+                    con.Settings.ModSettings = new ModSettings();
                 return UpdateValueOnObject(value, doc.RealName, con.Settings.ModSettings);
             }
             else
