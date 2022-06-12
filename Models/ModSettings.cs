@@ -70,5 +70,8 @@ namespace Coflnet.Sky.Commands.Shared
         [DataMember(Name = "noAdjustToPurse")]
         [SettingsDoc("Stop your max cost from being auto-adjusted to your purse", "ap")]
         public bool NoAdjustToPurse;
+        [DataMember(Name = "noBedDelay")]
+        [SettingsDoc("Don't delay bed flips, send them imediately instead", "nbd")]
+        public bool NoBedDelay;
     }
 }
