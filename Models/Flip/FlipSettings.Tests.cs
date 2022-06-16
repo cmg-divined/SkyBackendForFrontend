@@ -131,14 +131,14 @@ namespace Coflnet.Sky.Commands.Shared
                 if (settings.MatchesSettings(flipA).Item1)
                     matchCount++;
             }
-            Assert.Greater(10, stopWatch.ElapsedMilliseconds, "matching is too slow");
+            Assert.Greater(20, stopWatch.ElapsedMilliseconds, "matching is too slow");
             stopWatch = Stopwatch.StartNew();
             for (int i = 0; i < iterations; i++)
             {
                 if (!settings.MatchesSettings(flipB).Item1)
                     matchCount++;
             }
-            Assert.Greater(17, stopWatch.ElapsedMilliseconds, "matching blacklist is too slow");
+            Assert.Greater(37, stopWatch.ElapsedMilliseconds, "matching blacklist is too slow");
             Assert.AreEqual(iterations * 2, matchCount);
         }
 

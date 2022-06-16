@@ -32,7 +32,7 @@ namespace Coflnet.Sky.Commands.Tests
                 });
             }
             await Task.Delay(20); // wait for the async sending to finish
-            Assert.Less(watch.ElapsedMilliseconds, 40);
+            Assert.Less(watch.ElapsedMilliseconds, 45);
             Assert.AreEqual(5, con.LastFlip.MedianPrice);
             Assert.AreEqual(2, con.LastFlip.Volume);
             Assert.AreEqual(auction, con.LastFlip.Auction);
