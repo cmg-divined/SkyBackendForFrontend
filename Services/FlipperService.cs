@@ -209,7 +209,6 @@ namespace Coflnet.Sky.Commands.Shared
         {
             var flipIntance = new FlipInstance()
             {
-                LastKnownCost = (int)flip.Auction.StartingBid,
                 Auction = flip.Auction,
                 MedianPrice = flip.TargetPrice,
                 Uuid = flip.Auction.Uuid,

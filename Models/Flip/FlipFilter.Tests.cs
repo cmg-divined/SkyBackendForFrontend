@@ -35,7 +35,7 @@ namespace Coflnet.Sky.Commands.Shared
         public void FlipFilterLoad()
         {
             var settings = JsonConvert.DeserializeObject<FlipSettings>(File.ReadAllText("mock/bigsettings.json"));
-            sampleFlip.LastKnownCost = 10;
+            sampleFlip.Auction.StartingBid = 10;
             sampleFlip.MedianPrice = 1000000;
             sampleFlip.Tag = "DIAMOND_NECRON_HEAD";
             sampleFlip.Auction.ItemName = "hi";
@@ -208,7 +208,7 @@ namespace Coflnet.Sky.Commands.Shared
                 WhiteList = new List<ListEntry>() { new ListEntry() { filter = new Dictionary<string, string>() {
                     { "MinProfit", "5" },{"FlipFinder", "SNIPER_MEDIAN"},{"Bin","false"} } } }
             };
-            sampleFlip.LastKnownCost = 10;
+            sampleFlip.Auction.StartingBid = 10;
             sampleFlip.MedianPrice = 100;
             sampleFlip.Finder = LowPricedAuction.FinderType.SNIPER_MEDIAN;
             Matches(settings, sampleFlip);
@@ -224,7 +224,7 @@ namespace Coflnet.Sky.Commands.Shared
                 WhiteList = new List<ListEntry>() { new ListEntry() { filter = new Dictionary<string, string>() {
                     { "MinProfit", "5" } } } }
             };
-            sampleFlip.LastKnownCost = 10;
+            sampleFlip.Auction.StartingBid = 10;
             sampleFlip.MedianPrice = 100;
             sampleFlip.Finder = LowPricedAuction.FinderType.SNIPER_MEDIAN;
             Matches(settings, sampleFlip);
@@ -275,7 +275,7 @@ namespace Coflnet.Sky.Commands.Shared
                 BlackList = new List<ListEntry>() { new ListEntry() { filter = new Dictionary<string, string>() {
                     { "FlipFinder", "FLIPPER" } } } }
             };
-            sampleFlip.LastKnownCost = 10;
+            sampleFlip.Auction.StartingBid = 10;
             sampleFlip.MedianPrice = 1000000;
             sampleFlip.Finder = LowPricedAuction.FinderType.FLIPPER;
             NoMatch(settings, sampleFlip);
@@ -290,8 +290,23 @@ namespace Coflnet.Sky.Commands.Shared
                     { "ProfitPercentage", ">5" } }
                 } }
             };
-            sampleFlip.LastKnownCost = 10;
+            sampleFlip.Auction.StartingBid = 10;
             sampleFlip.MedianPrice = 10000;
+            Matches(settings, sampleFlip);
+        }
+        [Test]
+        public void RangeProfitPercentage()
+        {
+            var settings = new FlipSettings()
+            {
+                MinProfit = 10000,
+                WhiteList = new List<ListEntry>() { new ListEntry() { filter = new Dictionary<string, string>() {
+                    { "ProfitPercentage", "1-10" } }
+                } }
+            };
+            sampleFlip.Auction.StartingBid = 50;
+            sampleFlip.MedianPrice = 55;
+            System.Console.WriteLine(sampleFlip.ProfitPercentage);
             Matches(settings, sampleFlip);
         }
 

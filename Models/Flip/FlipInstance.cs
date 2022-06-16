@@ -11,7 +11,7 @@ namespace Coflnet.Sky.Commands.Shared
         [DataMember(Name = "median")]
         public int MedianPrice;
         [DataMember(Name = "cost")]
-        public int LastKnownCost;
+        public int LastKnownCost => (int)(Auction.HighestBidAmount == 0 ? Auction.StartingBid : Auction.HighestBidAmount);
         [DataMember(Name = "uuid")]
         public string Uuid;
         [DataMember(Name = "name")]
@@ -43,7 +43,7 @@ namespace Coflnet.Sky.Commands.Shared
         public long Profit => (MedianPrice - LastKnownCost) * 98 / 100;
 
         [IgnoreDataMember]
-        public long ProfitPercentage => (Profit / (LastKnownCost == 0 ? int.MaxValue : LastKnownCost));
+        public long ProfitPercentage => (Profit * 100 / (LastKnownCost == 0 ? int.MaxValue : LastKnownCost));
 
         [IgnoreDataMember]
         public Dictionary<string, string> Context { get; set; }

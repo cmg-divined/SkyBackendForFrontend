@@ -95,7 +95,7 @@ namespace Coflnet.Sky.Commands.Shared
 
         private static void CreateLookup(FlipInstance flip)
         {
-            flip.Auction.NBTLookup = new System.Collections.Generic.List<NBTLookup>(){new NBTLookup(1,2)};
+            flip.Auction.NBTLookup = new System.Collections.Generic.List<NBTLookup>() { new NBTLookup(1, 2) };
         }
 
         [Test]
@@ -113,7 +113,7 @@ namespace Coflnet.Sky.Commands.Shared
         public void BlacklitPetLevel()
         {
             flipB.Auction.Tag = PetTag;
-            flipB.Auction.NBTLookup.Add(new NBTLookup(1,2));
+            flipB.Auction.NBTLookup.Add(new NBTLookup(1, 2));
             var bRes = settings.MatchesSettings(flipB);
             Assert.IsFalse(bRes.Item1, bRes.Item2);
         }
@@ -128,18 +128,18 @@ namespace Coflnet.Sky.Commands.Shared
             var stopWatch = Stopwatch.StartNew();
             for (int i = 0; i < iterations; i++)
             {
-                if(settings.MatchesSettings(flipA).Item1)
+                if (settings.MatchesSettings(flipA).Item1)
                     matchCount++;
             }
             Assert.Greater(10, stopWatch.ElapsedMilliseconds, "matching is too slow");
             stopWatch = Stopwatch.StartNew();
             for (int i = 0; i < iterations; i++)
             {
-                if(!settings.MatchesSettings(flipB).Item1)
+                if (!settings.MatchesSettings(flipB).Item1)
                     matchCount++;
             }
             Assert.Greater(17, stopWatch.ElapsedMilliseconds, "matching blacklist is too slow");
-            Assert.AreEqual(iterations* 2,matchCount );
+            Assert.AreEqual(iterations * 2, matchCount);
         }
 
 
@@ -148,6 +148,49 @@ namespace Coflnet.Sky.Commands.Shared
         {
             var matcher = new FlipSettings.ListMatcher(null);
             Assert.IsFalse(matcher.IsMatch(flipA).Item1);
+        }
+
+        [Test]
+        public void MatchLevelRanges()
+        {
+            var listEntry = new ListEntry()
+            {
+                ItemTag = "SORROW_HELMET",
+                filter = new System.Collections.Generic.Dictionary<string, string>()
+                {
+                    { "Reforge","Renowned"}, {"Enchantment","ultimate_legion"}, {"EnchantLvl","1-5"}, {"ProfitPercentage","1-22"}
+                }
+            };
+
+            var auction = new FlipInstance()
+            {
+                MedianPrice = 32_000_000,
+                Auction = new SaveAuction()
+                {
+                    Tag = "SORROW_HELMET",
+                    Enchantments = new System.Collections.Generic.List<Enchantment>()
+                    {
+                        new Enchantment()
+                        {
+                            Type = Enchantment.EnchantmentType.ultimate_legion,
+                            Level = 4
+                        }
+                    },
+                    FlatenedNBT = new System.Collections.Generic.Dictionary<string, string>()
+                    {
+                        { "rarity_upgrades", "1" },
+                        { "hpc", "15" },
+                        { "unlocked_slots", "JADE_0" },
+                        { "uid", "83de32552763" }
+                    },
+                    StartingBid = 28_000_000,
+                    Reforge = ItemReferences.Reforge.Renowned
+                }
+            };
+
+            var profitp = auction.ProfitPercentage;
+
+            Assert.IsTrue(listEntry.MatchesSettings(auction));
         }
     }
 

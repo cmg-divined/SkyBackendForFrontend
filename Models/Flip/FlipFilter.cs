@@ -71,7 +71,6 @@ namespace Coflnet.Sky.Commands.Shared
             Filters = FilterEngine.GetMatcher(filters);
             if (expression != null)
                 FlipFilters = expression.Compile();
-
         }
 
         public bool IsMatch(FlipInstance flip)
