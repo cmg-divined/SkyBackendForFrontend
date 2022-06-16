@@ -151,7 +151,7 @@ namespace Coflnet.Sky.Commands.Shared
         }
 
         [Test]
-        public void MatchLevelRanges()
+        public void ReportFromartificialair()
         {
             var listEntry = new ListEntry()
             {
@@ -190,6 +190,32 @@ namespace Coflnet.Sky.Commands.Shared
 
             var profitp = auction.ProfitPercentage;
 
+            Assert.IsTrue(listEntry.MatchesSettings(auction));
+        }
+        [Test]
+        public void MinProfitPercentageForHyperion()
+        {
+            var listEntry = new ListEntry()
+            {
+                ItemTag = "HYPERION",
+                filter = new System.Collections.Generic.Dictionary<string, string>()
+                {
+                    { "FlipFinder", "SNIPER_MEDIAN"}, {"MinProfitPercentage", "60"}
+                }
+            };
+
+            var auction = new FlipInstance()
+            {
+                MedianPrice = 820000000,
+                Finder = LowPricedAuction.FinderType.SNIPER_MEDIAN,
+                Auction = new SaveAuction()
+                {
+                    Tag = "HYPERION",
+                    StartingBid = 1000000,
+                    Reforge = ItemReferences.Reforge.Heroic
+                }
+            };
+            // report https://discord.com/channels/267680588666896385/986382602376196116/986382624362737685
             Assert.IsTrue(listEntry.MatchesSettings(auction));
         }
     }
