@@ -216,121 +216,121 @@ namespace Coflnet.Sky.Commands
 
         public async Task<FlipSumary> GetPlayerFlips(IEnumerable<string> uuids, System.TimeSpan timeSpan)
         {
-            using (var context = new HypixelContext())
+            using var context = new HypixelContext();
+
+            var playerIds = await context.Players.Where(p => uuids.Contains(p.UuId)).AsNoTracking().Select(p => p.Id).ToListAsync();
+            var startTime = DateTime.Now - timeSpan;
+            var uidKey = NBT.Instance.GetKeyId("uid");
+            var sellList = await context.Auctions.Where(a => playerIds.Contains(a.SellerId))
+                .Where(a => a.End > startTime && a.End < DateTime.Now && a.HighestBidAmount > 0 && a.Bin)
+                .Include(a => a.NBTLookup)
+                .Include(a => a.Enchantments)
+                .AsNoTracking()
+                .ToListAsync().ConfigureAwait(false);
+
+            var sells = sellList
+                .Where(a => a.NBTLookup.Where(l => l.KeyId == uidKey).Any())
+                .GroupBy(a =>
+                {
+                    return a.NBTLookup.Where(l => l.KeyId == uidKey).FirstOrDefault().Value;
+                }).ToList();
+            var SalesUidLookup = sells.Select(a => a.Key).ToHashSet();
+            var sales = await context.NBTLookups.Where(b => b.KeyId == uidKey && SalesUidLookup.Contains(b.Value)).AsNoTracking().Select(n => n.AuctionId).ToListAsync();
+            var playerBids = await context.Bids.Where(b => playerIds.Contains(b.BidderId) && sales.Contains(b.Auction.Id) && b.Timestamp > startTime.Subtract(System.TimeSpan.FromDays(14)))
+                .AsNoTracking()
+                // filtering
+                .OrderByDescending(bid => bid.Id)
+                .Select(b => new
+                {
+                    b.Auction.Uuid,
+                    b.Auction.End,
+                    b.Auction.Tag,
+                    b.Amount,
+                    Enchants = b.Auction.Enchantments,
+                    Nbt = b.Auction.NBTLookup
+                }).GroupBy(b => b.Uuid)
+                .Select(bid => new
+                {
+                    bid.Key,
+                    Amount = bid.Max(b => b.Amount),
+                    HighestOwnBid = bid.Max(b => b.Amount),
+                    End = bid.Max(b => b.End),
+                    Tag = bid.First().Tag,
+                    Nbt = bid.OrderByDescending(b => b.Amount).First().Nbt,
+                    Enchants = bid.First().Enchants
+                })
+                //.ThenInclude (b => b.Auction)
+                .ToListAsync().ConfigureAwait(false);
+
+            var flipStats = (await flipTracking.TrackerBatchFlipsPostAsync(playerBids.Select(b => AuctionService.Instance.GetId(b.Key)).ToList()))
+                    ?.GroupBy(t => t.AuctionId)
+                    ?.ToDictionary(t => t.Key, v => v.AsEnumerable());
+            var flips = playerBids.Where(a => SalesUidLookup.Contains(a.Nbt.Where(b => b.KeyId == uidKey).FirstOrDefault().Value)).Select(b =>
             {
-                var playerIds = await context.Players.Where(p => uuids.Contains(p.UuId)).AsNoTracking().Select(p => p.Id).ToListAsync();
-                var startTime = DateTime.Now - timeSpan;
-                var uidKey = NBT.Instance.GetKeyId("uid");
-                var sellList = await context.Auctions.Where(a => playerIds.Contains(a.SellerId))
-                    .Where(a => a.End > startTime && a.End < DateTime.Now && a.HighestBidAmount > 0 && a.Bin)
-                    .Include(a => a.NBTLookup)
-                    .Include(a => a.Enchantments)
-                    .AsNoTracking()
-                    .ToListAsync();
+                FlipTracker.Client.Model.Flip first = flipStats?.GetValueOrDefault(AuctionService.Instance.GetId(b.Key))?.OrderBy(b => b.Timestamp).FirstOrDefault();
+                var uId = b.Nbt.Where(b => b.KeyId == uidKey).FirstOrDefault().Value;
+                var sell = sells.Where(s => s.Key == uId)?
+                        .FirstOrDefault()
+                        ?.OrderByDescending(b => b.End)
+                        .FirstOrDefault();
+                var soldFor = sell
+                        ?.HighestBidAmount;
 
-                var sells = sellList
-                    .Where(a => a.NBTLookup.Where(l => l.KeyId == uidKey).Any())
-                    .GroupBy(a =>
-                    {
-                        return a.NBTLookup.Where(l => l.KeyId == uidKey).FirstOrDefault().Value;
-                    }).ToList();
-                var SalesUidLookup = sells.Select(a => a.Key).ToHashSet();
-                var sales = await context.NBTLookups.Where(b => b.KeyId == uidKey && SalesUidLookup.Contains(b.Value)).AsNoTracking().Select(n => n.AuctionId).ToListAsync();
-                var playerBids = await context.Bids.Where(b => playerIds.Contains(b.BidderId) && sales.Contains(b.Auction.Id) && b.Timestamp > startTime.Subtract(System.TimeSpan.FromDays(14)))
-                    .AsNoTracking()
-                    // filtering
-                    .OrderByDescending(bid => bid.Id)
-                    .Select(b => new
-                    {
-                        b.Auction.Uuid,
-                        b.Auction.End,
-                        b.Auction.Tag,
-                        b.Amount,
-                        Enchants = b.Auction.Enchantments,
-                        Nbt = b.Auction.NBTLookup
-                    }).GroupBy(b => b.Uuid)
-                    .Select(bid => new
-                    {
-                        bid.Key,
-                        Amount = bid.Max(b => b.Amount),
-                        HighestOwnBid = bid.Max(b => b.Amount),
-                        End = bid.Max(b => b.End),
-                        Tag = bid.First().Tag,
-                        Nbt = bid.OrderByDescending(b => b.Amount).First().Nbt,
-                        Enchants = bid.First().Enchants
-                    })
-                    //.ThenInclude (b => b.Auction)
-                    .ToListAsync();
-
-                var flipStats = (await flipTracking.TrackerBatchFlipsPostAsync(playerBids.Select(b => AuctionService.Instance.GetId(b.Key)).ToList()))
-                        ?.GroupBy(t => t.AuctionId)
-                        ?.ToDictionary(t => t.Key, v => v.AsEnumerable());
-                var flips = playerBids.Where(a => SalesUidLookup.Contains(a.Nbt.Where(b => b.KeyId == uidKey).FirstOrDefault().Value)).Select(b =>
+                var enchantsBad = b.Tag == "ENCHANTED_BOOK" && (b.Enchants.Count == 1 && sell.Enchantments.Count != 1 || b.Enchants.First().Level != sell.Enchantments.First().Level)
+                                    && (sell.HighestBidAmount - b.HighestOwnBid) > 1_000_000;
+                var profit = 1L;
+                var changeSumary = new List<PropertyChange>();
+                if (b.Tag == sell.Tag
+                    && !enchantsBad)
                 {
-                    FlipTracker.Client.Model.Flip first = flipStats?.GetValueOrDefault(AuctionService.Instance.GetId(b.Key))?.OrderBy(b => b.Timestamp).FirstOrDefault();
-                    var uId = b.Nbt.Where(b => b.KeyId == uidKey).FirstOrDefault().Value;
-                    var sell = sells.Where(s => s.Key == uId)?
-                            .FirstOrDefault()
-                            ?.OrderByDescending(b => b.End)
-                            .FirstOrDefault();
-                    var soldFor = sell
-                            ?.HighestBidAmount;
+                    var gemSumaryBuy = gemPriceService.LookupToGems(b.Nbt);
+                    var gemSumarySell = gemPriceService.LookupToGems(sell.NBTLookup);
+                    var gemSumaryDiff = gemSumaryBuy.Sum(g => g.Effect) - gemSumarySell.Sum(g => g.Effect);
 
-                    var enchantsBad = b.Tag == "ENCHANTED_BOOK" && (b.Enchants.Count == 1 && sell.Enchantments.Count != 1 || b.Enchants.First().Level != sell.Enchantments.First().Level)
-                                        && (sell.HighestBidAmount - b.HighestOwnBid) > 1_000_000;
-                    var profit = 1L;
-                    var changeSumary = new List<PropertyChange>();
-                    if (b.Tag == sell.Tag
-                        && !enchantsBad)
+                    changeSumary.AddRange(gemSumaryBuy);
+                    changeSumary.AddRange(gemSumarySell.Select(g => new PropertyChange()
                     {
-                        var gemSumaryBuy = gemPriceService.LookupToGems(b.Nbt);
-                        var gemSumarySell = gemPriceService.LookupToGems(sell.NBTLookup);
-                        var gemSumaryDiff = gemSumaryBuy.Sum(g => g.Effect) - gemSumarySell.Sum(g => g.Effect);
-
-                        changeSumary.AddRange(gemSumaryBuy);
-                        changeSumary.AddRange(gemSumarySell.Select(g => new PropertyChange()
-                        {
-                            Description = $"Selling with {g.Description}",
-                            Effect = -g.Effect
-                        }));
-                        var tax = sell.HighestBidAmount - sell.HighestBidAmount * 98 / 100;
-                        changeSumary.Add(new PropertyChange()
-                        {
-                            Description = $"2% AH tax for sell",
-                            Effect = -tax
-                        });
-
-                        profit = gemSumaryDiff
-                        + sell.HighestBidAmount - tax
-                        - b.HighestOwnBid;
-                    }
-
-
-                    return new FlipDetails()
+                        Description = $"Selling with {g.Description}",
+                        Effect = -g.Effect
+                    }));
+                    var tax = sell.HighestBidAmount - sell.HighestBidAmount * 98 / 100;
+                    changeSumary.Add(new PropertyChange()
                     {
-                        Finder = (first == null ? LowPricedAuction.FinderType.UNKOWN : Enum.Parse<LowPricedAuction.FinderType>(
-                            first.FinderType.ToString().Replace("SNIPERMEDIAN", "SNIPER_MEDIAN"), true)),
-                        OriginAuction = b.Key,
-                        ItemTag = sell.Tag,
-                        Tier = sell.Tier.ToString(),
-                        SoldAuction = sell?.Uuid,
-                        PricePaid = b.HighestOwnBid,
-                        SoldFor = soldFor ?? 0,
-                        uId = uId,
-                        ItemName = sell?.ItemName,
-                        BuyTime = b.End,
-                        SellTime = sell.End,
-                        Profit = profit,
-                        PropertyChanges = changeSumary
-                    };
-                }).OrderByDescending(f => f.Profit).ToArray();
+                        Description = $"2% AH tax for sell",
+                        Effect = -tax
+                    });
 
-                return new FlipSumary()
+                    profit = gemSumaryDiff
+                    + sell.HighestBidAmount - tax
+                    - b.HighestOwnBid;
+                }
+
+
+                return new FlipDetails()
                 {
-                    Flips = flips,
-                    TotalProfit = flips.Sum(r => r.Profit)
+                    Finder = (first == null ? LowPricedAuction.FinderType.UNKOWN : Enum.Parse<LowPricedAuction.FinderType>(
+                        first.FinderType.ToString().Replace("SNIPERMEDIAN", "SNIPER_MEDIAN"), true)),
+                    OriginAuction = b.Key,
+                    ItemTag = sell.Tag,
+                    Tier = sell.Tier.ToString(),
+                    SoldAuction = sell?.Uuid,
+                    PricePaid = b.HighestOwnBid,
+                    SoldFor = soldFor ?? 0,
+                    uId = uId,
+                    ItemName = sell?.ItemName,
+                    BuyTime = b.End,
+                    SellTime = sell.End,
+                    Profit = profit,
+                    PropertyChanges = changeSumary
                 };
-            }
+            }).OrderByDescending(f => f.Profit).ToArray();
+
+            return new FlipSumary()
+            {
+                Flips = flips,
+                TotalProfit = flips.Sum(r => r.Profit)
+            };
+
         }
     }
 }
