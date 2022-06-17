@@ -45,7 +45,7 @@ namespace Coflnet.Sky.Commands.Shared
             {
                 NoMatch(settings, sampleFlip);
             }
-            Assert.LessOrEqual(watch.ElapsedMilliseconds, 20);
+            Assert.LessOrEqual(watch.ElapsedMilliseconds, 25);
         }
 
         [Test]
