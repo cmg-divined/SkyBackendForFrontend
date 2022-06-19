@@ -31,8 +31,8 @@ namespace Coflnet.Sky.Commands.Tests
                     TargetPrice = 5
                 });
             }
-            await Task.Delay(20); // wait for the async sending to finish
-            Assert.Less(watch.ElapsedMilliseconds, 75);
+            await Task.Delay(50); // wait for the async sending to finish
+            Assert.Less(watch.ElapsedMilliseconds, 85);
             Assert.AreEqual(5, con.LastFlip.MedianPrice);
             Assert.AreEqual(2, con.LastFlip.Volume);
             Assert.AreEqual(auction, con.LastFlip.Auction);
