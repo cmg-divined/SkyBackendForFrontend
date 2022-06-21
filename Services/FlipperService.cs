@@ -42,7 +42,7 @@ namespace Coflnet.Sky.Commands.Shared
         private static ProducerConfig producerConfig = new ProducerConfig { BootstrapServers = SimplerConfig.Config.Instance["KAFKA_HOST"] };
 
         private const string FoundFlippsKey = "foundFlipps";
-        public int PremiumUserCount => Subs.Select(s => s.Value.Connection.UserId).Distinct().Count();
+        public int PremiumUserCount => Subs.Count() + SuperSubs.Count();
 
         static Prometheus.Histogram runtroughTime = Prometheus.Metrics.CreateHistogram("sky_commands_auction_to_flip_seconds", "Represents the time in seconds taken from loading the auction to sendingthe flip. (should be close to 0)",
             new Prometheus.HistogramConfiguration()
