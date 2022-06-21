@@ -75,6 +75,7 @@ namespace Coflnet.Sky.Commands.Shared
             });
             services.AddSingleton<PremiumService>();
             services.AddSingleton<EventBrokerClient>();
+            services.AddSingleton<PlayerName.PlayerNameService>();
 
             _servics = services;
         }
