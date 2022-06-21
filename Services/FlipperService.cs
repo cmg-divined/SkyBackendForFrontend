@@ -235,7 +235,7 @@ namespace Coflnet.Sky.Commands.Shared
                 try
                 {
                     flip.SellerName = (await DiHandler.ServiceProvider.GetRequiredService<Coflnet.Sky.PlayerName.Client.Api.PlayerNameApi>()
-                                    .PlayerNameNameUuidGetAsync(flip.Auction.AuctioneerId, timeOut.Token))?.Trim('"');
+                                    .PlayerNameNameUuidGetAsync(flip.Auction.AuctioneerId, 0, timeOut.Token))?.Trim('"');
                 }
                 catch (TaskCanceledException)
                 {
