@@ -9,6 +9,10 @@ using NUnit.Framework;
 
 namespace Coflnet.Sky.Commands.Tests
 {
+    public static class TestConstants
+    {
+        public static int DelayMultiplier = 11;
+    }
     public class FlipperServiceTests
     {
         [Test]
@@ -31,8 +35,8 @@ namespace Coflnet.Sky.Commands.Tests
                     TargetPrice = 5
                 });
             }
-            await Task.Delay(80); // wait for the async sending to finish
-            Assert.Less(watch.ElapsedMilliseconds, 95);
+            await Task.Delay(9 * TestConstants.DelayMultiplier); // wait for the async sending to finish
+            Assert.Less(watch.ElapsedMilliseconds, 10 * TestConstants.DelayMultiplier);
             Assert.AreEqual(5, con.LastFlip.MedianPrice);
             Assert.AreEqual(2, con.LastFlip.Volume);
             Assert.AreEqual(auction, con.LastFlip.Auction);
@@ -57,7 +61,6 @@ namespace Coflnet.Sky.Commands.Tests
             public Task<bool> SendFlip(FlipInstance flip)
             {
                 LastFlip = flip;
-                Console.WriteLine("sending a flip");
                 return Task.FromResult(true);
             }
 

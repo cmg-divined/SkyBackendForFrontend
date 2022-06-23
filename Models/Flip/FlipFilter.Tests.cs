@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using Coflnet.Sky.Commands.Tests;
 using Coflnet.Sky.Core;
 using Newtonsoft.Json;
 using NUnit.Framework;
@@ -45,7 +46,7 @@ namespace Coflnet.Sky.Commands.Shared
             {
                 NoMatch(settings, sampleFlip);
             }
-            Assert.LessOrEqual(watch.ElapsedMilliseconds, 25);
+            Assert.LessOrEqual(watch.ElapsedMilliseconds, 3 * TestConstants.DelayMultiplier);
         }
 
         [Test]

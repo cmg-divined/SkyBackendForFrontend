@@ -1,6 +1,7 @@
 using NUnit.Framework;
 using Coflnet.Sky.Core;
 using System.Diagnostics;
+using Coflnet.Sky.Commands.Tests;
 
 namespace Coflnet.Sky.Commands.Shared
 {
@@ -131,14 +132,14 @@ namespace Coflnet.Sky.Commands.Shared
                 if (settings.MatchesSettings(flipA).Item1)
                     matchCount++;
             }
-            Assert.Greater(60, stopWatch.ElapsedMilliseconds, "matching is too slow");
+            Assert.Greater(6 * TestConstants.DelayMultiplier, stopWatch.ElapsedMilliseconds, "matching is too slow");
             stopWatch = Stopwatch.StartNew();
             for (int i = 0; i < iterations; i++)
             {
                 if (!settings.MatchesSettings(flipB).Item1)
                     matchCount++;
             }
-            Assert.Greater(140, stopWatch.ElapsedMilliseconds, "matching blacklist is too slow");
+            Assert.Greater(140 * TestConstants.DelayMultiplier, stopWatch.ElapsedMilliseconds, "matching blacklist is too slow");
             Assert.AreEqual(iterations * 2, matchCount);
         }
 
