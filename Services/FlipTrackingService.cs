@@ -112,13 +112,21 @@ namespace Coflnet.Sky.Commands
         /// <summary>
         /// Recomended delay for a given player
         /// </summary>
-        /// <param name="playerId">The uuid of the player to test</param>
+        /// <param name="playerIds">The uuid of the player to test</param>
         /// <returns></returns>
         public async Task<(System.TimeSpan, int)> GetRecommendedPenalty(IEnumerable<string> playerIds)
         {
-            var breakdown = await flipAnalyse.PlayersSpeedPostAsync(new SpeedCheckRequest(playerIds.ToList())).ConfigureAwait(false);
+            var breakdown = await GetSpeedComp(playerIds);
             var hourCount = breakdown?.Times?.Where(t => t.TotalSeconds > 1).GroupBy(t => System.TimeSpan.Parse(t.Age).Hours).Count() ?? 0;
             return (System.TimeSpan.FromSeconds(breakdown?.Penalty ?? 0), hourCount);
+        }
+
+        /// <summary>
+        /// Get the speed data for a given player
+        /// </summary>
+        public virtual async Task<SpeedCompResult> GetSpeedComp(IEnumerable<string> playerIds)
+        {
+            return await flipAnalyse.PlayersSpeedPostAsync(new SpeedCheckRequest(playerIds.ToList())).ConfigureAwait(false);
         }
 
         public async Task<int> ActiveFlipperCount()
