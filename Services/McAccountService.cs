@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using RestSharp;
 using System.Threading.Tasks;
 using System.Runtime.Serialization;
+using System;
 
 namespace Coflnet.Sky.Commands
 {
@@ -21,14 +22,14 @@ namespace Coflnet.Sky.Commands
             McConnect.Models.User mcAccounts = await ExecuteUserRequest(mcRequest);
             return mcAccounts.Accounts.OrderByDescending(a => a.UpdatedAt).Where(a => a.Verified).FirstOrDefault();
         }
-        public async Task<IEnumerable<string>> GetAllAccounts(string userId)
+        public async Task<IEnumerable<string>> GetAllAccounts(string userId, DateTime oldest = default)
         {
             if(userId == null)
                 return null;
             var mcRequest = new RestRequest("connect/user/{userId}")
                                 .AddUrlSegment("userId", userId);
             McConnect.Models.User mcAccounts = await ExecuteUserRequest(mcRequest);
-            return mcAccounts?.Accounts?.Where(a => a.Verified).Select(a=>a.AccountUuid);
+            return mcAccounts?.Accounts?.Where(a => a.Verified && a.LastRequestedAt > oldest).Select(a=>a.AccountUuid);
         }
 
         private async Task<McConnect.Models.User> ExecuteUserRequest(IRestRequest mcRequest)
