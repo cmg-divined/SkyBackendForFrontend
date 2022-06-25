@@ -11,7 +11,7 @@ namespace Coflnet.Sky.Commands.Tests
 {
     public static class TestConstants
     {
-        public static int DelayMultiplier = 13;
+        public static int DelayMultiplier = 18;
     }
     public class FlipperServiceTests
     {
