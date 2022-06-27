@@ -33,9 +33,9 @@ namespace Coflnet.Sky.Commands.Tests
                     DailyVolume = 2,
                     Finder = LowPricedAuction.FinderType.AI,
                     TargetPrice = 5
-                });
+                }).ConfigureAwait(false);
             }
-            await Task.Delay(20 * TestConstants.DelayMultiplier); // wait for the async sending to finish
+            await Task.Delay(20 * TestConstants.DelayMultiplier).ConfigureAwait(false); // wait for the async sending to finish
             Assert.NotNull(con.LastFlip, "No flip was sent but should have been after " + watch.ElapsedMilliseconds + "ms");
             Assert.AreEqual(5, con.LastFlip.MedianPrice);
             Assert.AreEqual(2, con.LastFlip.Volume);
