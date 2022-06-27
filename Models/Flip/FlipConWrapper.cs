@@ -104,9 +104,9 @@ namespace Coflnet.Sky.Commands.Shared
 
         public void Stop()
         {
+            stopWrites = true;
             cancellationTokenSource?.Cancel();
             LowPriced.Writer.TryComplete();
-            stopWrites = true;
             Connection.Log("canceled by " + Environment.StackTrace);
         }
 
