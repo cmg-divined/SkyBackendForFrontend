@@ -62,7 +62,7 @@ namespace Coflnet.Sky.Commands.Shared
                         }
                         catch (Exception e)
                         {
-                            Connection.Log(e.Message, Microsoft.Extensions.Logging.LogLevel.Error);
+                            Connection.Log(e.ToString(), Microsoft.Extensions.Logging.LogLevel.Error);
                             dev.Logger.Instance.Error(e, "seding flip to " + Connection.UserId);
                         }
                     }
@@ -104,8 +104,8 @@ namespace Coflnet.Sky.Commands.Shared
 
         public void Stop()
         {
-            LowPriced.Writer.TryComplete();
             cancellationTokenSource?.Cancel();
+            LowPriced.Writer.TryComplete();
             stopWrites = true;
             Connection.Log("canceled by " + Environment.StackTrace);
         }
