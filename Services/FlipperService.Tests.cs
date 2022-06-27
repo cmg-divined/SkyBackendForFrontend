@@ -21,7 +21,7 @@ namespace Coflnet.Sky.Commands.Tests
             var service = new FlipperService();
             var con = new MockConnection();
             service.AddConnection(con);
-            for (int i = 0; i < 10; i++)
+            for (int i = 0; i < 1; i++)
                 service.AddConnection(new MockConnection());
             var auction = new SaveAuction() { NbtData = new NbtData(), Enchantments = new System.Collections.Generic.List<Enchantment>() };
             var watch = Stopwatch.StartNew();
