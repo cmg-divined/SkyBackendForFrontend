@@ -30,6 +30,7 @@ namespace Coflnet.Sky.Commands.Shared
         private ConcurrentDictionary<long, FlipConWrapper> SuperSubs = new ConcurrentDictionary<long, FlipConWrapper>();
         public ConcurrentQueue<FlipInstance> Flipps = new ConcurrentQueue<FlipInstance>();
         private ConcurrentQueue<FlipInstance> SlowFlips = new ConcurrentQueue<FlipInstance>();
+        public int LowestMinProfit { get; private set; } = 0;
 
 
         /// <summary>
@@ -335,7 +336,7 @@ namespace Coflnet.Sky.Commands.Shared
             //    span = span.AsChildOf(tracer.Extract(BuiltinFormats.TextMap, flip.Auction.TraceContext));
             using var scope = span.StartActive();
             var time = (DateTime.Now - flip.Auction.FindTime).TotalSeconds;
-            if (time > 5)
+            if (time > 3)
                 scope.Span.SetTag("slow", true);
 
             if (flip.Auction != null && flip.Auction.NBTLookup == null)
@@ -588,6 +589,16 @@ namespace Coflnet.Sky.Commands.Shared
             var response = await SkyFlipperHost.ExecuteAsync(new RestRequest("flip/{uuid}/based").AddParameter("uuid", uuid, ParameterType.UrlSegment));
             var result = JsonConvert.DeserializeObject<List<SaveAuction>>(response.Content);
             return result;
+        }
+
+        public void UpdateLowestMinProfit()
+        {
+            var minProfit = int.MaxValue;
+            foreach (var item in SuperSubs.Values.Concat(Subs.Values))
+            {
+                minProfit = Math.Min(minProfit, item.Connection.Settings.MinProfit );
+            }
+            this.LowestMinProfit = minProfit;
         }
 
         public List<FlipConWrapper> Connections

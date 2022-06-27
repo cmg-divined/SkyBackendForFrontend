@@ -54,7 +54,7 @@ namespace Coflnet.Sky.Commands.Shared
                                 flip.AdditionalProps?.TryAdd("long wait", LowPriced.Reader.Count.ToString());
                             }
                             //await limiter.WaitAsync();
-                            await Connection.SendFlip(flip);
+                            await Connection.SendFlip(flip).ConfigureAwait(false);
                         }
                         catch (OperationCanceledException)
                         {
