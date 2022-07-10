@@ -41,7 +41,7 @@ namespace Coflnet.Sky.Commands.Shared
 
             for (int i = 0; i < count; i++)
             {
-                var worker = Task.Run(async () =>
+                _ = Task.Run(async () =>
                 {
                     while (!stoppingToken.IsCancellationRequested)
                     {
@@ -66,7 +66,7 @@ namespace Coflnet.Sky.Commands.Shared
                             dev.Logger.Instance.Error(e, "seding flip to " + Connection.UserId);
                         }
                     }
-                });
+                }).ConfigureAwait(false);
             }
 
 
