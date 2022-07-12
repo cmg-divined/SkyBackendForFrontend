@@ -109,7 +109,5 @@ namespace Coflnet.Sky.Commands.Shared
             LowPriced.Writer.TryComplete();
             Connection.Log("canceled by " + Environment.StackTrace);
         }
-
-
     }
 }

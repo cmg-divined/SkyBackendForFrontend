@@ -236,7 +236,7 @@ namespace Coflnet.Sky.Commands.Shared
                 try
                 {
                     flip.SellerName = (await DiHandler.ServiceProvider.GetRequiredService<Coflnet.Sky.PlayerName.Client.Api.PlayerNameApi>()
-                                    .PlayerNameNameUuidGetAsync(flip.Auction.AuctioneerId, 0, timeOut.Token))?.Trim('"');
+                                    .PlayerNameNameUuidGetAsync(flip.Auction.AuctioneerId, 0, timeOut.Token).ConfigureAwait(false))?.Trim('"');
                 }
                 catch (TaskCanceledException)
                 {
@@ -247,7 +247,7 @@ namespace Coflnet.Sky.Commands.Shared
 
             if (flip.LowestBin == 0 && (settings.Visibility.LowestBin || settings.Visibility.SecondLowestBin || settings.BasedOnLBin))
             {
-                var lowestBin = await GetLowestBin(flip.Auction);
+                var lowestBin = await GetLowestBin(flip.Auction).ConfigureAwait(false);
                 flip.LowestBin = lowestBin?.FirstOrDefault()?.Price;
                 flip.SecondLowestBin = lowestBin?.Count >= 2 ? lowestBin[1].Price : 0L;
             }
@@ -350,7 +350,7 @@ namespace Coflnet.Sky.Commands.Shared
             {
                 item.Value.AddLowPriced(flip);
             }
-            if (flip.TargetPrice - flip.Auction.StartingBid < 200_000) // send below 200k profit out to everyone
+            if (flip.TargetPrice - flip.Auction.StartingBid < 250_000) // send below 200k profit out to everyone
             {
                 foreach (var item in SlowSubs)
                 {
@@ -490,7 +490,7 @@ namespace Coflnet.Sky.Commands.Shared
                 {
                     dev.Logger.Instance.Error(e, "delivering low priced auction");
                 }
-            });
+            }, 50).ConfigureAwait(false);
         }
 
         protected virtual void UpdateSettingsInternal(SettingsChange settings)
