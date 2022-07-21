@@ -64,7 +64,7 @@ namespace Coflnet.Sky.Commands.Shared
         [SettingsDoc("How many digits the timer should target (3)")]
         public int TimerPrecision;
         [DataMember(Name = "blockedMsg")]
-        [SettingsDoc("How many minutes to have pass before showing the x amounts of flips blocked message again")]
+        [SettingsDoc("How many minutes to have pass before showing the x amounts of flips blocked message again, max is 127", false, "minBetweenBlocked")]
         public sbyte MinutesBetweenBlocked;
 
         [DataMember(Name = "noAdjustToPurse")]
