@@ -33,6 +33,7 @@ namespace Coflnet.Sky.Commands.Shared
             AdditionalFilters.Add<MaxCostDetailedFlipFilter>();
             AdditionalFilters.Add<ReferenceAgeDetailedFlipFilter>();
             AdditionalFilters.Add<ForceBlacklistDetailedFlipFilter>();
+            AdditionalFilters.Add<PriorityOpenDetailedFlipFilter>();
         }
 
         public FlipFilter(Dictionary<string, string> originalf)
