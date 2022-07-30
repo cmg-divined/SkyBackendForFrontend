@@ -42,7 +42,7 @@ namespace Coflnet.Sky.Commands.Shared
             sampleFlip.Auction.ItemName = "hi";
             NoMatch(settings, sampleFlip);
             var watch = Stopwatch.StartNew();
-            for (int i = 0; i < 5000; i++)
+            for (int i = 0; i < 2000; i++)
             {
                 NoMatch(settings, sampleFlip);
             }
