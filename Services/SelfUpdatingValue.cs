@@ -48,7 +48,8 @@ namespace Coflnet.Sky.Commands.Shared
 
         public void Dispose()
         {
-            subTask.Unsubscribe();
+            subTask?.Unsubscribe();
+            subTask = null;
         }
 
         /// <summary>
