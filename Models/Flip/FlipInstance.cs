@@ -9,9 +9,9 @@ namespace Coflnet.Sky.Commands.Shared
     public class FlipInstance
     {
         [DataMember(Name = "median")]
-        public int MedianPrice;
+        public long MedianPrice;
         [DataMember(Name = "cost")]
-        public int LastKnownCost => (int)(Auction.HighestBidAmount == 0 ? Auction.StartingBid : Auction.HighestBidAmount);
+        public long LastKnownCost => (int)(Auction.HighestBidAmount == 0 ? Auction.StartingBid : Auction.HighestBidAmount);
         [DataMember(Name = "uuid")]
         public string Uuid;
         [DataMember(Name = "name")]
