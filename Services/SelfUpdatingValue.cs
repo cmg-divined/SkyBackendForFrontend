@@ -12,6 +12,7 @@ namespace Coflnet.Sky.Commands.Shared
         public event Action<T> AfterChange;
         private string UserId;
         private string Key;
+        private bool IsDisposed = false;
 
         ChannelMessageQueue subTask;
 
@@ -31,6 +32,9 @@ namespace Coflnet.Sky.Commands.Shared
                 instance.Value = v;
                 instance.AfterChange?.Invoke(v);
             }, defaultGetter);
+            // if instance is already disposed we need to unsubscribe, this may or may not be bullshit
+            if(instance.IsDisposed)
+                instance.Dispose();
             return instance;
         }
 
@@ -48,6 +52,7 @@ namespace Coflnet.Sky.Commands.Shared
 
         public void Dispose()
         {
+            IsDisposed = true;
             subTask?.Unsubscribe();
             subTask = null;
         }
