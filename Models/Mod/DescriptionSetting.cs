@@ -17,7 +17,7 @@ public class DescriptionSetting
     public static DescriptionSetting Default => new DescriptionSetting()
     {
         Fields = new List<List<DescriptionField>>() {
-                    new() { DescriptionField.LBIN },
+                    new() { DescriptionField.LBIN, DescriptionField.BazaarBuy, DescriptionField.BazaarSell },
                     new() { DescriptionField.MEDIAN, DescriptionField.VOLUME },
                     new() { DescriptionField.CRAFT_COST } }
     };

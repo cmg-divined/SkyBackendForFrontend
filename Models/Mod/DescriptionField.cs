@@ -54,5 +54,6 @@ public enum DescriptionField
     /// </summary>
     PRICE_PAID,
 
+    // anything over 9000 gets hidden
     BAZAAR_COST = 9001
 }
