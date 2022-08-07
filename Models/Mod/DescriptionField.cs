@@ -42,11 +42,17 @@ public enum DescriptionField
     /// </summary>
     CRAFT_COST,
     /// <summary>
-    /// Display the bazaar cost
+    /// Display the bazaar buy cost
     /// </summary>
-    BAZAAR_COST,
+    BazaarBuy,
+    /// <summary>
+    /// Display the bazaar sell profit
+    /// </summary>
+    BazaarSell,
     /// <summary>
     /// Display price paid
     /// </summary>
     PRICE_PAID,
+
+    BAZAAR_COST = 9001
 }
