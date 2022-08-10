@@ -15,7 +15,7 @@ namespace Coflnet.Sky.Commands.Shared
     {
         [DataMember(Name = "minProfit")]
         [SettingsDoc("Minimum profit of flips")]
-        public int MinProfit;
+        public long MinProfit;
 
         [DataMember(Name = "minProfitPercent")]
         [SettingsDoc("Minimum profit Percentage")]
@@ -27,7 +27,7 @@ namespace Coflnet.Sky.Commands.Shared
 
         [SettingsDoc("Maximium cost of flips")]
         [DataMember(Name = "maxCost")]
-        public int MaxCost;
+        public long MaxCost;
     }
 
 
