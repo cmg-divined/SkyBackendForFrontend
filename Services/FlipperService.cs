@@ -30,7 +30,7 @@ namespace Coflnet.Sky.Commands.Shared
         private ConcurrentDictionary<long, FlipConWrapper> SuperSubs = new ConcurrentDictionary<long, FlipConWrapper>();
         public ConcurrentQueue<FlipInstance> Flipps = new ConcurrentQueue<FlipInstance>();
         private ConcurrentQueue<FlipInstance> SlowFlips = new ConcurrentQueue<FlipInstance>();
-        public int LowestMinProfit { get; private set; } = 0;
+        public long LowestMinProfit { get; private set; } = 0;
 
 
         /// <summary>
@@ -593,7 +593,7 @@ namespace Coflnet.Sky.Commands.Shared
 
         public void UpdateLowestMinProfit()
         {
-            var minProfit = int.MaxValue;
+            var minProfit = long.MaxValue;
             foreach (var item in SuperSubs.Values.Concat(Subs.Values))
             {
                 minProfit = Math.Min(minProfit, item.Connection.Settings.MinProfit );
