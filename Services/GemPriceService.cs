@@ -16,8 +16,8 @@ namespace Coflnet.Sky.Commands.Shared
 {
     public class GemPriceService : BackgroundService
     {
-        public static ConcurrentDictionary<string, int> Prices = new();
-        public static ConcurrentDictionary<(short, long), string> GemNames = new();
+        public ConcurrentDictionary<string, int> Prices = new();
+        public ConcurrentDictionary<(short, long), string> GemNames = new();
         private RestSharp.RestClient commandsClient;
         private IServiceScopeFactory scopeFactory;
         private ILogger<GemPriceService> logger;
