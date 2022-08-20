@@ -18,6 +18,11 @@ namespace Coflnet.Sky.PlayerName
         {
             return await client.PlayerNameNameUuidGetAsync(uuid);
         }
+        public async Task<string> GetUuid(string name)
+        {
+            return await client.PlayerNameUuidNameGetAsync(name);
+        }
+
         public async Task<Dictionary<string,string>> GetNames(IEnumerable<string> uuids)
         {
             return await client.PlayerNameNamesBatchPostAsync(uuids.ToList());
