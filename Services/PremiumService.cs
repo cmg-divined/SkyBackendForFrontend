@@ -64,6 +64,7 @@ namespace Coflnet.Sky.Commands.Shared
             catch (Exception e)
             {
                 dev.Logger.Instance.Error(e, "retrieving premium status for " + userId);
+                return (AccountTier.PREMIUM, DateTime.Now + TimeSpan.FromMinutes(3));
             }
             return (AccountTier.NONE, DateTime.Now + TimeSpan.FromMinutes(3));
         }
