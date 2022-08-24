@@ -10,6 +10,8 @@ namespace Coflnet.Sky.Commands.Shared
     {
         static string premiumPlanName = SimplerConfig.SConfig.Instance["PRODUCTS:PREMIUM"];
         static string testpremiumPlanName = SimplerConfig.SConfig.Instance["PRODUCTS:TEST_PREMIUM"];
+        static string premiumPlusSlug = SimplerConfig.SConfig.Instance["PRODUCTS:PREMIUM_PLUS"];
+        static string starterPremiumSlug = SimplerConfig.SConfig.Instance["PRODUCTS:STARTER_PREMIUM"];
 
         private UserApi userApi;
 
@@ -43,6 +45,20 @@ namespace Coflnet.Sky.Commands.Shared
         public async Task<DateTime> ExpiresWhen(int userId)
         {
             return await ExpiresWhen(userId.ToString());
+        }
+
+        public async Task<(AccountTier,DateTime)> GetCurrentTier(int userId)
+        {
+            if(GoogleUser.EveryoneIsPremium)
+                return (AccountTier.PREMIUM, DateTime.Now + TimeSpan.FromDays(30));
+            var owns = await userApi.UserUserIdOwnsUntilPostAsync(userId.ToString(), new() { premiumPlanName, premiumPlusSlug, starterPremiumSlug });
+            if(owns.TryGetValue(premiumPlusSlug, out DateTime end))
+                return (AccountTier.PREMIUM_PLUS, end);
+            if(owns.TryGetValue(premiumPlanName, out end))
+                return (AccountTier.PREMIUM, end);
+            if(owns.TryGetValue(starterPremiumSlug, out end))
+                return (AccountTier.STARTER_PREMIUM, end);
+            return (AccountTier.NONE, DateTime.Now + TimeSpan.FromMinutes(3));
         }
 
         public async Task<DateTime> ExpiresWhen(string userId)
