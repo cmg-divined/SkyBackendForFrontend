@@ -25,7 +25,7 @@ namespace Coflnet.Sky.Commands.Shared
 
             return UserService.Instance.GetOrCreateUser(ValidateToken(token).Subject);
         }
-        
+
         public GoogleJsonWebSignature.Payload ValidateToken(string token)
         {
             try
@@ -47,30 +47,37 @@ namespace Coflnet.Sky.Commands.Shared
             return await ExpiresWhen(userId.ToString());
         }
 
-        public async Task<(AccountTier,DateTime)> GetCurrentTier(int userId)
+        public async Task<(AccountTier, DateTime)> GetCurrentTier(int userId)
         {
-            if(GoogleUser.EveryoneIsPremium)
-                return (AccountTier.PREMIUM, DateTime.Now + TimeSpan.FromDays(30));
-            var owns = await userApi.UserUserIdOwnsUntilPostAsync(userId.ToString(), new() { premiumPlanName, premiumPlusSlug, starterPremiumSlug });
-            if(owns.TryGetValue(premiumPlusSlug, out DateTime end))
-                return (AccountTier.PREMIUM_PLUS, end);
-            if(owns.TryGetValue(premiumPlanName, out end))
-                return (AccountTier.PREMIUM, end);
-            if(owns.TryGetValue(starterPremiumSlug, out end))
-                return (AccountTier.STARTER_PREMIUM, end);
+            try
+            {
+                if (GoogleUser.EveryoneIsPremium)
+                    return (AccountTier.PREMIUM, DateTime.Now + TimeSpan.FromDays(30));
+                var owns = await userApi.UserUserIdOwnsUntilPostAsync(userId.ToString(), new() { premiumPlanName, premiumPlusSlug, starterPremiumSlug });
+                if (owns.TryGetValue(premiumPlusSlug, out DateTime end))
+                    return (AccountTier.PREMIUM_PLUS, end);
+                if (owns.TryGetValue(premiumPlanName, out end))
+                    return (AccountTier.PREMIUM, end);
+                if (owns.TryGetValue(starterPremiumSlug, out end))
+                    return (AccountTier.STARTER_PREMIUM, end);
+            }
+            catch (Exception e)
+            {
+                dev.Logger.Instance.Error(e, "retrieving premium status for " + userId);
+            }
             return (AccountTier.NONE, DateTime.Now + TimeSpan.FromMinutes(3));
         }
 
         public async Task<DateTime> ExpiresWhen(string userId)
         {
-            if(GoogleUser.EveryoneIsPremium)
+            if (GoogleUser.EveryoneIsPremium)
                 return DateTime.Now + TimeSpan.FromDays(30);
-            var until = await userApi.UserUserIdOwnsLongestPostAsync(userId, new (){ premiumPlanName, testpremiumPlanName});
+            var until = await userApi.UserUserIdOwnsLongestPostAsync(userId, new() { premiumPlanName, testpremiumPlanName });
             return until;
-        } 
+        }
         public async Task<bool> HasPremium(int userId)
         {
             return (await ExpiresWhen(userId)) > DateTime.Now;
-        } 
+        }
     }
 }
