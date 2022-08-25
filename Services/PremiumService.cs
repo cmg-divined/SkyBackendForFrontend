@@ -3,21 +3,31 @@ using Google.Apis.Auth;
 using Coflnet.Sky.Core;
 using System.Threading.Tasks;
 using Coflnet.Payments.Client.Api;
+using Microsoft.Extensions.Configuration;
 
 namespace Coflnet.Sky.Commands.Shared
 {
     public class PremiumService
     {
-        static string premiumPlanName = SimplerConfig.SConfig.Instance["PRODUCTS:PREMIUM"];
-        static string testpremiumPlanName = SimplerConfig.SConfig.Instance["PRODUCTS:TEST_PREMIUM"];
-        static string premiumPlusSlug = SimplerConfig.SConfig.Instance["PRODUCTS:PREMIUM_PLUS"];
-        static string starterPremiumSlug = SimplerConfig.SConfig.Instance["PRODUCTS:STARTER_PREMIUM"];
+        static string premiumPlanName;
+        static string testpremiumPlanName;
+        static string premiumPlusSlug;
+        static string starterPremiumSlug;
 
         private UserApi userApi;
 
-        public PremiumService(UserApi userApi)
+        public PremiumService(UserApi userApi, IConfiguration config)
         {
             this.userApi = userApi;
+            premiumPlanName = GetRequired(config, "PRODUCTS:PREMIUM");
+            testpremiumPlanName = GetRequired(config, "PRODUCTS:PREMIUM");
+            premiumPlusSlug = GetRequired(config, "PRODUCTS:PREMIUM");
+            starterPremiumSlug = GetRequired(config, "PRODUCTS:PREMIUM");
+
+            static string GetRequired(IConfiguration config, string key)
+            {
+                return config[key] ?? throw new Exception($"Required setting {key} isn't configured");
+            }
         }
 
         public GoogleUser GetUserWithToken(string token)
