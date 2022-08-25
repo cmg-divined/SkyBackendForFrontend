@@ -20,9 +20,9 @@ namespace Coflnet.Sky.Commands.Shared
         {
             this.userApi = userApi;
             premiumPlanName = GetRequired(config, "PRODUCTS:PREMIUM");
-            testpremiumPlanName = GetRequired(config, "PRODUCTS:PREMIUM");
-            premiumPlusSlug = GetRequired(config, "PRODUCTS:PREMIUM");
-            starterPremiumSlug = GetRequired(config, "PRODUCTS:PREMIUM");
+            testpremiumPlanName = GetRequired(config, "PRODUCTS:TEST_PREMIUM");
+            premiumPlusSlug = GetRequired(config, "PRODUCTS:PREMIUM_PLUS");
+            starterPremiumSlug = GetRequired(config, "PRODUCTS:STARTER_PREMIUM");
 
             static string GetRequired(IConfiguration config, string key)
             {
