@@ -64,11 +64,11 @@ namespace Coflnet.Sky.Commands.Shared
                 if (GoogleUser.EveryoneIsPremium)
                     return (AccountTier.PREMIUM, DateTime.Now + TimeSpan.FromDays(30));
                 var owns = await userApi.UserUserIdOwnsUntilPostAsync(userId.ToString(), new() { premiumPlanName, premiumPlusSlug, starterPremiumSlug });
-                if (premiumPlusSlug != null && owns.TryGetValue(premiumPlusSlug, out DateTime end))
+                if (owns.TryGetValue(premiumPlusSlug, out DateTime end) && end > DateTime.UtcNow)
                     return (AccountTier.PREMIUM_PLUS, end);
-                if (premiumPlanName != null && owns.TryGetValue(premiumPlanName, out end))
+                if (owns.TryGetValue(premiumPlanName, out end) && end > DateTime.UtcNow)
                     return (AccountTier.PREMIUM, end);
-                if (starterPremiumSlug != null && owns.TryGetValue(starterPremiumSlug, out end))
+                if (owns.TryGetValue(starterPremiumSlug, out end) && end > DateTime.UtcNow)
                     return (AccountTier.STARTER_PREMIUM, end);
             }
             catch (Exception e)
