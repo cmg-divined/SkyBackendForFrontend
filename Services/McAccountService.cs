@@ -24,12 +24,12 @@ namespace Coflnet.Sky.Commands
         }
         public async Task<IEnumerable<string>> GetAllAccounts(string userId, DateTime oldest = default)
         {
-            if(userId == null)
+            if (userId == null)
                 return null;
             var mcRequest = new RestRequest("connect/user/{userId}")
                                 .AddUrlSegment("userId", userId);
             McConnect.Models.User mcAccounts = await ExecuteUserRequest(mcRequest);
-            return mcAccounts?.Accounts?.Where(a => a.Verified && a.LastRequestedAt > oldest).Select(a=>a.AccountUuid);
+            return mcAccounts?.Accounts?.Where(a => a.Verified && a.LastRequestedAt > oldest).Select(a => a.AccountUuid);
         }
 
         private async Task<McConnect.Models.User> ExecuteUserRequest(IRestRequest mcRequest)
@@ -43,7 +43,15 @@ namespace Coflnet.Sky.Commands
         {
             var response = (await mcAccountClient.ExecuteAsync(new RestRequest("connect/user/{userId}", Method.POST)
                                 .AddUrlSegment("userId", userId).AddQueryParameter("mcUuid", uuid))).Content;
-            return JsonConvert.DeserializeObject<ConnectionRequest>(response);
+            try
+            {
+                return JsonConvert.DeserializeObject<ConnectionRequest>(response);
+            }
+            catch (System.Exception)
+            {
+                dev.Logger.Instance.Error("Parsing mc-verify response faield: " + response);
+                throw;
+            }
         }
         public async Task<Coflnet.Sky.McConnect.Models.User> GetUserId(string mcId)
         {
