@@ -98,9 +98,9 @@ namespace Coflnet.Sky.Commands.Shared
                     new
                     {
                         End = item.Key,
-                        Avg = (int)item.Average(a => ((int)a.HighestBidAmount) / a.Count),
-                        Max = (int)item.Max(a => ((int)a.HighestBidAmount) / a.Count),
-                        Min = (int)item.Min(a => ((int)a.HighestBidAmount) / a.Count),
+                        Avg = item.Average(a => (a.HighestBidAmount) / a.Count),
+                        Max = item.Max(a => (a.HighestBidAmount) / a.Count),
+                        Min = item.Min(a => (a.HighestBidAmount) / a.Count),
                         Count = item.Sum(a => a.Count)
                     }).AsNoTracking().ToListAsync();
 
