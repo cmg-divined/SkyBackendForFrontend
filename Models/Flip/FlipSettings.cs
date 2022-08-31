@@ -150,8 +150,11 @@ namespace Coflnet.Sky.Commands.Shared
         /// <param name="profit"></param>
         public void GetPrice(FlipInstance flip, out long targetPrice, out long profit)
         {
-            targetPrice = (BasedOnLBin ? (flip.LowestBin ?? 0) : flip.MedianPrice);
-            profit = flip.Profit;
+            targetPrice = (BasedOnLBin || flip.Finder == LowPricedAuction.FinderType.SNIPER ? (flip.LowestBin ?? 0) : flip.MedianPrice);
+            if (targetPrice > 1_000_000)
+                profit = targetPrice * 98 / 100 - flip.LastKnownCost;
+            else
+                profit = targetPrice * 99 / 100 - flip.LastKnownCost;
         }
 
         public override bool Equals(object obj)

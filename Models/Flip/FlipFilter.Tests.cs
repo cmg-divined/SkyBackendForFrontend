@@ -38,7 +38,6 @@ namespace Coflnet.Sky.Commands.Shared
             var settings = JsonConvert.DeserializeObject<FlipSettings>(File.ReadAllText("mock/bigsettings.json"));
             sampleFlip.Auction.StartingBid = 10;
             sampleFlip.MedianPrice = 1000000;
-            sampleFlip.Tag = "DIAMOND_NECRON_HEAD";
             sampleFlip.Auction.ItemName = "hi";
             NoMatch(settings, sampleFlip);
             var watch = Stopwatch.StartNew();
@@ -259,12 +258,33 @@ namespace Coflnet.Sky.Commands.Shared
                 MinVolume = 0,
             };
             settings.WhiteList = new List<ListEntry>() { new ListEntry() { filter = new Dictionary<string, string>() { { "Volume", "<0.5" } } } };
-            settings.BlackList = new List<ListEntry>() { new ListEntry() { filter = new Dictionary<string, string>() { { "Volume", "<0.5" }, {"ForceBlacklist", ""} } } };
+            settings.BlackList = new List<ListEntry>() { new ListEntry() { filter = new Dictionary<string, string>() { { "Volume", "<0.5" }, { "ForceBlacklist", "" } } } };
             sampleFlip.Volume = 0.1f;
             var result = settings.MatchesSettings(sampleFlip);
-            
+
             Assert.IsFalse(result.Item1, result.Item2);
             Assert.AreEqual("forced blacklist matched general filter", result.Item2);
+        }
+
+        [Test]
+        public void JujuHighProfit()
+        {
+            var settings = new FlipSettings()
+            {
+                MinProfit = 0,
+                MinVolume = 0,
+            };
+            settings.WhiteList = new List<ListEntry>() { new ListEntry() { filter = new() { { "FlipFinder", "SNIPER_MEDIAN" }, { "MinProfitPercentage", "40" } }, ItemTag = "JUJU_SHORTBOW" } };
+            settings.BlackList = new List<ListEntry>() { new ListEntry() { filter = new() { { "FlipFinder", "SNIPER_MEDIAN" } } } };
+            sampleFlip.Volume = 0.1f;
+            sampleFlip.Auction.Tag = "JUJU_SHORTBOW";
+            sampleFlip.MedianPrice = 35800000;
+            sampleFlip.Auction.StartingBid = 6000;
+            sampleFlip.Finder = LowPricedAuction.FinderType.SNIPER_MEDIAN;
+            var result = settings.MatchesSettings(sampleFlip);
+
+            Assert.IsTrue(result.Item1, result.Item2);
+            Assert.AreEqual("whitelist matched filter for item", result.Item2);
         }
 
         [Test]
