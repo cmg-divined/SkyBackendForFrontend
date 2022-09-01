@@ -14,6 +14,8 @@ using Microsoft.Extensions.DependencyInjection;
 using RestSharp;
 using Newtonsoft.Json;
 using Coflnet.Sky.Core;
+using Microsoft.Extensions.Hosting;
+using System.Threading;
 
 namespace Coflnet.Sky.Commands.Shared
 {
@@ -21,15 +23,17 @@ namespace Coflnet.Sky.Commands.Shared
     /// <summary>
     /// Frontendfacing methods for the flipper
     /// </summary>
-    public class FlipperService
+    public class FlipperService : BackgroundService
     {
         public static FlipperService Instance = new FlipperService();
 
         private ConcurrentDictionary<long, FlipConWrapper> Subs = new ConcurrentDictionary<long, FlipConWrapper>();
         private ConcurrentDictionary<long, FlipConWrapper> SlowSubs = new ConcurrentDictionary<long, FlipConWrapper>();
+        private ConcurrentDictionary<long, FlipConWrapper> StarterSubs = new ConcurrentDictionary<long, FlipConWrapper>();
         private ConcurrentDictionary<long, FlipConWrapper> SuperSubs = new ConcurrentDictionary<long, FlipConWrapper>();
         public ConcurrentQueue<FlipInstance> Flipps = new ConcurrentQueue<FlipInstance>();
         private ConcurrentQueue<FlipInstance> SlowFlips = new ConcurrentQueue<FlipInstance>();
+        private ConcurrentQueue<LowPricedAuction> StarterFlips = new();
         public long LowestMinProfit { get; private set; } = 0;
 
 
@@ -40,7 +44,6 @@ namespace Coflnet.Sky.Commands.Shared
         public static readonly string ConsumeTopic = SimplerConfig.Config.Instance["TOPICS:FLIP"];
         public static readonly string LowPriceConsumeTopic = SimplerConfig.Config.Instance["TOPICS:LOW_PRICED"];
         public static readonly string SettingsTopic = SimplerConfig.Config.Instance["TOPICS:SETTINGS_CHANGE"];
-        private static ProducerConfig producerConfig = new ProducerConfig { BootstrapServers = SimplerConfig.Config.Instance["KAFKA_HOST"] };
 
         private const string FoundFlippsKey = "foundFlipps";
         public int PremiumUserCount => Subs.Count() + SuperSubs.Count();
@@ -60,41 +63,19 @@ namespace Coflnet.Sky.Commands.Shared
 
         public event Action<SettingsChange> OnSettingsChange;
 
-        private async Task TryLoadFromCache()
+
+        public void AddConnectionPlus(IFlipConnection connection, bool sendHistory = true)
         {
-            if (Flipps.Count == 0)
-            {
-                // try to get from redis
-
-                var fromCache = await CacheService.Instance.GetFromRedis<ConcurrentQueue<FlipInstance>>(FoundFlippsKey);
-                if (fromCache != default(ConcurrentQueue<FlipInstance>))
-                {
-                    Flipps = fromCache;
-                    foreach (var item in Flipps)
-                    {
-                        FlipIdLookup[item.UId] = true;
-                    }
-                }
-            }
-        }
-
-
-        public async Task<DeliveryResult<string, SettingsChange>> UpdateSettings(SettingsChange settings)
-        {
-            var cacheKey = "uflipset" + settings.UserId;
-            var serializer = SerializerFactory.GetSerializer<SettingsChange>();
-            /* var stored = await CacheService.Instance.GetFromRedis<SettingsChange>(cacheKey);
-            //if(serializer.Serialize(settings,default).SequenceEqual(serializer.Serialize(stored,default)))
-            //    return null; */
-            using (var p = new ProducerBuilder<string, SettingsChange>(producerConfig).SetValueSerializer(serializer).Build())
-            {
-                var produceTask = p.ProduceAsync(SettingsTopic, new Message<string, SettingsChange> { Value = settings });
-                await CacheService.Instance.SaveInRedis(cacheKey, settings, TimeSpan.FromDays(5));
-                if (settings.LongConIds.Any())
-                    await CacheService.Instance.SaveInRedis(settings.LongConIds.LastOrDefault().ToString(), settings);
-
-                return await produceTask;
-            }
+            if (SuperSubs.ContainsKey(connection.Id))
+                return;
+            var con = new FlipConWrapper(connection);
+            RemoveConnection(con.Connection);
+            SuperSubs.AddOrUpdate(con.Connection.Id, cid => con, (cid, oldMId) => con);
+            var toSendFlips = Flipps.Reverse().Take(25);
+            if (sendHistory)
+                SendFlipHistory(connection, toSendFlips, 0);
+            RemoveNonConnection(con.Connection);
+            Task.Run(con.Work);
         }
 
         public void AddConnection(IFlipConnection connection, bool sendHistory = true)
@@ -110,18 +91,12 @@ namespace Coflnet.Sky.Commands.Shared
             Task.Run(con.Work);
         }
 
-        public void AddConnectionPlus(IFlipConnection connection, bool sendHistory = true)
+        public void AddStarterConnection(IFlipConnection connection, bool sendHistory = true)
         {
-            if (SuperSubs.ContainsKey(connection.Id))
-                return;
             var con = new FlipConWrapper(connection);
-            RemoveConnection(con.Connection);
-            SuperSubs.AddOrUpdate(con.Connection.Id, cid => con, (cid, oldMId) => con);
-            var toSendFlips = Flipps.Reverse().Take(25);
+            StarterSubs.AddOrUpdate(connection.Id, cid => con, (cid, oldMId) => con);
             if (sendHistory)
-                SendFlipHistory(connection, toSendFlips, 0);
-            RemoveNonConnection(con.Connection);
-            Task.Run(con.Work);
+                SendFlipHistory(connection, LoadBurst, 0);
         }
 
         public void AddNonConnection(IFlipConnection connection, bool sendHistory = true)
@@ -145,6 +120,7 @@ namespace Coflnet.Sky.Commands.Shared
         {
             Unsubscribe(Subs, con.Id);
             Unsubscribe(SuperSubs, con.Id);
+            Unsubscribe(StarterSubs, con.Id);
             RemoveNonConnection(con);
         }
 
@@ -157,7 +133,6 @@ namespace Coflnet.Sky.Commands.Shared
             {
                 try
                 {
-
                     foreach (var item in toSendFlips.ToList())
                     {
                         await con.SendFlip(item);
@@ -243,7 +218,7 @@ namespace Coflnet.Sky.Commands.Shared
                     flip.SellerName = $"not-found";
                 }
             }
-                
+
 
             if (flip.LowestBin == 0 && (settings.Visibility.LowestBin || settings.Visibility.SecondLowestBin || settings.BasedOnLBin))
             {
@@ -326,7 +301,7 @@ namespace Coflnet.Sky.Commands.Shared
             }
         }
 
-        public Task DeliverLowPricedAuction(LowPricedAuction flip)
+        public async Task DeliverLowPricedAuction(LowPricedAuction flip, AccountTier minAccountTier = AccountTier.PREMIUM)
         {
             if (flip.Auction.Context != null)
                 flip.Auction.Context["crec"] = (DateTime.Now - flip.Auction.FindTime).ToString();
@@ -346,10 +321,16 @@ namespace Coflnet.Sky.Commands.Shared
                 item.Value.AddLowPriced(flip);
             }
 
+            if (minAccountTier >= AccountTier.PREMIUM_PLUS)
+                await Task.Delay(0);
+
             foreach (var item in Subs)
             {
                 item.Value.AddLowPriced(flip);
             }
+
+            StarterFlips.Enqueue(flip);
+
             if (flip.TargetPrice - flip.Auction.StartingBid < 250_000) // send below 200k profit out to everyone
             {
                 foreach (var item in SlowSubs)
@@ -359,7 +340,6 @@ namespace Coflnet.Sky.Commands.Shared
             }
             else
                 PrepareSlow(LowPriceToFlip(flip));
-            return Task.CompletedTask;
         }
 
 
@@ -435,8 +415,6 @@ namespace Coflnet.Sky.Commands.Shared
 
         public async Task ListenToNewFlips()
         {
-
-            await TryLoadFromCache();
             string[] topics = new string[] { ConsumeTopic };
 
             Console.WriteLine("starting to listen for new auctions via topic " + ConsumeTopic);
@@ -482,14 +460,17 @@ namespace Coflnet.Sky.Commands.Shared
                 var time = (DateTime.Now - flip.Auction.FindTime).TotalSeconds;
                 runtroughTime.Observe(time);
 
-                try
+                Task.Run(async () =>
                 {
-                    DeliverLowPricedAuction(flip);
-                }
-                catch (Exception e)
-                {
-                    dev.Logger.Instance.Error(e, "delivering low priced auction");
-                }
+                    try
+                    {
+                        await DeliverLowPricedAuction(flip);
+                    }
+                    catch (Exception e)
+                    {
+                        dev.Logger.Instance.Error(e, "delivering low priced auction");
+                    }
+                }).ConfigureAwait(false);
             }, 50).ConfigureAwait(false);
         }
 
@@ -561,9 +542,9 @@ namespace Coflnet.Sky.Commands.Shared
             }
         }
 
-        public static int DelayTimeFor(int queueSize)
+        public static int DelayTimeFor(int queueSize, double minutes = 3, int max = 10000)
         {
-            return (int)Math.Min((TimeSpan.FromMinutes(3) / (Math.Max(queueSize, 1))).TotalMilliseconds, 10000);
+            return (int)Math.Min((TimeSpan.FromMinutes(minutes) / (Math.Max(queueSize, 1))).TotalMilliseconds, max);
         }
 
         /// <summary>
@@ -596,9 +577,60 @@ namespace Coflnet.Sky.Commands.Shared
             var minProfit = long.MaxValue;
             foreach (var item in SuperSubs.Values.Concat(Subs.Values))
             {
-                minProfit = Math.Min(minProfit, item.Connection.Settings.MinProfit );
+                minProfit = Math.Min(minProfit, item.Connection.Settings.MinProfit);
             }
             this.LowestMinProfit = minProfit;
+        }
+
+        protected override Task ExecuteAsync(CancellationToken stoppingToken)
+        {
+            Instance = this;
+            RunIsolatedForever(async () =>
+            {
+                while (!stoppingToken.IsCancellationRequested)
+                {
+                    if (!StarterFlips.TryDequeue(out LowPricedAuction flip))
+                    {
+                        await Task.Delay(TimeSpan.FromSeconds(13));
+                        continue;
+                    }
+                    foreach (var item in StarterSubs.Keys)
+                    {
+                        if (!StarterSubs.TryGetValue(item, out FlipConWrapper con) || !con.AddLowPriced(flip))
+                            StarterSubs.TryRemove(item, out _);
+                    }
+                    await Task.Delay(DelayTimeFor(StarterFlips.Count, 0.2, 2000));
+                }
+            }, "starter premium flips", stoppingToken);
+
+            RunIsolatedForever(ListentoUnavailableTopics, "flip wait", stoppingToken);
+            RunIsolatedForever(ListenToNewFlips, "flip wait", stoppingToken);
+            RunIsolatedForever(ListenToLowPriced, "low priced auctions", stoppingToken);
+
+            RunIsolatedForever(ProcessSlowQueue, "flip process slow", stoppingToken, 200);
+            return Task.CompletedTask;
+        }
+
+        private static TaskFactory factory = new TaskFactory();
+        public static void RunIsolatedForever(Func<Task> todo, string message, CancellationToken stoppingToken, int backoff = 2000)
+        {
+            factory.StartNew(async () =>
+            {
+                while (!stoppingToken.IsCancellationRequested)
+                {
+                    try
+                    {
+                        await todo().ConfigureAwait(false);
+                    }
+                    catch (Exception e)
+                    {
+                        Console.WriteLine();
+                        Console.WriteLine($"{message}: {e.Message} {e.StackTrace}\n {e.InnerException?.Message} {e.InnerException?.StackTrace} {e.InnerException?.InnerException?.Message} {e.InnerException?.InnerException?.StackTrace}");
+                        await Task.Delay(2000);
+                    }
+                    await Task.Delay(backoff, stoppingToken);
+                }
+            }, TaskCreationOptions.LongRunning).ConfigureAwait(false);
         }
 
         public List<FlipConWrapper> Connections

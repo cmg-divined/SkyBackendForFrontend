@@ -26,7 +26,7 @@ namespace Coflnet.Sky.Commands.Shared
             Connection = connection;
         }
 
-        public async Task Work()
+        public Task Work()
         {
             cancellationTokenSource?.Cancel();
             cancellationTokenSource = new CancellationTokenSource();
@@ -34,6 +34,7 @@ namespace Coflnet.Sky.Commands.Shared
             var count = Connection.LatestSettings.Tier switch
             {
                 AccountTier.PREMIUM => 3,
+                AccountTier.PREMIUM_PLUS => 6,
                 AccountTier.SUPER_PREMIUM => 6,
                 _ => 1
             };
@@ -69,7 +70,7 @@ namespace Coflnet.Sky.Commands.Shared
                 }).ConfigureAwait(false);
             }
 
-
+            return Task.CompletedTask;
         }
 
         public bool AddLowPriced(LowPricedAuction lp)
