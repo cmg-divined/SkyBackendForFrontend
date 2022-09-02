@@ -322,7 +322,7 @@ namespace Coflnet.Sky.Commands.Shared
             }
 
             if (minAccountTier >= AccountTier.PREMIUM_PLUS)
-                await Task.Delay(0);
+                await Task.Delay(900);
 
             foreach (var item in Subs)
             {
