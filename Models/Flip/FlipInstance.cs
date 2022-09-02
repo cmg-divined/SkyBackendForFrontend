@@ -40,7 +40,7 @@ namespace Coflnet.Sky.Commands.Shared
         [IgnoreDataMember]
         public long UId => AuctionService.Instance.GetId(this.Uuid);
         [IgnoreDataMember]
-        public long Profit => ((long)(Finder == LowPricedAuction.FinderType.SNIPER ? LowestBin : MedianPrice) - LastKnownCost) * 98 / 100;
+        public long Profit => ((long)(Finder == LowPricedAuction.FinderType.SNIPER ? LowestBin : MedianPrice) * 98 / 100 - LastKnownCost) ;
 
         [IgnoreDataMember]
         public long ProfitPercentage => (Profit * 100 / (LastKnownCost == 0 ? int.MaxValue : LastKnownCost));
