@@ -253,6 +253,7 @@ namespace Coflnet.Sky.Commands
                     b.Auction.Uuid,
                     b.Auction.End,
                     b.Auction.Tag,
+                    b.Auction.Tier,
                     b.Amount,
                     Enchants = b.Auction.Enchantments,
                     Nbt = b.Auction.NBTLookup
@@ -264,6 +265,7 @@ namespace Coflnet.Sky.Commands
                     HighestOwnBid = bid.Max(b => b.Amount),
                     End = bid.Max(b => b.End),
                     Tag = bid.First().Tag,
+                    Tier = bid.First().Tier,
                     Nbt = bid.OrderByDescending(b => b.Amount).First().Nbt,
                     Enchants = bid.First().Enchants
                 })
@@ -289,7 +291,8 @@ namespace Coflnet.Sky.Commands
                 var profit = 1L;
                 var changeSumary = new List<PropertyChange>();
                 if (b.Tag == sell.Tag
-                    && !enchantsBad)
+                    && !enchantsBad
+                    && b.Tier == sell.Tier)
                 {
                     var gemSumaryBuy = gemPriceService.LookupToGems(b.Nbt);
                     var gemSumarySell = gemPriceService.LookupToGems(sell.NBTLookup);
