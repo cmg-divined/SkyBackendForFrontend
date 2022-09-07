@@ -53,6 +53,10 @@ public enum DescriptionField
     /// Display price paid
     /// </summary>
     PRICE_PAID,
+    /// <summary>
+    /// Breakdown of relevant price modifying stats
+    /// </summary>
+    ITEM_KEY,
 
     // anything over 9000 gets hidden
     BAZAAR_COST = 9001
