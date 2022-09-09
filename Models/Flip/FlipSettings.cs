@@ -115,7 +115,8 @@ namespace Coflnet.Sky.Commands.Shared
                 return (false, "minProfit");
             if (MaxCost != 0 && flip.LastKnownCost > MaxCost)
                 return (false, "maxCost");
-            if (flip.LastKnownCost > 0 && flip.ProfitPercentage < MinProfitPercent)
+            if (flip.LastKnownCost > 0 && (flip.ProfitPercentage < MinProfitPercent 
+                || BasedOnLBin && (profit * 100 / flip.LastKnownCost < MinProfitPercent)))
             {
                 return (false, "profit Percentage");
             }
