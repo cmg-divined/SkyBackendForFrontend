@@ -31,6 +31,7 @@ namespace Coflnet.Sky.Commands.Shared
             AddSettings(typeof(FlipSettings).GetFields(), "");
             AddSettings(typeof(ModSettings).GetFields(), "mod");
             AddSettings(typeof(VisibilitySettings).GetFields(), "show");
+            AddSettings(typeof(PrivacySettings).GetFields(), "privacy");
         }
 
         private void AddSettings(System.Reflection.FieldInfo[] fields, string prefix = "")
@@ -40,7 +41,7 @@ namespace Coflnet.Sky.Commands.Shared
                 if (item.FieldType.IsPrimitive || item.FieldType == typeof(string) || item.FieldType.IsEnum)
                 {
                     var commandSlug = (item.GetCustomAttributes(typeof(DataMemberAttribute), true).FirstOrDefault() as DataMemberAttribute)?.Name;
-                    if(commandSlug == null)
+                    if (commandSlug == null)
                         commandSlug = item.Name;
                     var doc = (item.GetCustomAttributes(typeof(SettingsDocAttribute), true).FirstOrDefault() as SettingsDocAttribute);
                     SettingDoc desc = GetDesc(item, doc, prefix);
@@ -69,7 +70,7 @@ namespace Coflnet.Sky.Commands.Shared
             return options.Keys.ToArray();
         }
 
-        public IEnumerable<KeyValuePair<string,SettingDoc>> ModOptions => options;
+        public IEnumerable<KeyValuePair<string, SettingDoc>> ModOptions => options;
 
         public async Task<object> Update(IFlipConnection con, string key, string value)
         {
@@ -87,15 +88,23 @@ namespace Coflnet.Sky.Commands.Shared
             }
             else if (doc.Prefix == "show")
             {
-                if(con.Settings.Visibility == null)
+                if (con.Settings.Visibility == null)
                     con.Settings.Visibility = new VisibilitySettings();
                 return UpdateValueOnObject(value, doc.RealName, con.Settings.Visibility);
             }
             else if (doc.Prefix == "mod")
             {
-                if(con.Settings.ModSettings == null)
+                if (con.Settings.ModSettings == null)
                     con.Settings.ModSettings = new ModSettings();
                 return UpdateValueOnObject(value, doc.RealName, con.Settings.ModSettings);
+            }
+            else if (doc.Prefix == "privacy")
+            {
+                var settingsService = DiHandler.GetService<SettingsService>();
+                var current = await settingsService.GetCurrentValue<PrivacySettings>(con.UserId.ToString(), "privacySettings", () => PrivacySettings.Default);
+                var newVal = UpdateValueOnObject(value, doc.RealName, current);
+                await settingsService.UpdateSetting(con.UserId.ToString(), "privacySettings", current);
+                return newVal;
             }
             else
             {
@@ -104,7 +113,7 @@ namespace Coflnet.Sky.Commands.Shared
             return value;
         }
 
-        
+
         public SettingDoc GetDocFor(string key)
         {
             options.TryGetValue(key, out SettingDoc doc);
@@ -134,7 +143,7 @@ namespace Coflnet.Sky.Commands.Shared
             }
             else if (field.FieldType.IsEnum)
                 newValue = Enum.Parse(field.FieldType, value, true);
-            else if(field.FieldType.IsPrimitive && field.FieldType != typeof(bool))
+            else if (field.FieldType.IsPrimitive && field.FieldType != typeof(bool))
                 newValue = Convert.ChangeType(NumberParser.Double(value), field.FieldType);
             else
                 newValue = Convert.ChangeType(value, field.FieldType);
