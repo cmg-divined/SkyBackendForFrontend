@@ -43,6 +43,7 @@ namespace Coflnet.Sky.Commands.Shared
         private ConcurrentDictionary<long, bool> FlipIdLookup = new ConcurrentDictionary<long, bool>();
         public static readonly string ConsumeTopic = SimplerConfig.Config.Instance["TOPICS:FLIP"];
         public static readonly string LowPriceConsumeTopic = SimplerConfig.Config.Instance["TOPICS:LOW_PRICED"];
+        public static readonly string AuctionConsumeTopic = SimplerConfig.Config.Instance["TOPICS:NEW_AUCTION"];
         public static readonly string SettingsTopic = SimplerConfig.Config.Instance["TOPICS:SETTINGS_CHANGE"];
 
         private const string FoundFlippsKey = "foundFlipps";
@@ -451,7 +452,7 @@ namespace Coflnet.Sky.Commands.Shared
         {
             string[] topics = new string[] { LowPriceConsumeTopic };
 
-            await ConsumeBatch<LowPricedAuction>(topics, flip =>
+            await ConsumeBatch(topics, (Action<LowPricedAuction>)(flip =>
             {
                 if (flip.Auction.Start.ToUniversalTime() < DateTime.Now.ToUniversalTime() - TimeSpan.FromMinutes(4)
                     && flip.Auction.Bin || flip.Auction.End < DateTime.UtcNow)
@@ -459,21 +460,45 @@ namespace Coflnet.Sky.Commands.Shared
 
                 var time = (DateTime.Now - flip.Auction.FindTime).TotalSeconds;
                 runtroughTime.Observe(time);
-
-                Task.Run(async () =>
-                {
-                    try
-                    {
-                        await DeliverLowPricedAuction(flip);
-                    }
-                    catch (Exception e)
-                    {
-                        dev.Logger.Instance.Error(e, "delivering low priced auction");
-                    }
-                }).ConfigureAwait(false);
-            }, 50).ConfigureAwait(false);
+                QueueLowPriced(flip);
+            }), 50).ConfigureAwait(false);
         }
 
+        public async Task ConsumeNewAuctions()
+        {
+            string[] topics = new string[] { AuctionConsumeTopic };
+
+            await ConsumeBatch(topics, (Action<SaveAuction>)(auction =>
+            {
+                if (auction.Start.ToUniversalTime() < DateTime.Now.ToUniversalTime() - TimeSpan.FromMinutes(4)
+                    && auction.Bin || auction.End < DateTime.UtcNow)
+                    return;
+
+                QueueLowPriced(new LowPricedAuction(){
+                    Auction = auction,
+                    DailyVolume = 0,
+                    Finder = LowPricedAuction.FinderType.USER,
+                    TargetPrice = auction.StartingBid
+                });
+            }), 50).ConfigureAwait(false);
+        }
+
+        private void QueueLowPriced(LowPricedAuction flip)
+        {
+            Task.Run(async () =>
+            {
+                try
+                {
+                    await DeliverLowPricedAuction(flip);
+                }
+                catch (Exception e)
+                {
+                    dev.Logger.Instance.Error(e, "delivering low priced auction");
+                }
+            }).ConfigureAwait(false);
+        }
+
+        
         protected virtual void UpdateSettingsInternal(SettingsChange settings)
         {
             foreach (var item in settings.LongConIds)
@@ -606,6 +631,7 @@ namespace Coflnet.Sky.Commands.Shared
             RunIsolatedForever(ListentoUnavailableTopics, "flip wait", stoppingToken);
             RunIsolatedForever(ListenToNewFlips, "flip wait", stoppingToken);
             RunIsolatedForever(ListenToLowPriced, "low priced auctions", stoppingToken);
+            RunIsolatedForever(ConsumeNewAuctions, "consuming new auctions for user filter", stoppingToken);
 
             RunIsolatedForever(ProcessSlowQueue, "flip process slow", stoppingToken, 200);
             return Task.CompletedTask;
