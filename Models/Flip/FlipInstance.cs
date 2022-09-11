@@ -40,6 +40,7 @@ namespace Coflnet.Sky.Commands.Shared
         [IgnoreDataMember]
         public long UId => AuctionService.Instance.GetId(this.Uuid);
         [IgnoreDataMember]
+        [Newtonsoft.Json.JsonProperty]
         public long Profit => ((long)(Finder == LowPricedAuction.FinderType.SNIPER ? LowestBin : MedianPrice) * 98 / 100 - LastKnownCost) ;
 
         [IgnoreDataMember]
