@@ -187,7 +187,7 @@ namespace Coflnet.Sky.Commands.Shared
             var flipIntance = new FlipInstance()
             {
                 Auction = flip.Auction,
-                MedianPrice = flip.Finder == LowPricedAuction.FinderType.SNIPER && flip.AdditionalProps.TryGetValue("mVal", out string mVal) ? int.Parse(mVal) : flip.TargetPrice,
+                MedianPrice = flip.Finder == LowPricedAuction.FinderType.SNIPER && flip.AdditionalProps.TryGetValue("mVal", out string mVal) ? long.Parse(mVal) : flip.TargetPrice,
                 Uuid = flip.Auction.Uuid,
                 Bin = flip.Auction.Bin,
                 Name = flip.Auction.ItemName,

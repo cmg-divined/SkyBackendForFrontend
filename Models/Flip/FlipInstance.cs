@@ -11,7 +11,7 @@ namespace Coflnet.Sky.Commands.Shared
         [DataMember(Name = "median")]
         public long MedianPrice;
         [DataMember(Name = "cost")]
-        public long LastKnownCost => (int)(Auction.HighestBidAmount == 0 ? Auction.StartingBid : Auction.HighestBidAmount);
+        public long LastKnownCost => (Auction.HighestBidAmount == 0 ? Auction.StartingBid : Auction.HighestBidAmount);
         [DataMember(Name = "uuid")]
         public string Uuid;
         [DataMember(Name = "name")]
