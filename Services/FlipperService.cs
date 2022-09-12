@@ -138,7 +138,7 @@ namespace Coflnet.Sky.Commands.Shared
                     {
                         await con.SendFlip(item);
 
-                        await Task.Delay(delay);
+                        await Task.Delay(delay).ConfigureAwait(false);
                     }
                 }
                 catch (Exception e)
@@ -323,7 +323,7 @@ namespace Coflnet.Sky.Commands.Shared
             }
 
             if (minAccountTier >= AccountTier.PREMIUM_PLUS)
-                await Task.Delay(900);
+                await Task.Delay(900).ConfigureAwait(false);
 
             foreach (var item in Subs)
             {
@@ -388,7 +388,7 @@ namespace Coflnet.Sky.Commands.Shared
                         LoadBurst.Dequeue();
                 }
 
-                await Task.Delay(DelayTimeFor(SlowFlips.Count) * 4 / 5);
+                await Task.Delay(DelayTimeFor(SlowFlips.Count) * 4 / 5).ConfigureAwait(false);
             }
             catch (Exception e)
             {
@@ -529,7 +529,7 @@ namespace Coflnet.Sky.Commands.Shared
                             var cr = c.Consume(30000);
                             if (cr == null)
                             {
-                                await Task.Delay(10);
+                                await Task.Delay(10).ConfigureAwait(false);
                                 continue;
                             }
                             if (cr.TopicPartitionOffset.Offset % 200 == 0)
@@ -616,7 +616,7 @@ namespace Coflnet.Sky.Commands.Shared
                 {
                     if (!StarterFlips.TryDequeue(out LowPricedAuction flip))
                     {
-                        await Task.Delay(TimeSpan.FromSeconds(13));
+                        await Task.Delay(TimeSpan.FromSeconds(13)).ConfigureAwait(false);
                         continue;
                     }
                     foreach (var item in StarterSubs.Keys)
@@ -624,7 +624,7 @@ namespace Coflnet.Sky.Commands.Shared
                         if (!StarterSubs.TryGetValue(item, out FlipConWrapper con) || !con.AddLowPriced(flip))
                             StarterSubs.TryRemove(item, out _);
                     }
-                    await Task.Delay(DelayTimeFor(StarterFlips.Count, 0.2, 2000));
+                    await Task.Delay(DelayTimeFor(StarterFlips.Count, 0.2, 2000)).ConfigureAwait(false);
                 }
             }, "starter premium flips", stoppingToken);
 
@@ -652,9 +652,9 @@ namespace Coflnet.Sky.Commands.Shared
                     {
                         Console.WriteLine();
                         Console.WriteLine($"{message}: {e.Message} {e.StackTrace}\n {e.InnerException?.Message} {e.InnerException?.StackTrace} {e.InnerException?.InnerException?.Message} {e.InnerException?.InnerException?.StackTrace}");
-                        await Task.Delay(2000);
+                        await Task.Delay(2000).ConfigureAwait(false);
                     }
-                    await Task.Delay(backoff, stoppingToken);
+                    await Task.Delay(backoff, stoppingToken).ConfigureAwait(false);
                 }
             }, TaskCreationOptions.LongRunning).ConfigureAwait(false);
         }
