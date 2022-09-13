@@ -489,7 +489,7 @@ namespace Coflnet.Sky.Commands.Shared
             {
                 try
                 {
-                    await DeliverLowPricedAuction(flip);
+                    await DeliverLowPricedAuction(flip).ConfigureAwait(false);
                 }
                 catch (Exception e)
                 {
