@@ -226,6 +226,8 @@ namespace Coflnet.Sky.Commands.Shared
                 var lowestBin = await GetLowestBin(flip.Auction).ConfigureAwait(false);
                 flip.LowestBin = lowestBin?.FirstOrDefault()?.Price;
                 flip.SecondLowestBin = lowestBin?.Count >= 2 ? lowestBin[1].Price : 0L;
+                if(settings.BasedOnLBin)
+                    flip.MedianPrice = flip.LowestBin ?? flip.MedianPrice;
             }
         }
 
