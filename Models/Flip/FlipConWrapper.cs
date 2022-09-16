@@ -84,17 +84,7 @@ namespace Coflnet.Sky.Commands.Shared
                 DailyVolume = lp.DailyVolume,
                 Finder = lp.Finder,
                 TargetPrice = lp.TargetPrice
-            };
-            if (Connection?.Settings?.FastMode ?? false)
-                try
-                {
-                    return Connection.SendFlip(copy).Wait(10);
-                }
-                catch (Exception e)
-                {
-                    dev.Logger.Instance.Error(e, "fast send ");
-                }
-            
+            };            
             return LowPriced.Writer.TryWrite(copy);
         }
 

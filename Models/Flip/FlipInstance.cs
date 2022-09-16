@@ -1,6 +1,5 @@
 using System.Collections.Generic;
 using System.Runtime.Serialization;
-using Coflnet.Sky;
 using Coflnet.Sky.Core;
 
 namespace Coflnet.Sky.Commands.Shared

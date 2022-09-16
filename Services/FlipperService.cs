@@ -315,7 +315,7 @@ namespace Coflnet.Sky.Commands.Shared
             using var scope = span.StartActive();
             var time = (DateTime.Now - flip.Auction.FindTime).TotalSeconds;
             if (time > 3)
-                scope.Span.SetTag("slow", true);
+                scope.Span.SetTag("slow", true).SetTag("uuid", flip.Auction.Uuid);
 
             if (flip.Auction != null && flip.Auction.NBTLookup == null)
                 flip.Auction.NBTLookup = NBT.CreateLookup(flip.Auction);
