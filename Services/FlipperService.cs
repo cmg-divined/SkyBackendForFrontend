@@ -34,7 +34,7 @@ namespace Coflnet.Sky.Commands.Shared
         public ConcurrentQueue<FlipInstance> Flipps = new ConcurrentQueue<FlipInstance>();
         private ConcurrentQueue<FlipInstance> SlowFlips = new ConcurrentQueue<FlipInstance>();
         private ConcurrentQueue<LowPricedAuction> StarterFlips = new();
-        public long LowestMinProfit { get; private set; } = 0;
+        public ServerFilterSumary FilterSumary { get; private set; } = new();
 
 
         /// <summary>
@@ -109,12 +109,13 @@ namespace Coflnet.Sky.Commands.Shared
             SendFlipHistory(connection, LoadBurst, 0);
             if (SlowSubs.Count % 10 == 0)
                 Console.WriteLine("Added new con " + SlowSubs.Count);
-
+            UpdateFilterSumaries();
         }
 
         private void RemoveNonConnection(IFlipConnection con)
         {
             Unsubscribe(SlowSubs, con.Id);
+            UpdateFilterSumaries();
         }
 
         public void RemoveConnection(IFlipConnection con)
@@ -475,6 +476,8 @@ namespace Coflnet.Sky.Commands.Shared
                 if (auction.Start.ToUniversalTime() < DateTime.Now.ToUniversalTime() - TimeSpan.FromMinutes(4)
                     && auction.Bin || auction.End < DateTime.UtcNow)
                     return;
+                if(FilterSumary.UserFinderEnabledCount == 0)
+                    return;
 
                 QueueLowPriced(new LowPricedAuction(){
                     Auction = auction,
@@ -487,6 +490,9 @@ namespace Coflnet.Sky.Commands.Shared
 
         private void QueueLowPriced(LowPricedAuction flip)
         {
+            var profit = flip.TargetPrice - flip.Auction.StartingBid;
+            if(flip.Finder != LowPricedAuction.FinderType.USER && profit < FilterSumary.LowestMinProfit && profit < 2_000_000)
+                return; // don't queue there is noone interested 
             Task.Run(async () =>
             {
                 try
@@ -599,14 +605,23 @@ namespace Coflnet.Sky.Commands.Shared
             return result;
         }
 
-        public void UpdateLowestMinProfit()
+        private void UpdateFilterSumaries()
         {
             var minProfit = long.MaxValue;
-            foreach (var item in SuperSubs.Values.Concat(Subs.Values))
+            var sumary = new ServerFilterSumary();
+            foreach (var item in Connections)
             {
-                minProfit = Math.Min(minProfit, item.Connection.Settings.MinProfit);
+                var settings = item.Connection.Settings;
+                if(settings == null)
+                    continue;
+                if(settings.AllowedFinders.HasFlag(LowPricedAuction.FinderType.USER))
+                    sumary.UserFinderEnabledCount++;
+                 minProfit = Math.Min(minProfit, settings.MinProfit);
             }
-            this.LowestMinProfit = minProfit;
+            sumary.LowestMinProfit = minProfit;
+
+            // assign after calculation so that there is no racecondition while calculating
+            this.FilterSumary = sumary;
         }
 
         protected override Task ExecuteAsync(CancellationToken stoppingToken)
@@ -672,5 +687,10 @@ namespace Coflnet.Sky.Commands.Shared
                 return list;
             }
         }
+    }
+    public class ServerFilterSumary
+    {
+        public int UserFinderEnabledCount;
+        public long LowestMinProfit;
     }
 }
