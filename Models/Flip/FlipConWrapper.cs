@@ -54,6 +54,7 @@ namespace Coflnet.Sky.Commands.Shared
                                 Connection.Log("amany flips waiting " + LowPriced.Reader.Count, Microsoft.Extensions.Logging.LogLevel.Error);
                                 flip.AdditionalProps?.TryAdd("long wait", LowPriced.Reader.Count.ToString());
                             }
+                            flip.AdditionalProps.TryAdd("da", (DateTime.Now - flip.Auction.FindTime).ToString());
                             //await limiter.WaitAsync();
                             await Connection.SendFlip(flip);
                         }
