@@ -29,7 +29,8 @@ namespace Coflnet.Sky.Commands.Shared
                 },
                     FlatenedNBT = new Dictionary<string, string>() { { "candy", "3" } }
                 },
-                Context = new Dictionary<string, string>()
+                Context = new Dictionary<string, string>(),
+                Finder = LowPricedAuction.FinderType.SNIPER_MEDIAN
             };
         }
         [Test]
@@ -359,7 +360,8 @@ namespace Coflnet.Sky.Commands.Shared
                     Enchantments = new List<Enchantment>(){
                         new Enchantment(Enchantment.EnchantmentType.ultimate_one_for_all,1)
                     }
-                }
+                },
+                Finder = LowPricedAuction.FinderType.SNIPER
             };
         }
 

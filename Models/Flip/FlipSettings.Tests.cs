@@ -27,7 +27,8 @@ namespace Coflnet.Sky.Commands.Shared
                     },
                     Tag = SwordTag
                 },
-                MedianPrice = 1000
+                MedianPrice = 1000,
+                Finder = LowPricedAuction.FinderType.SNIPER
             };
 
             flipB = new FlipInstance()
@@ -40,7 +41,8 @@ namespace Coflnet.Sky.Commands.Shared
                     },
                     Tag = SwordTag
                 },
-                MedianPrice = 500
+                MedianPrice = 500,
+                Finder = LowPricedAuction.FinderType.SNIPER
             };
             CreateLookup(flipA);
             CreateLookup(flipB);
@@ -218,6 +220,25 @@ namespace Coflnet.Sky.Commands.Shared
             };
             // report https://discord.com/channels/267680588666896385/986382602376196116/986382624362737685
             Assert.IsTrue(listEntry.MatchesSettings(auction));
+        }
+
+        [Test]
+        public void IsFinderBlockedDefault()
+        {
+            var settings = new FlipSettings() { };
+            Assert.IsTrue(settings.IsFinderBlocked(LowPricedAuction.FinderType.USER));
+            Assert.IsTrue(settings.IsFinderBlocked(LowPricedAuction.FinderType.FLIPPER));
+            Assert.IsFalse(settings.IsFinderBlocked(LowPricedAuction.FinderType.SNIPER));
+            Assert.IsFalse(settings.IsFinderBlocked(LowPricedAuction.FinderType.SNIPER_MEDIAN));
+        }
+        [Test]
+        public void IsFinderBlocked()
+        {
+            var settings = new FlipSettings() { AllowedFinders = LowPricedAuction.FinderType.FLIPPER | LowPricedAuction.FinderType.SNIPER };
+            Assert.IsTrue(settings.IsFinderBlocked(LowPricedAuction.FinderType.USER));
+            Assert.IsTrue(settings.IsFinderBlocked(LowPricedAuction.FinderType.SNIPER_MEDIAN));
+            Assert.IsFalse(settings.IsFinderBlocked(LowPricedAuction.FinderType.SNIPER));
+            Assert.IsFalse(settings.IsFinderBlocked(LowPricedAuction.FinderType.FLIPPER));
         }
     }
 

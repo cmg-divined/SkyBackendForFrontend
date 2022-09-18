@@ -143,8 +143,9 @@ namespace Coflnet.Sky.Commands.Shared
 
         public bool IsFinderBlocked(LowPricedAuction.FinderType finder)
         {
-            return AllowedFinders != LowPricedAuction.FinderType.UNKOWN && finder != LowPricedAuction.FinderType.UNKOWN
-                                                && !AllowedFinders.HasFlag(finder)
+            return  finder == LowPricedAuction.FinderType.UNKOWN || 
+                    AllowedFinders == LowPricedAuction.FinderType.UNKOWN && (LowPricedAuction.FinderType.FLIPPER | LowPricedAuction.FinderType.USER).HasFlag(finder)
+                                                || AllowedFinders != LowPricedAuction.FinderType.UNKOWN && !AllowedFinders.HasFlag(finder)
                                                 && (int)finder != 3;
         }
 
