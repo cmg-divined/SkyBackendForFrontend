@@ -69,7 +69,6 @@ namespace Coflnet.Sky.Commands.Shared
         [SettingsDoc("Hide all auctions")]
         public bool OnlyBin;
 
-        private FlipFilter filter;
         private List<FlipFilter> blackListFilters;
         private ListMatcher BlackListMatcher;
         private ListMatcher ForcedBlackListMatcher;
@@ -130,10 +129,7 @@ namespace Coflnet.Sky.Commands.Shared
             if (match.Item1)
                 return (false, "blacklist " + match.Item2);
 
-            if (filter == null)
-                filter = new FlipFilter(this.Filters);
-
-            return (filter.IsMatch(flip), "general filter");
+            return (true, "general filter");
         }
 
         public List<ListEntry> GetForceBlacklist()

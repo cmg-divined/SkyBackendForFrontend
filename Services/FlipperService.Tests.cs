@@ -56,6 +56,8 @@ namespace Coflnet.Sky.Commands.Tests
                 ExpiresAt = DateTime.Now + TimeSpan.FromHours(2)
             };
 
+            public AccountInfo AccountInfo => throw new NotImplementedException();
+
             public FlipInstance LastFlip;
 
             public Task<bool> SendFlip(FlipInstance flip)

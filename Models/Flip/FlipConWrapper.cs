@@ -31,7 +31,7 @@ namespace Coflnet.Sky.Commands.Shared
             cancellationTokenSource?.Cancel();
             cancellationTokenSource = new CancellationTokenSource();
             var stoppingToken = cancellationTokenSource.Token;
-            var count = Connection.LatestSettings.Tier switch
+            var count = Connection.AccountInfo.Tier switch
             {
                 AccountTier.PREMIUM => 3,
                 AccountTier.PREMIUM_PLUS => 6,
@@ -48,14 +48,14 @@ namespace Coflnet.Sky.Commands.Shared
                     {
                         try
                         {
-                            var flip = await LowPriced.Reader.ReadAsync(stoppingToken).ConfigureAwait(false);
+                            var flip = await LowPriced.Reader.ReadAsync(stoppingToken);
                             if (LowPriced.Reader.Count > 90)
                             {
                                 Connection.Log("amany flips waiting " + LowPriced.Reader.Count, Microsoft.Extensions.Logging.LogLevel.Error);
                                 flip.AdditionalProps?.TryAdd("long wait", LowPriced.Reader.Count.ToString());
                             }
                             //await limiter.WaitAsync();
-                            await Connection.SendFlip(flip).ConfigureAwait(false);
+                            await Connection.SendFlip(flip);
                         }
                         catch (OperationCanceledException)
                         {
