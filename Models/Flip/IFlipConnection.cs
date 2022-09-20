@@ -3,6 +3,7 @@ using Coflnet.Sky.Commands.Shared;
 using Coflnet.Sky.Filter;
 using Coflnet.Sky.Core;
 using Microsoft.Extensions.Logging;
+using System.Collections.Generic;
 
 namespace Coflnet.Sky.Commands
 {
@@ -14,6 +15,7 @@ namespace Coflnet.Sky.Commands
         /// <param name="flip"></param>
         /// <returns></returns>
         Task<bool> SendFlip(FlipInstance flip);
+        Task SendBatch(IEnumerable<LowPricedAuction> flips);
         Task<bool> SendFlip(LowPricedAuction flip);
         Task<bool> SendSold(string uuid);
         FlipSettings Settings { get; }

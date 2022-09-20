@@ -6,6 +6,7 @@ using Coflnet.Sky.Filter;
 using Coflnet.Sky.Core;
 using Microsoft.Extensions.Logging;
 using NUnit.Framework;
+using System.Collections.Generic;
 
 namespace Coflnet.Sky.Commands.Tests
 {
@@ -82,6 +83,16 @@ namespace Coflnet.Sky.Commands.Tests
             }
 
             public void Log(string message, LogLevel level = LogLevel.Information)
+            {
+                throw new NotImplementedException();
+            }
+
+            public Task<bool> SendBatch(IEnumerable<LowPricedAuction> flips)
+            {
+                throw new NotImplementedException();
+            }
+
+            Task IFlipConnection.SendBatch(IEnumerable<LowPricedAuction> flips)
             {
                 throw new NotImplementedException();
             }

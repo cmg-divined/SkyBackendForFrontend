@@ -521,7 +521,7 @@ namespace Coflnet.Sky.Commands.Shared
             OnSettingsChange?.Invoke(settings);
         }
 
-        private async Task ConsumeBatch<T>(string[] topics, Action<T> work, int batchSize = 10)
+        private async Task ConsumeBatch<T>(string[] topics, Action<T> work, int batchSize = 20)
         {
             using (var c = new ConsumerBuilder<Ignore, T>(consumerConf).SetValueDeserializer(SerializerFactory.GetDeserializer<T>()).Build())
             {

@@ -54,9 +54,15 @@ namespace Coflnet.Sky.Commands.Shared
                                 Connection.Log("amany flips waiting " + LowPriced.Reader.Count, Microsoft.Extensions.Logging.LogLevel.Error);
                                 flip.AdditionalProps?.TryAdd("long wait", LowPriced.Reader.Count.ToString());
                             }
-                            flip.AdditionalProps.TryAdd("da", (DateTime.Now - flip.Auction.FindTime).ToString());
+                            var batch = new List<LowPricedAuction>();
+                            batch.Add(flip);
+                            while (batch.Count < 20 && LowPriced.Reader.TryRead(out flip))
+                            {
+                                batch.Add(flip);
+                                flip.AdditionalProps.TryAdd("da", (DateTime.Now - flip.Auction.FindTime).ToString());
+                            }
                             //await limiter.WaitAsync();
-                            await Connection.SendFlip(flip);
+                            await Connection.SendBatch(batch);
                         }
                         catch (OperationCanceledException)
                         {
@@ -76,7 +82,7 @@ namespace Coflnet.Sky.Commands.Shared
 
         public bool AddLowPriced(LowPricedAuction lp)
         {
-            if(stopWrites)
+            if (stopWrites)
                 return false;
             var copy = new LowPricedAuction()
             {
@@ -85,7 +91,7 @@ namespace Coflnet.Sky.Commands.Shared
                 DailyVolume = lp.DailyVolume,
                 Finder = lp.Finder,
                 TargetPrice = lp.TargetPrice
-            };            
+            };
             return LowPriced.Writer.TryWrite(copy);
         }
 
