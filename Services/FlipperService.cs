@@ -227,7 +227,7 @@ namespace Coflnet.Sky.Commands.Shared
                 var lowestBin = await GetLowestBin(flip.Auction).ConfigureAwait(false);
                 flip.LowestBin = lowestBin?.FirstOrDefault()?.Price;
                 flip.SecondLowestBin = lowestBin?.Count >= 2 ? lowestBin[1].Price : 0L;
-                if(settings.BasedOnLBin)
+                if (settings.BasedOnLBin)
                     flip.MedianPrice = flip.LowestBin ?? flip.MedianPrice;
             }
         }
@@ -263,7 +263,7 @@ namespace Coflnet.Sky.Commands.Shared
         {
             await NotifySubsInactiveAuction(uuid);
             var uid = AuctionService.Instance.GetId(uuid);
-            SoldAuctions[uid] = DateTime.Now;
+            SoldAuctions[uid] = DateTime.UtcNow;
         }
 
 
@@ -275,9 +275,9 @@ namespace Coflnet.Sky.Commands.Shared
         /// <param name="flip"></param>
         private async Task DeliverFlip(FlipInstance flip)
         {
-            if (flip.Auction?.Start < DateTime.Now - TimeSpan.FromMinutes(3) && flip.Auction?.Start != default)
+            if (flip.Auction?.Start < DateTime.UtcNow - TimeSpan.FromMinutes(3) && flip.Auction?.Start != default)
                 return; // skip old flips
-            runtroughTime.Observe((DateTime.Now - flip.Auction.FindTime).TotalSeconds);
+            runtroughTime.Observe((DateTime.UtcNow - flip.Auction.FindTime).TotalSeconds);
             var tracer = OpenTracing.Util.GlobalTracer.Instance;
             var span = OpenTracing.Util.GlobalTracer.Instance.BuildSpan("SendFlip");
             if (flip.Auction.TraceContext != null)
@@ -305,16 +305,25 @@ namespace Coflnet.Sky.Commands.Shared
             }
         }
 
+        public async Task DeliverLowPricedAuctions(IEnumerable<LowPricedAuction> flips)
+        {
+            foreach (var item in flips)
+            {
+                await DeliverLowPricedAuction(item);
+            }
+        }
+
+
         public async Task DeliverLowPricedAuction(LowPricedAuction flip, AccountTier minAccountTier = AccountTier.PREMIUM)
         {
             if (flip.Auction.Context != null)
-                flip.Auction.Context["crec"] = (DateTime.Now - flip.Auction.FindTime).ToString();
+                flip.Auction.Context["crec"] = (DateTime.UtcNow - flip.Auction.FindTime).ToString();
             var tracer = OpenTracing.Util.GlobalTracer.Instance;
             var span = OpenTracing.Util.GlobalTracer.Instance.BuildSpan("DeliverFlip");
             //if (flip.Auction.TraceContext != null)
             //    span = span.AsChildOf(tracer.Extract(BuiltinFormats.TextMap, flip.Auction.TraceContext));
             using var scope = span.StartActive();
-            var time = (DateTime.Now - flip.Auction.FindTime).TotalSeconds;
+            var time = (DateTime.UtcNow - flip.Auction.FindTime).TotalSeconds;
             if (time > 3)
                 scope.Span.SetTag("slow", true).SetTag("uuid", flip.Auction.Uuid);
 
@@ -455,49 +464,45 @@ namespace Coflnet.Sky.Commands.Shared
         {
             string[] topics = new string[] { LowPriceConsumeTopic };
 
-            await ConsumeBatch(topics, (Action<LowPricedAuction>)(flip =>
+            await Kafka.KafkaConsumer.ConsumeBatch<LowPricedAuction>(this.consumerConf.BootstrapServers, topics, flips =>
             {
-                if (flip.Auction.Start.ToUniversalTime() < DateTime.Now.ToUniversalTime() - TimeSpan.FromMinutes(4)
-                    && flip.Auction.Bin || flip.Auction.End < DateTime.UtcNow)
-                    return;
-
-                var time = (DateTime.Now - flip.Auction.FindTime).TotalSeconds;
+                var time = (DateTime.UtcNow - flips.First().Auction.FindTime).TotalSeconds;
                 runtroughTime.Observe(time);
-                QueueLowPriced(flip);
-            }), 50).ConfigureAwait(false);
+                QueueLowPriced(flips.Where(flip => !(flip.Auction.Start.ToUniversalTime() < DateTime.UtcNow.ToUniversalTime() - TimeSpan.FromMinutes(4)
+                    && flip.Auction.Bin || flip.Auction.End < DateTime.UtcNow)));
+
+                return Task.CompletedTask;
+            }, CancellationToken.None, consumerConf.GroupId, 50, AutoOffsetReset.Latest).ConfigureAwait(false);
         }
 
         public async Task ConsumeNewAuctions()
         {
             string[] topics = new string[] { AuctionConsumeTopic };
 
-            await ConsumeBatch(topics, (Action<SaveAuction>)(auction =>
+            await Kafka.KafkaConsumer.ConsumeBatch<SaveAuction>(this.consumerConf.BootstrapServers, topics, auctions =>
             {
-                if (auction.Start.ToUniversalTime() < DateTime.Now.ToUniversalTime() - TimeSpan.FromMinutes(4)
-                    && auction.Bin || auction.End < DateTime.UtcNow)
-                    return;
-                if(FilterSumary.UserFinderEnabledCount == 0)
-                    return;
+                if (FilterSumary.UserFinderEnabledCount == 0)
+                    return Task.CompletedTask;
 
-                QueueLowPriced(new LowPricedAuction(){
-                    Auction = auction,
-                    DailyVolume = 0,
-                    Finder = LowPricedAuction.FinderType.USER,
-                    TargetPrice = auction.StartingBid
-                });
-            }), 50).ConfigureAwait(false);
+                QueueLowPriced(auctions.Where(flip => !(flip.Start.ToUniversalTime() < DateTime.UtcNow.ToUniversalTime() - TimeSpan.FromMinutes(4)
+                    && flip.Bin || flip.End < DateTime.UtcNow)).Select(auction => new LowPricedAuction()
+                    {
+                        Auction = auction,
+                        DailyVolume = 0,
+                        Finder = LowPricedAuction.FinderType.USER,
+                        TargetPrice = auction.StartingBid
+                    }));
+                return Task.CompletedTask;
+            }, CancellationToken.None, consumerConf.GroupId, 50, AutoOffsetReset.Latest).ConfigureAwait(false);
         }
 
-        private void QueueLowPriced(LowPricedAuction flip)
+        private void QueueLowPriced(IEnumerable<LowPricedAuction> flips)
         {
-            var profit = flip.TargetPrice - flip.Auction.StartingBid;
-            if(flip.Finder != LowPricedAuction.FinderType.USER && profit < FilterSumary.LowestMinProfit && profit < 2_000_000)
-                return; // don't queue there is noone interested 
             Task.Run(async () =>
             {
                 try
                 {
-                    await DeliverLowPricedAuction(flip).ConfigureAwait(false);
+                    await DeliverLowPricedAuctions(flips.ToList()).ConfigureAwait(false);
                 }
                 catch (Exception e)
                 {
@@ -506,7 +511,7 @@ namespace Coflnet.Sky.Commands.Shared
             }).ConfigureAwait(false);
         }
 
-        
+
         protected virtual void UpdateSettingsInternal(SettingsChange settings)
         {
             foreach (var item in settings.LongConIds)
@@ -586,7 +591,7 @@ namespace Coflnet.Sky.Commands.Shared
         private void ClearSoldBuffer()
         {
             var toRemove = new List<long>();
-            var oldestTime = DateTime.Now - TimeSpan.FromMinutes(10);
+            var oldestTime = DateTime.UtcNow - TimeSpan.FromMinutes(10);
             foreach (var item in SoldAuctions)
             {
                 if (item.Value < oldestTime)
@@ -612,11 +617,11 @@ namespace Coflnet.Sky.Commands.Shared
             foreach (var item in Connections)
             {
                 var settings = item.Connection.Settings;
-                if(settings == null)
+                if (settings == null)
                     continue;
-                if(settings.AllowedFinders.HasFlag(LowPricedAuction.FinderType.USER))
+                if (settings.AllowedFinders.HasFlag(LowPricedAuction.FinderType.USER))
                     sumary.UserFinderEnabledCount++;
-                 minProfit = Math.Min(minProfit, settings.MinProfit);
+                minProfit = Math.Min(minProfit, settings.MinProfit);
             }
             sumary.LowestMinProfit = minProfit;
 

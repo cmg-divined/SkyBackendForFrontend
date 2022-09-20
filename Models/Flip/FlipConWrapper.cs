@@ -55,10 +55,10 @@ namespace Coflnet.Sky.Commands.Shared
                                 flip.AdditionalProps?.TryAdd("long wait", LowPriced.Reader.Count.ToString());
                             }
                             var batch = new List<LowPricedAuction>();
-                            batch.Add(flip);
+                            batch.Add(Copy(flip));
                             while (batch.Count < 20 && LowPriced.Reader.TryRead(out flip))
                             {
-                                batch.Add(flip);
+                                batch.Add(Copy(flip));
                                 flip.AdditionalProps.TryAdd("da", (DateTime.Now - flip.Auction.FindTime).ToString());
                             }
                             //await limiter.WaitAsync();
@@ -84,7 +84,12 @@ namespace Coflnet.Sky.Commands.Shared
         {
             if (stopWrites)
                 return false;
-            var copy = new LowPricedAuction()
+            return LowPriced.Writer.TryWrite(lp);
+        }
+
+        private static LowPricedAuction Copy(LowPricedAuction lp)
+        {
+            return new LowPricedAuction()
             {
                 AdditionalProps = lp.AdditionalProps == null ? new Dictionary<string, string>() : new Dictionary<string, string>(lp.AdditionalProps),
                 Auction = lp.Auction,
@@ -92,7 +97,6 @@ namespace Coflnet.Sky.Commands.Shared
                 Finder = lp.Finder,
                 TargetPrice = lp.TargetPrice
             };
-            return LowPriced.Writer.TryWrite(copy);
         }
 
         public Task<bool> SendFlip(FlipInstance flip)
