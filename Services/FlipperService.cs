@@ -307,10 +307,10 @@ namespace Coflnet.Sky.Commands.Shared
 
         public async Task DeliverLowPricedAuctions(IEnumerable<LowPricedAuction> flips)
         {
-            foreach (var item in flips)
+            await Parallel.ForEachAsync(flips, async (item, s) =>
             {
                 await DeliverLowPricedAuction(item);
-            }
+            });
         }
 
 
