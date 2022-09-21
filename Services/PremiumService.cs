@@ -62,7 +62,7 @@ namespace Coflnet.Sky.Commands.Shared
             try
             {
                 if (GoogleUser.EveryoneIsPremium)
-                    return (AccountTier.PREMIUM, DateTime.Now + TimeSpan.FromDays(30));
+                    return (AccountTier.PREMIUM_PLUS, DateTime.Now + TimeSpan.FromDays(30));
                 var owns = await userApi.UserUserIdOwnsUntilPostAsync(userId.ToString(), new() { premiumPlanName, premiumPlusSlug, starterPremiumSlug });
                 if (owns.TryGetValue(premiumPlusSlug, out DateTime end) && end > DateTime.UtcNow)
                     return (AccountTier.PREMIUM_PLUS, end);

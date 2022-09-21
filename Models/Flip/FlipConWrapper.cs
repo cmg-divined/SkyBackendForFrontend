@@ -55,11 +55,12 @@ namespace Coflnet.Sky.Commands.Shared
                                 flip.AdditionalProps?.TryAdd("long wait", LowPriced.Reader.Count.ToString());
                             }
                             var batch = new List<LowPricedAuction>();
+                            flip.AdditionalProps.TryAdd("da", (DateTime.UtcNow - flip.Auction.FindTime).ToString());
                             batch.Add(Copy(flip));
                             while (batch.Count < 20 && LowPriced.Reader.TryRead(out flip))
                             {
+                                flip.AdditionalProps.TryAdd("da", (DateTime.UtcNow - flip.Auction.FindTime).ToString());
                                 batch.Add(Copy(flip));
-                                flip.AdditionalProps.TryAdd("da", (DateTime.Now - flip.Auction.FindTime).ToString());
                             }
                             //await limiter.WaitAsync();
                             await Connection.SendBatch(batch);

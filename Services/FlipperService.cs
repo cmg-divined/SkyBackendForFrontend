@@ -307,6 +307,7 @@ namespace Coflnet.Sky.Commands.Shared
 
         public async Task DeliverLowPricedAuctions(IEnumerable<LowPricedAuction> flips)
         {
+            Console.WriteLine("queuing batch of " + flips.Count());
             await Parallel.ForEachAsync(flips, async (item, s) =>
             {
                 await DeliverLowPricedAuction(item);
@@ -329,6 +330,9 @@ namespace Coflnet.Sky.Commands.Shared
 
             if (flip.Auction != null && flip.Auction.NBTLookup == null)
                 flip.Auction.NBTLookup = NBT.CreateLookup(flip.Auction);
+            
+             if (flip.Auction.Context != null)
+                flip.Auction.Context["csh"] = (DateTime.UtcNow - flip.Auction.FindTime).ToString();
             foreach (var item in SuperSubs)
             {
                 item.Value.AddLowPriced(flip);
@@ -472,7 +476,7 @@ namespace Coflnet.Sky.Commands.Shared
                     && flip.Auction.Bin || flip.Auction.End < DateTime.UtcNow)));
 
                 return Task.CompletedTask;
-            }, CancellationToken.None, consumerConf.GroupId, 50, AutoOffsetReset.Latest).ConfigureAwait(false);
+            }, CancellationToken.None, consumerConf.GroupId + Random.Shared.Next(), 50, AutoOffsetReset.Latest).ConfigureAwait(false);
         }
 
         public async Task ConsumeNewAuctions()
