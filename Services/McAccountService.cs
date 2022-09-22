@@ -32,7 +32,7 @@ namespace Coflnet.Sky.Commands
             return mcAccounts?.Accounts?.Where(a => a.Verified && a.LastRequestedAt > oldest).Select(a => a.AccountUuid);
         }
 
-        private async Task<McConnect.Models.User> ExecuteUserRequest(IRestRequest mcRequest)
+        private async Task<McConnect.Models.User> ExecuteUserRequest(RestRequest mcRequest)
         {
             var mcResponse = await mcAccountClient.ExecuteAsync(mcRequest);
             var mcAccounts = JsonConvert.DeserializeObject<Coflnet.Sky.McConnect.Models.User>(mcResponse.Content);
@@ -41,7 +41,7 @@ namespace Coflnet.Sky.Commands
 
         public async Task<ConnectionRequest> ConnectAccount(string userId, string uuid)
         {
-            var response = (await mcAccountClient.ExecuteAsync(new RestRequest("connect/user/{userId}", Method.POST)
+            var response = (await mcAccountClient.ExecuteAsync(new RestRequest("connect/user/{userId}", Method.Post)
                                 .AddUrlSegment("userId", userId).AddQueryParameter("mcUuid", uuid))).Content;
             try
             {
@@ -55,7 +55,7 @@ namespace Coflnet.Sky.Commands
         }
         public async Task<Coflnet.Sky.McConnect.Models.User> GetUserId(string mcId)
         {
-            return await ExecuteUserRequest(new RestRequest("connect/minecraft/{mcId}", Method.GET)
+            return await ExecuteUserRequest(new RestRequest("connect/minecraft/{mcId}", Method.Get)
                                 .AddUrlSegment("mcId", mcId));
         }
 

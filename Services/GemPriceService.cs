@@ -11,6 +11,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
+using RestSharp;
 
 namespace Coflnet.Sky.Commands.Shared
 {
@@ -52,7 +53,7 @@ namespace Coflnet.Sky.Commands.Shared
                         var route = $"/api/item/price/{itemId}/current";
                         try
                         {
-                            var result = await commandsClient.ExecuteGetAsync(new RestSharp.RestRequest(route));
+                            var result = await commandsClient.ExecuteGetAsync(new RestRequest(route));
                             if (result.StatusCode != System.Net.HttpStatusCode.OK)
                                 throw new Exception("Response has the status " + result.StatusCode);
                             var profit = JsonConvert.DeserializeObject<CurrentPrice>(result.Content).Sell;
