@@ -23,8 +23,8 @@
 
 
   <ItemGroup>
-    <PackageReference Include="Coflnet.Payments.Client" Version="0.8.0" />
-    <PackageReference Include="Coflnet.Sky.PlayerName.Client" Version="0.1.0" />
+    <PackageReference Include="Coflnet.Payments.Client" Version="0.9.0" />
+    <PackageReference Include="Coflnet.Sky.PlayerName.Client" Version="0.2.0" />
     <PackageReference Include="Microsoft.Extensions.Configuration" Version="6.0.0" />
     <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="6.0.0" />
     <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="6.0.0" />
@@ -41,16 +41,15 @@
     <PackageReference Include="Pomelo.EntityFrameworkCore.MySql" Version="6.0.0" />
     <PackageReference Include="prometheus-net.AspNetCore" Version="5.0.2" />
     <PackageReference Include="Swashbuckle.AspNetCore" Version="6.1.5" />
-    <PackageReference Include="Coflnet.Sky.FlipTracker.Client" Version="0.3.2" />
+    <PackageReference Include="Coflnet.Sky.FlipTracker.Client" Version="0.4.0" />
     <PackageReference Include="Fastenshtein" Version="1.0.0.7" />
-    <PackageReference Include="Coflnet.Sky.Settings.Client" Version="0.1.0" />
-    <PackageReference Include="Coflnet.Sky.Crafts.Client" Version="0.1.0" />
-    <PackageReference Include="Coflnet.Sky.Bazaar.Client" Version="0.2.0" />
-    <PackageReference Include="Coflnet.Sky.Referral.Client" Version="0.0.1" />
-    <PackageReference Include="Coflnet.Sky.Sniper.Client" Version="0.3.0" />
+    <PackageReference Include="Coflnet.Sky.Settings.Client" Version="0.2.0" />
+    <PackageReference Include="Coflnet.Sky.Crafts.Client" Version="0.2.0" />
+    <PackageReference Include="Coflnet.Sky.Bazaar.Client" Version="0.3.0" />
+    <PackageReference Include="Coflnet.Sky.Referral.Client" Version="0.1.0" />
+    <PackageReference Include="Coflnet.Sky.Sniper.Client" Version="0.4.0" />
     <PackageReference Include="Google.Apis.Auth" Version="1.50.0" />
-    <PackageReference Include="Coflnet.Sky.EventBroker.Client" Version="0.0.1" />
-    <PackageReference Include="RestSharp" Version="108.0.2" />
+    <PackageReference Include="Coflnet.Sky.EventBroker.Client" Version="0.1.0" />
 
   </ItemGroup>
 
