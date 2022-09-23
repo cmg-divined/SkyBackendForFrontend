@@ -74,12 +74,13 @@ namespace Coflnet.Sky.Commands.Shared
             {
                 try
                 {
-                    await api.SettingsUserIdSettingKeyPostAsync(userId, key, JsonConvert.SerializeObject(data));
+                    await api.SettingsUserIdSettingKeyPostAsync(userId, key, JsonConvert.SerializeObject(JsonConvert.SerializeObject(data)));
                     return;
                 }
-                catch (System.Exception)
+                catch (System.Exception e)
                 {
                     await Task.Delay(20 * i);
+                    Console.WriteLine($"failed to update settings {e.Message} \n" + JsonConvert.SerializeObject(data));
                     if(i == 2)
                         throw;
                 }
