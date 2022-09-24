@@ -27,6 +27,7 @@ namespace Coflnet.Sky.Commands.Shared
             AdditionalFilters.Add<ProfitPercentageDetailedFlipFilter>();
             AdditionalFilters.Add<FlipFinderDetailedFlipFilter>();
             AdditionalFilters.Add<BedFlipDetailedFlipFilter>();
+            AdditionalFilters.Add<DoNotOpenDetailedFlipFilter>();
             AdditionalFilters.Add<MinProfitPercentageDetailedFlipFilter>();
             AdditionalFilters.Add<ItemCategoryDetailedFlipFilter>();
             AdditionalFilters.Add<MinProfitDetailedFlipFilter>();
