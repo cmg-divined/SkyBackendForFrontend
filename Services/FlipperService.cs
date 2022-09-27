@@ -99,6 +99,7 @@ namespace Coflnet.Sky.Commands.Shared
             if (sendHistory)
                 SendFlipHistory(connection, LoadBurst, 0);
             RemoveNonConnection(con.Connection);
+            Task.Run(con.Work);
         }
 
         public void AddNonConnection(IFlipConnection connection, bool sendHistory = true)
