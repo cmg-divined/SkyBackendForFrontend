@@ -98,6 +98,7 @@ namespace Coflnet.Sky.Commands.Shared
             StarterSubs.AddOrUpdate(connection.Id, cid => con, (cid, oldMId) => con);
             if (sendHistory)
                 SendFlipHistory(connection, LoadBurst, 0);
+            RemoveNonConnection(con.Connection);
         }
 
         public void AddNonConnection(IFlipConnection connection, bool sendHistory = true)
@@ -650,6 +651,7 @@ namespace Coflnet.Sky.Commands.Shared
                         if (!StarterSubs.TryGetValue(item, out FlipConWrapper con) || !con.AddLowPriced(flip))
                             StarterSubs.TryRemove(item, out _);
                     }
+                    Console.Write("sending starter flip ");
                     await Task.Delay(DelayTimeFor(StarterFlips.Count, 0.2, 2000)).ConfigureAwait(false);
                 }
             }, "starter premium flips", stoppingToken);
