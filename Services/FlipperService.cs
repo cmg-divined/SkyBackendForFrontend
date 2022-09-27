@@ -331,8 +331,8 @@ namespace Coflnet.Sky.Commands.Shared
 
             if (flip.Auction != null && flip.Auction.NBTLookup == null)
                 flip.Auction.NBTLookup = NBT.CreateLookup(flip.Auction);
-            
-             if (flip.Auction.Context != null)
+
+            if (flip.Auction.Context != null)
                 flip.Auction.Context["csh"] = (DateTime.UtcNow - flip.Auction.FindTime).ToString();
             foreach (var item in SuperSubs)
             {
@@ -648,8 +648,11 @@ namespace Coflnet.Sky.Commands.Shared
                     }
                     foreach (var item in StarterSubs.Keys)
                     {
-                        if (!StarterSubs.TryGetValue(item, out FlipConWrapper con) || !con.AddLowPriced(flip))
+                        if (!StarterSubs.TryGetValue(item, out FlipConWrapper con) || !con.AddLowPriced(flip) && con.Closed)
+                        {
+                            Console.WriteLine("removing starter premium user");
                             StarterSubs.TryRemove(item, out _);
+                        }
                     }
                     Console.Write("sending starter flip ");
                     await Task.Delay(DelayTimeFor(StarterFlips.Count, 0.2, 2000)).ConfigureAwait(false);

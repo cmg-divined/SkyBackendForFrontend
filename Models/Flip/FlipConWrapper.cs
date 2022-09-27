@@ -19,6 +19,8 @@ namespace Coflnet.Sky.Commands.Shared
         private CancellationTokenSource cancellationTokenSource = null;
         private bool stopWrites;
 
+        public bool Closed => stopWrites;
+
         public int ChannelCount => LowPriced.Reader.Count;
 
         public FlipConWrapper(IFlipConnection connection)
