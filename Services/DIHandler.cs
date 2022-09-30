@@ -44,6 +44,8 @@ namespace Coflnet.Sky.Commands.Shared
             services.AddSingleton<SettingsService>();
             services.AddSingleton<GemPriceService>();
             services.AddHostedService<GemPriceService>(di => di.GetRequiredService<GemPriceService>());
+            services.AddSingleton<UpgradePriceService>();
+            services.AddHostedService<UpgradePriceService>(di => di.GetRequiredService<UpgradePriceService>());
             services.AddSingleton<FlipTrackingService>();
             services.AddPaymentSingleton<ProductsApi>(url => new ProductsApi(url));
             services.AddPaymentSingleton<UserApi>(url => new UserApi(url));
@@ -73,6 +75,12 @@ namespace Coflnet.Sky.Commands.Shared
                 var config = context.GetRequiredService<IConfiguration>();
                 return new KatApi("http://" + config["CRAFTS_HOST"]);
             });
+            services.AddSingleton<Api.Client.Api.IPricesApi>(context =>
+            {
+                var config = context.GetRequiredService<IConfiguration>();
+                return new Api.Client.Api.PricesApi(config["API_BASE_URL"]);
+            });
+
             services.AddSingleton<PremiumService>();
             services.AddSingleton<EventBrokerClient>();
             services.AddSingleton<PlayerName.PlayerNameService>();

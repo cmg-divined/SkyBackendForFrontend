@@ -20,6 +20,4 @@ namespace Coflnet.Sky.Commands.Shared
         {
         }
     }
-
-
 }

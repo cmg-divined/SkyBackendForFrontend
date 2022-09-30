@@ -34,5 +34,17 @@ namespace Coflnet.Sky.Commands.Shared
     {
         public string Description;
         public long Effect;
+
+        public PropertyChange()
+        {
+        }
+
+        public PropertyChange(string description, long effect)
+        {
+            Description = description;
+            Effect = effect;
+        }
+
+        
     }
 }

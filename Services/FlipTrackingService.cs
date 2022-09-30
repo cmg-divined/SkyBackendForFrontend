@@ -23,6 +23,7 @@ namespace Coflnet.Sky.Commands
         private static string ProduceTopic;
         private static ProducerConfig producerConfig;
         private GemPriceService gemPriceService;
+        private UpgradePriceService priceService;
 
         IProducer<string, FlipTracker.Client.Model.FlipEvent> producer;
 
@@ -32,7 +33,7 @@ namespace Coflnet.Sky.Commands
             ProduceTopic = SimplerConfig.Config.Instance["TOPICS:FLIP_EVENT"];
         }
 
-        public FlipTrackingService(GemPriceService gemPriceService)
+        public FlipTrackingService(GemPriceService gemPriceService, UpgradePriceService priceService)
         {
             producer = new ProducerBuilder<string, FlipTracker.Client.Model.FlipEvent>(new ProducerConfig
             {
@@ -43,6 +44,7 @@ namespace Coflnet.Sky.Commands
             flipTracking = new TrackerApi("http://" + SimplerConfig.Config.Instance["FLIPTRACKER_HOST"]);
             flipAnalyse = new AnalyseApi("http://" + SimplerConfig.Config.Instance["FLIPTRACKER_HOST"]);
             this.gemPriceService = gemPriceService;
+            this.priceService = priceService;
         }
 
 
@@ -258,17 +260,16 @@ namespace Coflnet.Sky.Commands
                     Enchants = b.Auction.Enchantments,
                     Nbt = b.Auction.NBTLookup
                 }).GroupBy(b => b.Uuid)
-                .Select(bid => new
-                {
+                .Select(bid => new BidQuery(
                     bid.Key,
-                    Amount = bid.Max(b => b.Amount),
-                    HighestOwnBid = bid.Max(b => b.Amount),
-                    End = bid.Max(b => b.End),
-                    Tag = bid.First().Tag,
-                    Tier = bid.First().Tier,
-                    Nbt = bid.OrderByDescending(b => b.Amount).First().Nbt,
-                    Enchants = bid.First().Enchants
-                })
+                    bid.Max(b => b.Amount),
+                    bid.Max(b => b.Amount),
+                    bid.Max(b => b.End),
+                    bid.First().Tag,
+                    bid.First().Tier,
+                    bid.OrderByDescending(b => b.Amount).First().Nbt,
+                    bid.First().Enchants
+                ))
                 //.ThenInclude (b => b.Auction)
                 .ToListAsync().ConfigureAwait(false);
 
@@ -291,12 +292,10 @@ namespace Coflnet.Sky.Commands
                 var profit = 1L;
                 var changeSumary = new List<PropertyChange>();
                 if (b.Tag == sell.Tag
-                    && !enchantsBad
-                    && b.Tier == sell.Tier)
+                    && !enchantsBad)
                 {
                     var gemSumaryBuy = gemPriceService.LookupToGems(b.Nbt);
                     var gemSumarySell = gemPriceService.LookupToGems(sell.NBTLookup);
-                    var gemSumaryDiff = gemSumaryBuy.Sum(g => g.Effect) - gemSumarySell.Sum(g => g.Effect);
 
                     changeSumary.AddRange(gemSumaryBuy);
                     changeSumary.AddRange(gemSumarySell.Select(g => new PropertyChange()
@@ -304,6 +303,7 @@ namespace Coflnet.Sky.Commands
                         Description = $"Selling with {g.Description}",
                         Effect = -g.Effect
                     }));
+                    changeSumary.AddRange(GetChanges(b, sell));
                     var tax = sell.HighestBidAmount - sell.HighestBidAmount * 98 / 100;
                     changeSumary.Add(new PropertyChange()
                     {
@@ -311,7 +311,7 @@ namespace Coflnet.Sky.Commands
                         Effect = -tax
                     });
 
-                    profit = gemSumaryDiff
+                    profit = changeSumary.Sum(g => g.Effect)
                     + sell.HighestBidAmount - tax
                     - b.HighestOwnBid;
                 }
@@ -342,6 +342,12 @@ namespace Coflnet.Sky.Commands
                 TotalProfit = flips.Sum(r => r.Profit)
             };
 
+        }
+
+        private IEnumerable<PropertyChange> GetChanges(BidQuery b, SaveAuction sell)
+        {
+            if (b.Tier < sell.Tier)
+                yield return new PropertyChange("Recombobulator", (long)priceService.GetPrice("RECOMBOBULATOR_3000"));
         }
     }
 }
