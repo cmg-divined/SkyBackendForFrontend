@@ -16,7 +16,6 @@
     <Compile Remove="**\*.Tests.cs" />
   </ItemGroup>
   <ItemGroup Condition="'$(Configuration)' != 'Release'">
-    <PackageReference Include="Coflnet.Sky.Api.Client" Version="0.2.0" />
     <PackageReference Include="nunit" Version="3.13.2" />
     <PackageReference Include="NUnit3TestAdapter" Version="4.0.0" />
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="16.11.0" />
@@ -51,6 +50,7 @@
     <PackageReference Include="Coflnet.Sky.Sniper.Client" Version="0.4.0" />
     <PackageReference Include="Google.Apis.Auth" Version="1.50.0" />
     <PackageReference Include="Coflnet.Sky.EventBroker.Client" Version="0.1.0" />
+    <PackageReference Include="Coflnet.Sky.Api.Client" Version="0.2.0" />
 
   </ItemGroup>
 
