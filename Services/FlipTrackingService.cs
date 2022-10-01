@@ -347,7 +347,21 @@ namespace Coflnet.Sky.Commands
         private IEnumerable<PropertyChange> GetChanges(BidQuery b, SaveAuction sell)
         {
             if (b.Tier < sell.Tier)
-                yield return new PropertyChange("Recombobulator", (long)-priceService.GetPrice("RECOMBOBULATOR_3000"));
+                if (sell.Tag.StartsWith("PET_"))
+                {
+                    if (sell.FlatenedNBT.TryGetValue("pet_item", out var petItem) && petItem.Contains("TIER_BOOST"))
+                        yield return new("Tier Boost cost", priceService.GetTierBoostCost());
+                    else
+                    {
+                        var cost = priceService.GetKatPrice(sell.Tag, sell.Tier);
+                        yield return new("Kat upgrade", (long)-cost.UpgradeCost);
+                        if (cost.MaterialCost > 0)
+                            yield return new("Kat materials", (long)-cost.MaterialCost);
+                    }
+                }
+                else
+                    yield return new("Recombobulator", (long)-priceService.GetPrice("RECOMBOBULATOR_3000"));
+
         }
     }
 }
