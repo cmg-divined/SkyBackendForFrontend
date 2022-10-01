@@ -347,7 +347,7 @@ namespace Coflnet.Sky.Commands
         private IEnumerable<PropertyChange> GetChanges(BidQuery b, SaveAuction sell)
         {
             if (b.Tier < sell.Tier)
-                yield return new PropertyChange("Recombobulator", (long)priceService.GetPrice("RECOMBOBULATOR_3000"));
+                yield return new PropertyChange("Recombobulator", (long)-priceService.GetPrice("RECOMBOBULATOR_3000"));
         }
     }
 }
