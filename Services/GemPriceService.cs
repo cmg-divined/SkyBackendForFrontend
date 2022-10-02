@@ -206,7 +206,7 @@ namespace Coflnet.Sky.Commands.Shared
                             {
                                 return new PropertyChange()
                                 {
-                                    Description = $"Universal {key}",
+                                    Description = $"Universal {gemName}",
                                     Effect = value
                                 };
                             }
