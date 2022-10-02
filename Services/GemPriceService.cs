@@ -202,7 +202,7 @@ namespace Coflnet.Sky.Commands.Shared
                     foreach (var item in lookup)
                     {
                         if (mappings.TryGetValue((item.KeyId, item.Value), out var gemName))
-                            if (Prices.TryGetValue(key, out int value))
+                            if (Prices.TryGetValue(gemName, out int value))
                             {
                                 return new PropertyChange()
                                 {
