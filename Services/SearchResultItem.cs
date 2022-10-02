@@ -39,9 +39,9 @@ public class SearchResultItem
         var isPet = IsPet(item);
         if (item.Tag != null && !item.Tag.StartsWith("POTION") && !isPet && !item.Tag.StartsWith("RUNE"))
             if (item.Tag.StartsWith("ENCHANTMENT_"))
-                IconUrl = "https://sky.shiiyu.moe/item/ENCHANTED_BOOK";
+                IconUrl = "https://skycrypt.coflnet.com/item/ENCHANTED_BOOK";
             else
-                IconUrl = "https://sky.shiiyu.moe/item/" + item.Tag;
+                IconUrl = "https://skycrypt.coflnet.com/item/" + item.Tag;
         else
             this.IconUrl = item.IconUrl;
         if (isPet && !Name.Contains("Pet") && Name != null)
