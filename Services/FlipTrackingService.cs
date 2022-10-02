@@ -312,7 +312,7 @@ namespace Coflnet.Sky.Commands
                     });
 
                     profit = changeSumary.Sum(g => g.Effect)
-                    + sell.HighestBidAmount - tax
+                    + sell.HighestBidAmount
                     - b.HighestOwnBid;
                 }
 
