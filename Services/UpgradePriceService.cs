@@ -71,7 +71,9 @@ public class UpgradePriceService : BackgroundService
 
     public KatCost GetKatPrice(string petTag, Coflnet.Sky.Core.Tier targetRarity)
     {
-        var convertedRarity = Enum.Parse<Tier>(targetRarity.ToString().Replace("_",""));
+        var convertedRarity = Enum.Parse<Tier>(targetRarity.ToString().Replace("_", ""));
+        if (katPrices == null)
+            return new(-1, -1);
         return katPrices.Where(p => p.TargetRarity == convertedRarity && p.CoreData.ItemTag == petTag).Select(p => new KatCost(p.MaterialCost, p.UpgradeCost)).FirstOrDefault();
     }
 
