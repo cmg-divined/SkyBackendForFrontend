@@ -232,7 +232,7 @@ namespace Coflnet.Sky.Commands
             var startTime = DateTime.Now - timeSpan;
             var uidKey = NBT.Instance.GetKeyId("uid");
             var sellList = await context.Auctions.Where(a => playerIds.Contains(a.SellerId))
-                .Where(a => a.End > startTime && a.End < DateTime.Now && a.HighestBidAmount > 0 && a.Bin)
+                .Where(a => a.End > startTime && a.End < DateTime.Now && a.HighestBidAmount > 0)
                 .Include(a => a.NBTLookup)
                 .Include(a => a.Enchantments)
                 .AsNoTracking()
