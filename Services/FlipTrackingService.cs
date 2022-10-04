@@ -10,6 +10,7 @@ using Coflnet.Sky.Commands.Shared;
 using Coflnet.Sky.FlipTracker.Client.Model;
 using OpenTracing.Util;
 using Newtonsoft.Json;
+using OpenTracing;
 
 namespace Coflnet.Sky.Commands
 {
@@ -24,6 +25,7 @@ namespace Coflnet.Sky.Commands
         private static ProducerConfig producerConfig;
         private GemPriceService gemPriceService;
         private UpgradePriceService priceService;
+        private ITracer tracer;
 
         IProducer<string, FlipTracker.Client.Model.FlipEvent> producer;
 
@@ -33,7 +35,7 @@ namespace Coflnet.Sky.Commands
             ProduceTopic = SimplerConfig.Config.Instance["TOPICS:FLIP_EVENT"];
         }
 
-        public FlipTrackingService(GemPriceService gemPriceService, UpgradePriceService priceService)
+        public FlipTrackingService(GemPriceService gemPriceService, UpgradePriceService priceService, ITracer tracer)
         {
             producer = new ProducerBuilder<string, FlipTracker.Client.Model.FlipEvent>(new ProducerConfig
             {
@@ -45,6 +47,7 @@ namespace Coflnet.Sky.Commands
             flipAnalyse = new AnalyseApi("http://" + SimplerConfig.Config.Instance["FLIPTRACKER_HOST"]);
             this.gemPriceService = gemPriceService;
             this.priceService = priceService;
+            this.tracer = tracer;
         }
 
 
@@ -278,62 +281,9 @@ namespace Coflnet.Sky.Commands
                     ?.ToDictionary(t => t.Key, v => v.AsEnumerable());
             var flips = playerBids.Where(a => SalesUidLookup.Contains(a.Nbt.Where(b => b.KeyId == uidKey).FirstOrDefault().Value)).Select(b =>
             {
-                FlipTracker.Client.Model.Flip first = flipStats?.GetValueOrDefault(AuctionService.Instance.GetId(b.Key))?.OrderBy(b => b.Timestamp).FirstOrDefault();
-                var uId = b.Nbt.Where(b => b.KeyId == uidKey).FirstOrDefault().Value;
-                var sell = sells.Where(s => s.Key == uId)?
-                        .FirstOrDefault()
-                        ?.OrderByDescending(b => b.End)
-                        .FirstOrDefault();
-                var soldFor = sell
-                        ?.HighestBidAmount;
 
-                var enchantsBad = b.Tag == "ENCHANTED_BOOK" && (b.Enchants.Count == 1 && sell.Enchantments.Count != 1 || b.Enchants.First().Level != sell.Enchantments.First().Level)
-                                    && (sell.HighestBidAmount - b.HighestOwnBid) > 1_000_000;
-                var profit = 1L;
-                var changeSumary = new List<PropertyChange>();
-                if (b.Tag == sell.Tag
-                    && !enchantsBad)
-                {
-                    var gemSumaryBuy = gemPriceService.LookupToGems(b.Nbt);
-                    var gemSumarySell = gemPriceService.LookupToGems(sell.NBTLookup);
+                return ToFlipDetails(b, uidKey, sells, flipStats);
 
-                    changeSumary.AddRange(gemSumaryBuy);
-                    changeSumary.AddRange(gemSumarySell.Select(g => new PropertyChange()
-                    {
-                        Description = $"Selling with {g.Description}",
-                        Effect = -g.Effect
-                    }));
-                    changeSumary.AddRange(GetChanges(b, sell));
-                    var tax = sell.HighestBidAmount - sell.HighestBidAmount * 98 / 100;
-                    changeSumary.Add(new PropertyChange()
-                    {
-                        Description = $"2% AH tax for sell",
-                        Effect = -tax
-                    });
-
-                    profit = changeSumary.Sum(g => g.Effect)
-                    + sell.HighestBidAmount
-                    - b.HighestOwnBid;
-                }
-
-
-                return new FlipDetails()
-                {
-                    Finder = (first == null ? LowPricedAuction.FinderType.UNKOWN : Enum.Parse<LowPricedAuction.FinderType>(
-                        first.FinderType.ToString().Replace("SNIPERMEDIAN", "SNIPER_MEDIAN"), true)),
-                    OriginAuction = b.Key,
-                    ItemTag = sell.Tag,
-                    Tier = sell.Tier.ToString(),
-                    SoldAuction = sell?.Uuid,
-                    PricePaid = b.HighestOwnBid,
-                    SoldFor = soldFor ?? 0,
-                    uId = uId,
-                    ItemName = sell?.ItemName,
-                    BuyTime = b.End,
-                    SellTime = sell.End,
-                    Profit = profit,
-                    PropertyChanges = changeSumary
-                };
             }).OrderByDescending(f => f.Profit).ToArray();
 
             return new FlipSumary()
@@ -344,8 +294,84 @@ namespace Coflnet.Sky.Commands
 
         }
 
+        private FlipDetails ToFlipDetails(BidQuery b, short uidKey, List<IGrouping<long, SaveAuction>> sells, Dictionary<long, IEnumerable<Flip>> flipStats)
+        {
+            FlipTracker.Client.Model.Flip first = flipStats?.GetValueOrDefault(AuctionService.Instance.GetId(b.Key))?.OrderBy(b => b.Timestamp).FirstOrDefault();
+            var uId = b.Nbt.Where(b => b.KeyId == uidKey).FirstOrDefault().Value;
+            var sell = sells.Where(s => s.Key == uId)?
+                    .FirstOrDefault()
+                    ?.OrderByDescending(b => b.End)
+                    .FirstOrDefault();
+            try
+            {
+                return ToFlipDetails(b, first, uId, sell);
+            }
+            catch
+            {
+                tracer.ActiveSpan.Log(JsonConvert.SerializeObject(b));
+                tracer.ActiveSpan.Log(JsonConvert.SerializeObject(sell));
+                throw;
+            }
+        }
+
+        private FlipDetails ToFlipDetails(BidQuery b, Flip first, long uId, SaveAuction sell)
+        {
+            var soldFor = sell
+                                ?.HighestBidAmount;
+
+            var enchantsBad = b.Tag == "ENCHANTED_BOOK" && (b.Enchants.Count == 1 && sell.Enchantments.Count != 1 || b.Enchants.First().Level != sell.Enchantments.First().Level)
+                                && (sell.HighestBidAmount - b.HighestOwnBid) > 1_000_000;
+            var profit = 1L;
+            var changeSumary = new List<PropertyChange>();
+            if (b.Tag == sell.Tag
+                && !enchantsBad)
+            {
+                var gemSumaryBuy = gemPriceService.LookupToGems(b.Nbt);
+                var gemSumarySell = gemPriceService.LookupToGems(sell.NBTLookup);
+
+                changeSumary.AddRange(gemSumaryBuy);
+                changeSumary.AddRange(gemSumarySell.Select(g => new PropertyChange()
+                {
+                    Description = $"Selling with {g.Description}",
+                    Effect = -g.Effect
+                }));
+                changeSumary.AddRange(GetChanges(b, sell));
+                var tax = sell.HighestBidAmount - sell.HighestBidAmount * 98 / 100;
+                changeSumary.Add(new PropertyChange()
+                {
+                    Description = $"2% AH tax for sell",
+                    Effect = -tax
+                });
+
+                profit = changeSumary.Sum(g => g.Effect)
+                + sell.HighestBidAmount
+                - b.HighestOwnBid;
+            }
+
+
+            return new FlipDetails()
+            {
+                Finder = (first == null ? LowPricedAuction.FinderType.UNKOWN : Enum.Parse<LowPricedAuction.FinderType>(
+                    first.FinderType.ToString().Replace("SNIPERMEDIAN", "SNIPER_MEDIAN"), true)),
+                OriginAuction = b.Key,
+                ItemTag = sell.Tag,
+                Tier = sell.Tier.ToString(),
+                SoldAuction = sell?.Uuid,
+                PricePaid = b.HighestOwnBid,
+                SoldFor = soldFor ?? 0,
+                uId = uId,
+                ItemName = sell?.ItemName,
+                BuyTime = b.End,
+                SellTime = sell.End,
+                Profit = profit,
+                PropertyChanges = changeSumary
+            };
+        }
+
         private IEnumerable<PropertyChange> GetChanges(BidQuery b, SaveAuction sell)
         {
+            if (b == null || sell.Tag == null)
+                yield break;
             if (b.Tier < sell.Tier)
                 if (sell.Tag.StartsWith("PET_"))
                 {
