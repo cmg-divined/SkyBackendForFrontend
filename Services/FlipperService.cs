@@ -405,7 +405,7 @@ namespace Coflnet.Sky.Commands.Shared
                     if (LoadBurst.Count > 5)
                         LoadBurst.Dequeue();
                 }
-                if(SlowFlips.Count > 600)
+                if(SlowFlips.Count > 800)
                     return; // to large queue, continue immediately
                 await Task.Delay(DelayTimeFor(SlowFlips.Count) ).ConfigureAwait(false);
             }

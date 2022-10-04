@@ -335,7 +335,14 @@ namespace Coflnet.Sky.Commands
                     Description = $"Selling with {g.Description}",
                     Effect = -g.Effect
                 }));
-                changeSumary.AddRange(GetChanges(b, sell));
+                try
+                {
+                    changeSumary.AddRange(GetChanges(b, sell));
+                } catch(Exception e)
+                {
+                    tracer.ActiveSpan.Log(e.ToString());
+                    changeSumary.Add(new("Error occured " + tracer.ActiveSpan.Context.TraceId, -1));
+                }
                 var tax = sell.HighestBidAmount - sell.HighestBidAmount * 98 / 100;
                 changeSumary.Add(new PropertyChange()
                 {
@@ -375,7 +382,7 @@ namespace Coflnet.Sky.Commands
             if (b.Tier < sell.Tier)
                 if (sell.Tag.StartsWith("PET_"))
                 {
-                    if (sell.NBTLookup.Where(l=>l.KeyId == NBT.Instance.GetKeyId("pet_item") && l.Value == ItemDetails.Instance.GetItemIdForTag("TIER_BOOST")).Any())
+                    if (sell.NBTLookup.Where(l => l.KeyId == NBT.Instance.GetKeyId("heldItem") && l.Value == ItemDetails.Instance.GetItemIdForTag("TIER_BOOST")).Any())
                         yield return new("Tier Boost cost", priceService.GetTierBoostCost());
                     else
                     {
