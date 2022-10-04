@@ -375,7 +375,7 @@ namespace Coflnet.Sky.Commands
             if (b.Tier < sell.Tier)
                 if (sell.Tag.StartsWith("PET_"))
                 {
-                    if (sell.FlatenedNBT.TryGetValue("pet_item", out var petItem) && petItem.Contains("TIER_BOOST"))
+                    if (sell.NBTLookup.Where(l=>l.KeyId == NBT.Instance.GetKeyId("pet_item") && l.Value == ItemDetails.Instance.GetItemIdForTag("TIER_BOOST")).Any())
                         yield return new("Tier Boost cost", priceService.GetTierBoostCost());
                     else
                     {
