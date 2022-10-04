@@ -180,7 +180,7 @@ namespace Coflnet.Sky.Commands.Shared
             var searchSpan = tracer.ActiveSpan;
 
             //var singlePlayer = PlayerSearch.Instance.FindDirect(search);
-            var itemTask = GetItems(ReplaceStart(search,"item"), 12);
+            var itemTask = GetItems(ReplaceStart(search, "item"), 12);
             var playersTask = PlayerSearch.Instance.Search(ReplaceStart(search, "player"), targetAmount, false);
 
             var Results = Channel.CreateBounded<SearchResultItem>(50);
@@ -201,7 +201,7 @@ namespace Coflnet.Sky.Commands.Shared
 
             searchTasks[2] = Task.Run(async () =>
             {
-                if(isSpecialSearch)
+                if (isSpecialSearch)
                     return;
                 await FindSimilarSearches(search, Results, searchWords);
             }, token).ConfigureAwait(false);
@@ -231,7 +231,7 @@ namespace Coflnet.Sky.Commands.Shared
                 Tier = (Coflnet.Sky.Core.Tier)i.Tier,
                 IconUrl = "https://sky.coflnet.com/static/icon/" + i.Tag,
                 HitCount = i.Tag == "CAKE_SOUL" ? 2 : 30 // items higher base hit count
-                
+
             }).ToList();
         }
 
@@ -274,7 +274,7 @@ namespace Coflnet.Sky.Commands.Shared
                                 .ToListAsync();
                     if (auctions.Count == 0)
                         return;
-                    foreach (var auction in auctions.GroupBy(a => a.Tag).Select(a => a.First()))
+                    foreach (var auction in auctions.OrderByDescending(a => a.End).GroupBy(a => a.Tag).Select(a => a.First()))
                     {
                         AddAuctionAsResult(Results, auction);
                     }
@@ -435,9 +435,11 @@ namespace Coflnet.Sky.Commands.Shared
                             })
                             .OrderBy(r => r.rating)
                         .ToList()
-                        .Select(r => {
+                        .Select(r =>
+                        {
                             Console.WriteLine(r.r.Name + " " + r.rating);
-                            return r.r;})
+                            return r.r;
+                        })
                         .Distinct(new SearchService.SearchResultComparer())
                         .Take(10)
                         .ToList();
