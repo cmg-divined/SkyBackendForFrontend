@@ -85,6 +85,7 @@ namespace Coflnet.Sky.Commands.Shared
             services.AddSingleton<EventBrokerClient>();
             services.AddSingleton<PlayerName.PlayerNameService>();
             services.AddSingleton<IdConverter>();
+            services.AddSingleton<IStateUpdateService, StateUpdateService>();
 
             _servics = services;
         }
