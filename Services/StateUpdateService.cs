@@ -19,6 +19,8 @@ namespace Coflnet.Sky.Commands.Shared
 
         public StateUpdateService(IConfiguration config, ILogger<StateUpdateService> logger)
         {
+            this.logger = logger;
+            this.config = config;
             var producerConfig = new ProducerConfig
             {
                 BootstrapServers = config["KAFKA_HOST"],
@@ -31,7 +33,6 @@ namespace Coflnet.Sky.Commands.Shared
                 int partition = Math.Abs((int)key[0] << 8 | key[1] ^ key[2]) % pcount;
                 return partition;
             }).Build();
-            this.logger = logger;
         }
 
         public void Produce(string playerId, UpdateMessage message)
