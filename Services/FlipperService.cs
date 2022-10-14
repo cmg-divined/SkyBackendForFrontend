@@ -44,7 +44,6 @@ namespace Coflnet.Sky.Commands.Shared
         public static readonly string ConsumeTopic = SimplerConfig.Config.Instance["TOPICS:FLIP"];
         public static readonly string LowPriceConsumeTopic = SimplerConfig.Config.Instance["TOPICS:LOW_PRICED"];
         public static readonly string AuctionConsumeTopic = SimplerConfig.Config.Instance["TOPICS:NEW_AUCTION"];
-        public static readonly string SettingsTopic = SimplerConfig.Config.Instance["TOPICS:SETTINGS_CHANGE"];
 
         private const string FoundFlippsKey = "foundFlipps";
         public int PremiumUserCount => Subs.Count() + SuperSubs.Count();
@@ -61,9 +60,6 @@ namespace Coflnet.Sky.Commands.Shared
         private Queue<FlipInstance> LoadBurst = new Queue<FlipInstance>();
         private ConcurrentDictionary<long, DateTime> SoldAuctions = new ConcurrentDictionary<long, DateTime>();
         static RestClient SkyFlipperHost = new RestClient("http://" + SimplerConfig.Config.Instance["SKYFLIPPER_HOST"]);
-
-        public event Action<SettingsChange> OnSettingsChange;
-
 
         public void AddConnectionPlus(IFlipConnection connection, bool sendHistory = true)
         {
@@ -458,13 +454,6 @@ namespace Coflnet.Sky.Commands.Shared
             Console.WriteLine("ended listening");
         }
 
-        public Task ListenForSettingsChange()
-        {
-            string[] topics = new string[] { SettingsTopic };
-
-            Console.WriteLine("starting to listen for config changes topic " + SettingsTopic);
-            return ConsumeBatch<SettingsChange>(topics, UpdateSettingsInternal);
-        }
 
 
         public async Task ListenToLowPriced()
@@ -518,20 +507,6 @@ namespace Coflnet.Sky.Commands.Shared
             }).ConfigureAwait(false);
         }
 
-
-        protected virtual void UpdateSettingsInternal(SettingsChange settings)
-        {
-            foreach (var item in settings.LongConIds)
-            {
-                if (SlowSubs.TryGetValue(item, out FlipConWrapper con)
-                    || Subs.TryGetValue(item, out con)
-                    || SuperSubs.TryGetValue(item, out con))
-                {
-                    con.Connection.UpdateSettings(settings);
-                }
-            }
-            OnSettingsChange?.Invoke(settings);
-        }
 
         private async Task ConsumeBatch<T>(string[] topics, Action<T> work, int batchSize = 20)
         {

@@ -111,7 +111,9 @@ namespace Coflnet.Sky.Commands.Shared
         {
             stopWrites = true;
             cancellationTokenSource?.Cancel();
-            LowPriced.Writer.TryComplete();
+            if (LowPriced.Writer.TryComplete())
+                while (LowPriced.Reader.Count > 0)
+                    LowPriced.Reader.TryRead(out _);
             Connection.Log("canceled by " + Environment.StackTrace);
         }
     }
