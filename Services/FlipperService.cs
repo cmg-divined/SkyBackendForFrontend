@@ -63,10 +63,8 @@ namespace Coflnet.Sky.Commands.Shared
 
         public void AddConnectionPlus(IFlipConnection connection, bool sendHistory = true)
         {
-            if (SuperSubs.ContainsKey(connection.Id))
-                return;
             var con = new FlipConWrapper(connection);
-            SuperSubs.AddOrUpdate(con.Connection.Id, cid => con, (cid, oldMId) => con);
+            SuperSubs.AddOrUpdate(con.Connection.Id, cid => con, (cid, oldMId) => { oldMId.Stop(); return con; });
             SendHistoryAndStartWorker(connection, sendHistory, con);
         }
 
@@ -401,9 +399,9 @@ namespace Coflnet.Sky.Commands.Shared
                     if (LoadBurst.Count > 5)
                         LoadBurst.Dequeue();
                 }
-                if(SlowFlips.Count > 800)
+                if (SlowFlips.Count > 800)
                     return; // to large queue, continue immediately
-                await Task.Delay(DelayTimeFor(SlowFlips.Count) ).ConfigureAwait(false);
+                await Task.Delay(DelayTimeFor(SlowFlips.Count)).ConfigureAwait(false);
             }
             catch (Exception e)
             {
