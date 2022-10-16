@@ -71,8 +71,8 @@ namespace Coflnet.Sky.Commands.Shared
             var toSendFlips = Flipps.Reverse().Take(25);
             if (sendHistory)
                 SendFlipHistory(connection, toSendFlips, 0);
-            RemoveNonConnection(con.Connection);
             Task.Run(con.Work);
+            RemoveNonConnection(con.Connection);
         }
 
         public void AddConnection(IFlipConnection connection, bool sendHistory = true)
