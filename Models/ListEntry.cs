@@ -33,5 +33,18 @@ namespace Coflnet.Sky.Commands.Shared
        //     Expression<Func<FlipInstance,bool>> normal = (flip) => (ItemTag == null || ItemTag == flip.Auction.Tag);
             return filterCache.GetExpression();
         }
+
+        public override bool Equals(object obj)
+        {
+            return obj is ListEntry entry &&
+                   ItemTag == entry.ItemTag &&
+                   DisplayName == entry.DisplayName &&
+                   EqualityComparer<Dictionary<string, string>>.Default.Equals(filter, entry.filter);
+        }
+
+        public override int GetHashCode()
+        {
+            return HashCode.Combine(ItemTag, filter);
+        }
     }
 }

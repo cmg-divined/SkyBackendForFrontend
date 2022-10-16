@@ -249,6 +249,24 @@ namespace Coflnet.Sky.Commands.Shared
             Assert.IsTrue(result);
         }
 
+        [Test]
+        public void WhitelistAfterMain()
+        {
+            var settings = new FlipSettings()
+            {
+                WhiteList = new List<ListEntry>() { new ListEntry() { filter = new Dictionary<string, string>() { { "Reforge", "Sharp" }, { "AfterMainFilter", "true" } } } },
+                MinProfit = 1000
+            };
+            sampleFlip.Auction.Reforge = ItemReferences.Reforge.Sharp;
+            sampleFlip.Auction.StartingBid = 5;
+            sampleFlip.MedianPrice = 500;
+            var matches = settings.MatchesSettings(sampleFlip);
+            Assert.IsFalse(matches.Item1, "flip shouldn't match below minprofit");
+            sampleFlip.MedianPrice = 5000;
+            matches = settings.MatchesSettings(sampleFlip);
+            Assert.IsTrue(matches.Item1, "flip should match above minprofit");
+        }
+
 
         [Test]
         public void ForceBlacklistOverwritesWhitelist()

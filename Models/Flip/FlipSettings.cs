@@ -73,6 +73,7 @@ namespace Coflnet.Sky.Commands.Shared
         private ListMatcher BlackListMatcher;
         private ListMatcher ForcedBlackListMatcher;
         private ListMatcher WhiteListMatcher;
+        private ListMatcher AfterMainWhiteListMatcher;
         private Func<FlipInstance, bool> generalFilter;
 
         [SettingsDoc("Stop receiving any flips (just use other features) also stops the timer")]
@@ -95,36 +96,24 @@ namespace Coflnet.Sky.Commands.Shared
             if (OnlyBin && !flip.Auction.Bin)
                 return (false, "not bin");
 
-            if (ForcedBlackListMatcher == null)
-                ForcedBlackListMatcher = new ListMatcher(GetForceBlacklist());
+            MakeSureMatchersAreInitialized();
+
             var forceBlacklistMatch = ForcedBlackListMatcher.IsMatch(flip);
             if (forceBlacklistMatch.Item1)
                 return (false, "forced blacklist " + forceBlacklistMatch.Item2);
 
-            if (WhiteListMatcher == null)
-                WhiteListMatcher = new ListMatcher(WhiteList);
             var match = WhiteListMatcher.IsMatch(flip);
             if (match.Item1)
                 return (true, "whitelist " + match.Item2);
 
-            if (flip.Volume < MinVolume)
-                return (false, "minVolume");
-            GetPrice(flip, out long targetPrice, out long profit);
-            if (profit < MinProfit)
-                return (false, "minProfit");
-            if (MaxCost != 0 && flip.LastKnownCost > MaxCost)
-                return (false, "maxCost");
-            if (flip.LastKnownCost > 0 && (flip.ProfitPercentage < MinProfitPercent 
-                || BasedOnLBin && (profit * 100 / flip.LastKnownCost < MinProfitPercent)))
-            {
-                return (false, "profit Percentage");
-            }
-            if (flip.Auction == null)
-                return (false, "auction not set");
+            var main = MainSettingsMatch(flip);
+            if (!main.Item1)
+                return main;
 
+            match = AfterMainWhiteListMatcher.IsMatch(flip);
+            if (match.Item1)
+                return (true, "whitelist am " + match.Item2);
 
-            if (BlackListMatcher == null)
-                BlackListMatcher = new ListMatcher(BlackList);
             match = BlackListMatcher.IsMatch(flip);
             if (match.Item1)
                 return (false, "blacklist " + match.Item2);
@@ -132,14 +121,49 @@ namespace Coflnet.Sky.Commands.Shared
             return (true, "general filter");
         }
 
+        private void MakeSureMatchersAreInitialized()
+        {
+            if (ForcedBlackListMatcher == null)
+                ForcedBlackListMatcher = new ListMatcher(GetForceBlacklist());
+            if (WhiteListMatcher == null)
+                WhiteListMatcher = new ListMatcher(WhiteList?.Except(GetAfterMainWhitelist()).ToList());
+            if(AfterMainWhiteListMatcher == null)
+                AfterMainWhiteListMatcher = new ListMatcher(GetAfterMainWhitelist());
+            if (BlackListMatcher == null)
+                BlackListMatcher = new ListMatcher(BlackList?.Except(GetForceBlacklist()).ToList());
+        }
+
+        private (bool, string) MainSettingsMatch(FlipInstance flip)
+        {
+            if (flip.Volume < MinVolume)
+                return (false, "minVolume");
+            if (MaxCost != 0 && flip.LastKnownCost > MaxCost)
+                return (false, "maxCost");
+            GetPrice(flip, out long targetPrice, out long profit);
+            if (profit < MinProfit)
+                return (false, "minProfit");
+            if (flip.LastKnownCost > 0 && (flip.ProfitPercentage < MinProfitPercent
+                || BasedOnLBin && (profit * 100 / flip.LastKnownCost < MinProfitPercent)))
+            {
+                return (false, "profit Percentage");
+            }
+            if (flip.Auction == null)
+                return (false, "auction not set");
+            return (true, null);
+        }
+
         public List<ListEntry> GetForceBlacklist()
         {
             return BlackList?.Where(b => b.filter?.Where(f => f.Key == "ForceBlacklist").Any() ?? false).ToList();
         }
+        public List<ListEntry> GetAfterMainWhitelist()
+        {
+            return WhiteList?.Where(b => b.filter?.Where(f => f.Key == "AfterMainFilter").Any() ?? false).ToList();
+        }
 
         public bool IsFinderBlocked(LowPricedAuction.FinderType finder)
         {
-            return  finder == LowPricedAuction.FinderType.UNKOWN || 
+            return finder == LowPricedAuction.FinderType.UNKOWN ||
                     AllowedFinders == LowPricedAuction.FinderType.UNKOWN && (LowPricedAuction.FinderType.FLIPPER | LowPricedAuction.FinderType.USER).HasFlag(finder)
                                                 || AllowedFinders != LowPricedAuction.FinderType.UNKOWN && !AllowedFinders.HasFlag(finder)
                                                 && (int)finder != 3;

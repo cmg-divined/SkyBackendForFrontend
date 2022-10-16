@@ -34,6 +34,7 @@ namespace Coflnet.Sky.Commands.Shared
             AdditionalFilters.Add<MaxCostDetailedFlipFilter>();
             AdditionalFilters.Add<ReferenceAgeDetailedFlipFilter>();
             AdditionalFilters.Add<ForceBlacklistDetailedFlipFilter>();
+            AdditionalFilters.Add<AfterMainFilterDetailedFlipFilter>();
             AdditionalFilters.Add<PriorityOpenDetailedFlipFilter>();
         }
 

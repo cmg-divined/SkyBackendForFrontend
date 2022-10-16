@@ -6,7 +6,7 @@ using Coflnet.Sky.Filter;
 
 namespace Coflnet.Sky.Commands.Shared
 {
-    public class ForceBlacklistDetailedFlipFilter : DetailedFlipFilter
+    public class AfterMainFilterDetailedFlipFilter : DetailedFlipFilter
     {
         public object[] Options => new object[] { "true" };
 
