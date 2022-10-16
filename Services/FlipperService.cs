@@ -281,6 +281,7 @@ namespace Coflnet.Sky.Commands.Shared
             using var scope = span.StartActive();
 
             flip.Finder = LowPricedAuction.FinderType.FLIPPER;
+            await NotifyAll(flip, SuperSubs);
             await NotifyAll(flip, Subs);
             PrepareSlow(flip);
         }
