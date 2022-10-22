@@ -17,6 +17,7 @@ using System.Threading.Channels;
 using Microsoft.Extensions.DependencyInjection;
 using System.Globalization;
 using Newtonsoft.Json;
+using Coflnet.Sky.Api.Client.Api;
 
 namespace Coflnet.Sky.Commands.Shared
 {
@@ -181,7 +182,8 @@ namespace Coflnet.Sky.Commands.Shared
 
             //var singlePlayer = PlayerSearch.Instance.FindDirect(search);
             var itemTask = GetItems(ReplaceStart(search, "item"), 12);
-            var playersTask = PlayerSearch.Instance.Search(ReplaceStart(search, "player"), targetAmount, false);
+            var playerName = ReplaceStart(search, "player").TrimStart(':').Trim();
+            var playersTask = PlayerSearch.Instance.Search(playerName, targetAmount, false);
 
             var Results = Channel.CreateBounded<SearchResultItem>(50);
             var searchTasks = new ConfiguredTaskAwaitable[4];
@@ -326,6 +328,7 @@ namespace Coflnet.Sky.Commands.Shared
             var playerList = (await playersTask);
             foreach (var item in playerList.Select(player => new SearchResultItem(player)))
                 await Results.Writer.WriteAsync(item);
+            await Results.Writer.WriteAsync(new SearchResultItem() { Type = "internal", Id = "players" });
             if (playerList.Count() == 1)
                 await IndexerClient.TriggerNameUpdate(playerList.First().UUid);
         }
@@ -335,16 +338,18 @@ namespace Coflnet.Sky.Commands.Shared
             if (search.Length <= 8 || IsHex(search))
                 return;
             await Task.Delay(20);
-            foreach (var item in await CoreServer.ExecuteCommandWithCache<string, List<SearchResultItem>>("fullSearch", search.Substring(1, search.Length - 2)))
-                await Results.Writer.WriteAsync(item);
+            var searchApi = DiHandler.ServiceProvider.GetRequiredService<ISearchApi>();
+            foreach (var item in await searchApi.ApiSearchSearchValGetAsync(search.Substring(0, search.Length - 2)))
+                await Results.Writer.WriteAsync(new(item));
             if (searchWords.Count() == 1 || String.IsNullOrWhiteSpace(searchWords.Last()))
                 return;
             if (searchWords[1].Length < 2)
                 return;
-            foreach (var item in await CoreServer.ExecuteCommandWithCache<string, List<SearchResultItem>>("fullSearch", searchWords[1]))
+            foreach (var item in await searchApi.ApiSearchSearchValGetAsync(searchWords[1]))
             {
-                item.HitCount -= 20; // no exact match
-                await Results.Writer.WriteAsync(item);
+                var resultItem = new SearchResultItem(item);
+                resultItem.HitCount -= 20; // no exact match
+                await Results.Writer.WriteAsync(resultItem);
             }
         }
 

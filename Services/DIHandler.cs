@@ -80,6 +80,11 @@ namespace Coflnet.Sky.Commands.Shared
                 var config = context.GetRequiredService<IConfiguration>();
                 return new Api.Client.Api.PricesApi(config["API_BASE_URL"]);
             });
+            services.AddSingleton<Api.Client.Api.ISearchApi>(context =>
+            {
+                var config = context.GetRequiredService<IConfiguration>();
+                return new Api.Client.Api.SearchApi(config["API_BASE_URL"]);
+            });
 
             services.AddSingleton<PremiumService>();
             services.AddSingleton<EventBrokerClient>();

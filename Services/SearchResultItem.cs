@@ -53,6 +53,16 @@ public class SearchResultItem
         this.Tier = item.Tier;
     }
 
+    public SearchResultItem(Api.Client.Model.SearchResultItem item)
+    {
+        this.Name = item.Name;
+        this.IconUrl = item.IconUrl;
+        this.Image = item.Img;
+        this.Name = item.Name;
+        Enum.TryParse<Tier>(item.Tier.ToString(),true, out this.Tier);
+        this.Type = item.Type;
+    }
+
     private static bool IsPet(ItemDetails.ItemSearchResult item)
     {
         return ((item?.Tag?.StartsWith("PET") ?? false) && !item.Tag.StartsWith("PET_SKIN"));
