@@ -61,6 +61,7 @@ public class SearchResultItem
         this.Name = item.Name;
         Enum.TryParse<Tier>(item.Tier.ToString(),true, out this.Tier);
         this.Type = item.Type;
+        this.Id = item.Id;
     }
 
     private static bool IsPet(ItemDetails.ItemSearchResult item)
