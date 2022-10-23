@@ -66,8 +66,11 @@ namespace Coflnet.Sky.Commands.Shared
         [SettingsDoc("The last changer of the settings", true)]
         public string Changer;
         [DataMember(Name = "onlyBin")]
-        [SettingsDoc("Hide all auctions")]
+        [SettingsDoc("Hide all auctions (not buy item now)")]
         public bool OnlyBin;
+        [DataMember(Name = "whitelistAftermain")]
+        [SettingsDoc("with this on whitelist won't skip the main filter anymore")]
+        public bool WhitelistAfterMain;
 
         private List<FlipFilter> blackListFilters;
         private ListMatcher BlackListMatcher;
@@ -158,7 +161,7 @@ namespace Coflnet.Sky.Commands.Shared
         }
         public List<ListEntry> GetAfterMainWhitelist()
         {
-            return WhiteList?.Where(b => b.filter?.Where(f => f.Key == "AfterMainFilter").Any() ?? false).ToList();
+            return WhiteList?.Where(b => WhitelistAfterMain || (b.filter?.Where(f => f.Key == "AfterMainFilter").Any() ?? false)).ToList();
         }
 
         public bool IsFinderBlocked(LowPricedAuction.FinderType finder)
