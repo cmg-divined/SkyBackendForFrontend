@@ -25,5 +25,9 @@ namespace Coflnet.Sky.Commands.Shared
 
         [DataMember(Name = "lastCaptchaSolve")]
         public DateTime LastCaptchaSolve { get; set; }
+        [DataMember(Name = "locale")]
+        public string Locale { get; set; }
+        [DataMember(Name = "timeZoneString")]
+        public string timeZone { get; set; }
     }
 }
