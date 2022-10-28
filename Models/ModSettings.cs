@@ -73,9 +73,6 @@ namespace Coflnet.Sky.Commands.Shared
         [DataMember(Name = "noBedDelay")]
         [SettingsDoc("Don't delay bed flips, send them imediately instead", "nbd")]
         public bool NoBedDelay;
-        [DataMember(Name = "onlyBeds")]
-        [SettingsDoc("Get only bed flips, may be helpful if you have slow internet")]
-        public bool OnlyBedFlips;
         [DataMember(Name = "streamerMode")]
         [SettingsDoc("Hide any personal data and reduce sounds")]
         public bool StreamerMode;
