@@ -46,6 +46,7 @@ namespace Coflnet.Sky.Commands.Shared
             {
                 _ = Task.Run(async () =>
                 {
+                    Console.Write("Started worker " + i);
                     while (!stoppingToken.IsCancellationRequested)
                     {
                         try
@@ -70,7 +71,7 @@ namespace Coflnet.Sky.Commands.Shared
                         catch (OperationCanceledException e)
                         {
                             Console.WriteLine("worker was canceled " + e);
-                            return;
+                            break;
                         }
                         catch (Exception e)
                         {
@@ -78,6 +79,7 @@ namespace Coflnet.Sky.Commands.Shared
                             dev.Logger.Instance.Error(e, "seding flip to " + Connection.UserId);
                         }
                     }
+                    Console.Write("Stopped worker " + i);
                 }).ConfigureAwait(false);
             }
 
@@ -88,6 +90,7 @@ namespace Coflnet.Sky.Commands.Shared
         {
             if (stopWrites)
                 return false;
+            Console.Write("qlp on con ");
             return LowPriced.Writer.TryWrite(lp);
         }
 

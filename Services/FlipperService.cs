@@ -312,7 +312,7 @@ namespace Coflnet.Sky.Commands.Shared
             await Parallel.ForEachAsync(flips, async (item, s) =>
             {
                 await DeliverLowPricedAuction(item);
-            });
+            }).ConfigureAwait(false);
         }
 
 
