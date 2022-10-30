@@ -76,12 +76,12 @@ namespace Coflnet.Sky.Commands.Shared
         {
             RemoveNonConnection(connection);
             var con = new FlipConWrapper(connection);
+            Task.Run(con.Work);
             targetType.AddOrUpdate(con.Connection.Id, cid => con, (cid, oldMId) => { oldMId.Stop(); return con; });
 
             var toSendFlips = Flipps.Reverse().Take(25);
             if (sendHistory)
                 SendFlipHistory(connection, toSendFlips, 200);
-            Task.Run(con.Work);
         }
 
         private void SendHistoryAndStartWorker(IFlipConnection connection, bool sendHistory, FlipConWrapper con)
