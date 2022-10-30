@@ -76,29 +76,12 @@ namespace Coflnet.Sky.Commands.Shared
         {
             RemoveNonConnection(connection);
             var con = new FlipConWrapper(connection);
-            Task.Run(async ()=>{
-                try
-                {
-                    await con.Work();
-                }
-                catch (System.Exception e)
-                {
-                    Console.WriteLine("when trying to sub to flips \n" + e);
-                }
-            });
             targetType.AddOrUpdate(con.Connection.Id, cid => con, (cid, oldMId) => { oldMId.Stop(); return con; });
 
             var toSendFlips = Flipps.Reverse().Take(25);
             if (sendHistory)
                 SendFlipHistory(connection, toSendFlips, 200);
-        }
-
-        private void SendHistoryAndStartWorker(IFlipConnection connection, bool sendHistory, FlipConWrapper con)
-        {
-            var toSendFlips = Flipps.Reverse().Take(25);
-            if (sendHistory)
-                SendFlipHistory(connection, toSendFlips, 200);
-            Task.Run(con.Work);
+            con.StartWorkers();
         }
 
         public void AddStarterConnection(IFlipConnection connection, bool sendHistory = true)
@@ -108,7 +91,7 @@ namespace Coflnet.Sky.Commands.Shared
             StarterSubs.AddOrUpdate(connection.Id, cid => con, (cid, oldMId) => con);
             if (sendHistory)
                 SendFlipHistory(connection, LoadBurst, 0);
-            Task.Run(con.Work);
+            con.StartWorkers();
         }
 
         public void AddNonConnection(IFlipConnection connection, bool sendHistory = true)

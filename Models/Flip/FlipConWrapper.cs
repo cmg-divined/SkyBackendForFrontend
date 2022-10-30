@@ -28,7 +28,7 @@ namespace Coflnet.Sky.Commands.Shared
             Connection = connection;
         }
 
-        public Task Work()
+        public void StartWorkers()
         {
             cancellationTokenSource?.Cancel();
             cancellationTokenSource = new CancellationTokenSource();
@@ -82,8 +82,6 @@ namespace Coflnet.Sky.Commands.Shared
                     Console.Write("Stopped worker " + i);
                 }).ConfigureAwait(false);
             }
-
-            return Task.CompletedTask;
         }
 
         public bool AddLowPriced(LowPricedAuction lp)
