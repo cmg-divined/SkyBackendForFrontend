@@ -53,6 +53,7 @@ namespace Coflnet.Sky.Commands.Shared
             {
                 Buckets = Prometheus.Histogram.LinearBuckets(start: 1, width: 2, count: 10)
             });
+        static Prometheus.Counter snipesReceived = Prometheus.Metrics.CreateCounter("sky_commands_snipes_received", "How many snipes were received");
 
         /// <summary>
         /// Special load burst queue that will send out 5 flips at load
@@ -499,6 +500,7 @@ namespace Coflnet.Sky.Commands.Shared
                 try
                 {
                     await DeliverLowPricedAuctions(flips.ToList()).ConfigureAwait(false);
+                    snipesReceived.Inc(flips.Count());
                 }
                 catch (Exception e)
                 {
