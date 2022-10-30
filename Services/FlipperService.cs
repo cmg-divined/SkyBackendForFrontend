@@ -64,20 +64,24 @@ namespace Coflnet.Sky.Commands.Shared
 
         public void AddConnectionPlus(IFlipConnection connection, bool sendHistory = true)
         {
-            RemoveNonConnection(connection);
-            var con = new FlipConWrapper(connection);
-            SuperSubs.AddOrUpdate(con.Connection.Id, cid => con, (cid, oldMId) => { oldMId.Stop(); return con; });
-            SendHistoryAndStartWorker(connection, sendHistory, con);
+            SubToTier(connection, sendHistory, SuperSubs);
         }
 
         public void AddConnection(IFlipConnection connection, bool sendHistory = true)
         {
-            if (Subs.ContainsKey(connection.Id))
-                return;
+            SubToTier(connection, sendHistory, Subs);
+        }
+
+        private void SubToTier(IFlipConnection connection, bool sendHistory, ConcurrentDictionary<long, FlipConWrapper> targetType)
+        {
             RemoveNonConnection(connection);
             var con = new FlipConWrapper(connection);
-            Subs.AddOrUpdate(con.Connection.Id, cid => con, (cid, oldMId) => con);
-            SendHistoryAndStartWorker(connection, sendHistory, con);
+            targetType.AddOrUpdate(con.Connection.Id, cid => con, (cid, oldMId) => { oldMId.Stop(); return con; });
+
+            var toSendFlips = Flipps.Reverse().Take(25);
+            if (sendHistory)
+                SendFlipHistory(connection, toSendFlips, 200);
+            Task.Run(con.Work);
         }
 
         private void SendHistoryAndStartWorker(IFlipConnection connection, bool sendHistory, FlipConWrapper con)
@@ -123,8 +127,6 @@ namespace Coflnet.Sky.Commands.Shared
             Unsubscribe(StarterSubs, con.Id);
             RemoveNonConnection(con);
         }
-
-
 
 
         private static void SendFlipHistory(IFlipConnection con, IEnumerable<FlipInstance> toSendFlips, int delay = 5000)

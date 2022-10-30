@@ -67,8 +67,9 @@ namespace Coflnet.Sky.Commands.Shared
                             //await limiter.WaitAsync();
                             await Connection.SendBatch(batch);
                         }
-                        catch (OperationCanceledException)
+                        catch (OperationCanceledException e)
                         {
+                            Console.WriteLine("worker was canceled " + e);
                             return;
                         }
                         catch (Exception e)
