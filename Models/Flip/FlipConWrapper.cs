@@ -90,7 +90,6 @@ namespace Coflnet.Sky.Commands.Shared
         {
             if (stopWrites)
                 return false;
-            Console.Write("qlp on con ");
             return LowPriced.Writer.TryWrite(lp);
         }
 

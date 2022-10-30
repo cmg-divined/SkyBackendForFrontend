@@ -76,7 +76,16 @@ namespace Coflnet.Sky.Commands.Shared
         {
             RemoveNonConnection(connection);
             var con = new FlipConWrapper(connection);
-            Task.Run(con.Work);
+            Task.Run(async ()=>{
+                try
+                {
+                    await con.Work();
+                }
+                catch (System.Exception e)
+                {
+                    Console.WriteLine("when trying to sub to flips \n" + e);
+                }
+            });
             targetType.AddOrUpdate(con.Connection.Id, cid => con, (cid, oldMId) => { oldMId.Stop(); return con; });
 
             var toSendFlips = Flipps.Reverse().Take(25);
