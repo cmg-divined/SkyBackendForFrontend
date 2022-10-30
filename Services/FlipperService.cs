@@ -466,7 +466,7 @@ namespace Coflnet.Sky.Commands.Shared
                 var time = (DateTime.UtcNow - flips.First().Auction.FindTime).TotalSeconds;
                 runtroughTime.Observe(time);
                 QueueLowPriced(flips.Where(flip => !(flip.Auction.Start.ToUniversalTime() < DateTime.UtcNow.ToUniversalTime() - TimeSpan.FromMinutes(4)
-                    && flip.Auction.Bin || flip.Auction.End < DateTime.UtcNow)));
+                    && flip.Auction.Bin || flip.Auction.End < DateTime.UtcNow)).ToList());
 
                 return Task.CompletedTask;
             }, CancellationToken.None, consumerConf.GroupId + Random.Shared.Next(), 50, AutoOffsetReset.Latest).ConfigureAwait(false);

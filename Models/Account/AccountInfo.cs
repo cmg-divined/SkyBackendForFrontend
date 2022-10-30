@@ -29,5 +29,7 @@ namespace Coflnet.Sky.Commands.Shared
         public string Locale { get; set; }
         [DataMember(Name = "timeZoneString")]
         public string timeZone { get; set; }
+        [DataMember(Name = "captchaType")]
+        public string CaptchaType { get; set; }
     }
 }
