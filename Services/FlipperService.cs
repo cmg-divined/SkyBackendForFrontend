@@ -2,12 +2,8 @@ using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
-using Coflnet.Sky;
-using Coflnet.Sky.Commands;
 using Coflnet.Sky.Commands.Helper;
-using Coflnet.Sky.Commands.Shared;
 using Confluent.Kafka;
 using OpenTracing.Propagation;
 using Microsoft.Extensions.DependencyInjection;
@@ -623,11 +619,9 @@ namespace Coflnet.Sky.Commands.Shared
                     {
                         if (!StarterSubs.TryGetValue(item, out FlipConWrapper con) || !con.AddLowPriced(flip) && con.Closed)
                         {
-                            Console.WriteLine("removing starter premium user");
                             StarterSubs.TryRemove(item, out _);
                         }
                     }
-                    Console.Write("sending starter flip ");
                     await Task.Delay(DelayTimeFor(StarterFlips.Count, 0.2, 2000)).ConfigureAwait(false);
                 }
             }, "starter premium flips", stoppingToken);
