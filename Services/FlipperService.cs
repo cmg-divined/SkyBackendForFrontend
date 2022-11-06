@@ -447,7 +447,7 @@ namespace Coflnet.Sky.Commands.Shared
 
 
 
-        public async Task ListenToLowPriced()
+        public async Task ListenToLowPriced(CancellationToken token)
         {
             string[] topics = new string[] { LowPriceConsumeTopic };
 
@@ -459,10 +459,10 @@ namespace Coflnet.Sky.Commands.Shared
                     && flip.Auction.Bin || flip.Auction.End < DateTime.UtcNow)).ToList());
 
                 return Task.CompletedTask;
-            }, CancellationToken.None, consumerConf.GroupId + Random.Shared.Next(), 50, AutoOffsetReset.Latest).ConfigureAwait(false);
+            }, token, consumerConf.GroupId + Random.Shared.Next(), 50, AutoOffsetReset.Latest).ConfigureAwait(false);
         }
 
-        public async Task ConsumeNewAuctions()
+        public async Task ConsumeNewAuctions(CancellationToken token)
         {
             string[] topics = new string[] { AuctionConsumeTopic };
 
@@ -480,7 +480,7 @@ namespace Coflnet.Sky.Commands.Shared
                         TargetPrice = auction.StartingBid
                     }));
                 return Task.CompletedTask;
-            }, CancellationToken.None, consumerConf.GroupId, 50, AutoOffsetReset.Latest).ConfigureAwait(false);
+            }, token, consumerConf.GroupId, 50, AutoOffsetReset.Latest).ConfigureAwait(false);
         }
 
         private void QueueLowPriced(IEnumerable<LowPricedAuction> flips)
@@ -636,6 +636,11 @@ namespace Coflnet.Sky.Commands.Shared
         }
 
         private static TaskFactory factory = new TaskFactory();
+        public static void RunIsolatedForever(Func<CancellationToken, Task> todo, string message, CancellationToken stoppingToken, int backoff = 2000)
+        {
+            RunIsolatedForever(async () => await todo(stoppingToken), message, stoppingToken, backoff);
+        }
+
         public static void RunIsolatedForever(Func<Task> todo, string message, CancellationToken stoppingToken, int backoff = 2000)
         {
             factory.StartNew(async () =>
