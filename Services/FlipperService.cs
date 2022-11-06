@@ -296,7 +296,6 @@ namespace Coflnet.Sky.Commands.Shared
 
         public async Task DeliverLowPricedAuctions(IEnumerable<LowPricedAuction> flips)
         {
-            Console.WriteLine("queuing batch of " + flips.Count());
             await Parallel.ForEachAsync(flips, async (item, s) =>
             {
                 await DeliverLowPricedAuction(item);
