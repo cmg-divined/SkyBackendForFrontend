@@ -106,6 +106,7 @@ namespace Coflnet.Sky.Commands.Shared
         {
             Unsubscribe(SlowSubs, con.Id);
             UpdateFilterSumaries();
+            ClearSoldBuffer();
         }
 
         public void RemoveConnection(IFlipConnection con)
@@ -563,6 +564,8 @@ namespace Coflnet.Sky.Commands.Shared
         /// </summary>
         private void ClearSoldBuffer()
         {
+            if (SoldAuctions.Count < 500)
+                return;
             var toRemove = new List<long>();
             var oldestTime = DateTime.UtcNow - TimeSpan.FromMinutes(10);
             foreach (var item in SoldAuctions)
