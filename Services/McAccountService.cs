@@ -28,8 +28,8 @@ namespace Coflnet.Sky.Commands
                 return null;
             var mcRequest = new RestRequest("connect/user/{userId}")
                                 .AddUrlSegment("userId", userId);
-            McConnect.Models.User mcAccounts = await ExecuteUserRequest(mcRequest);
-            return mcAccounts?.Accounts?.Where(a => a.Verified && a.LastRequestedAt > oldest).Select(a => a.AccountUuid);
+            var mcAccounts = await ExecuteUserRequest(mcRequest);
+            return mcAccounts?.Accounts?.Where(a => a.Verified && a.UpdatedAt > oldest).Select(a => a.AccountUuid).ToList();
         }
 
         private async Task<McConnect.Models.User> ExecuteUserRequest(RestRequest mcRequest)
