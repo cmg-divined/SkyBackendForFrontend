@@ -33,7 +33,7 @@ namespace Coflnet.Sky.Commands.Shared
             cancellationTokenSource?.Cancel();
             cancellationTokenSource = new CancellationTokenSource();
             var stoppingToken = cancellationTokenSource.Token;
-            var count = Connection.AccountInfo.Tier switch
+            var count = Connection.AccountInfo?.Tier switch
             {
                 AccountTier.PREMIUM => 3,
                 AccountTier.PREMIUM_PLUS => 6,
