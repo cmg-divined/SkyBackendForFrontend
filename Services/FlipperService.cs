@@ -174,20 +174,23 @@ namespace Coflnet.Sky.Commands.Shared
 
         public static FlipInstance LowPriceToFlip(LowPricedAuction flip)
         {
+            var targetPrice = flip.Finder == LowPricedAuction.FinderType.SNIPER && flip.AdditionalProps.TryGetValue("mVal", out string mVal) ? long.Parse(mVal) : flip.TargetPrice;
+            var interesting = PropertiesSelector.GetProperties(flip.Auction).OrderByDescending(a => a.Rating).Select(a => a.Value).ToList();
+            var context = flip.AdditionalProps == null || flip.AdditionalProps.Count == 0 ? new Dictionary<string, string>() : new Dictionary<string, string>(flip.AdditionalProps);
             var flipIntance = new FlipInstance()
             {
                 Auction = flip.Auction,
-                MedianPrice = flip.Finder == LowPricedAuction.FinderType.SNIPER && flip.AdditionalProps.TryGetValue("mVal", out string mVal) ? long.Parse(mVal) : flip.TargetPrice,
+                MedianPrice = targetPrice,
                 Uuid = flip.Auction.Uuid,
                 Bin = flip.Auction.Bin,
                 Name = flip.Auction.ItemName,
-                Interesting = PropertiesSelector.GetProperties(flip.Auction).OrderByDescending(a => a.Rating).Select(a => a.Value).ToList(),
+                Interesting = interesting,
                 Tag = flip.Auction.Tag,
                 Volume = flip.DailyVolume,
                 Rarity = flip.Auction.Tier,
                 Finder = flip.Finder,
                 LowestBin = flip.Finder == LowPricedAuction.FinderType.SNIPER ? flip.TargetPrice : 0,
-                Context = flip.AdditionalProps == null || flip.AdditionalProps.Count == 0 ? new Dictionary<string, string>() : new Dictionary<string, string>(flip.AdditionalProps)
+                Context = context
             };
             return flipIntance;
         }
