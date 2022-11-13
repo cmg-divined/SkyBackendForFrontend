@@ -142,11 +142,37 @@ namespace Coflnet.Sky.Commands.Shared
                 newValue = !(bool)field.GetValue(obj);
             }
             else if (field.FieldType.IsEnum)
-                newValue = Enum.Parse(field.FieldType, value, true);
+                try
+                {
+                    newValue = Enum.Parse(field.FieldType, value, true);
+                }
+                catch (System.Exception)
+                {
+                    var values = Enum.GetNames(field.FieldType);
+                    if (field.FieldType == typeof(LowPricedAuction.FinderType))
+                        throw new CoflnetException("parse", "Invalid selection. Use either one ore more of flipper,sniper,sniper_median,user");
+                    throw new CoflnetException("parse", "Your input could not be parsed in any of " + String.Join(',', values));
+                }
             else if (field.FieldType.IsPrimitive && field.FieldType != typeof(bool))
-                newValue = Convert.ChangeType(NumberParser.Double(value), field.FieldType);
+                try
+                {
+                    newValue = Convert.ChangeType(NumberParser.Double(value), field.FieldType);
+                }
+                catch (System.Exception)
+                {
+                    throw new CoflnetException("parse", "This setting has to be a number. This includes 1.6M or 3.2k");
+                }
             else
-                newValue = Convert.ChangeType(value, field.FieldType);
+                try
+                {
+                    newValue = Convert.ChangeType(value, field.FieldType);
+                }
+                catch (System.Exception)
+                {
+                    if (field.FieldType == typeof(bool))
+                        throw new CoflnetException("parse", "This setting can only be set to true or false. No value toggles it.");
+                    throw;
+                }
 
             field.SetValue(obj, newValue);
 
