@@ -76,5 +76,8 @@ namespace Coflnet.Sky.Commands.Shared
         [DataMember(Name = "streamerMode")]
         [SettingsDoc("Hide any personal data and reduce sounds")]
         public bool StreamerMode;
+        [DataMember(Name = "autoStartFlipper")]
+        [SettingsDoc("Start showing flips automatically when joining skyblock", false, "fas")]
+        public bool AutoStartFlipper;
     }
 }

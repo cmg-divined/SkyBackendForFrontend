@@ -74,6 +74,10 @@ namespace Coflnet.Sky.Commands.Shared
                             Console.WriteLine($"worker {index} was canceled");
                             break;
                         }
+                        catch(ChannelClosedException)
+                        {
+                            break;
+                        }
                         catch (Exception e)
                         {
                             Connection.Log(e.ToString(), Microsoft.Extensions.Logging.LogLevel.Error);
