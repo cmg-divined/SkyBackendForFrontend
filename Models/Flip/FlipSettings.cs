@@ -69,7 +69,7 @@ namespace Coflnet.Sky.Commands.Shared
         [SettingsDoc("Hide all auctions (not buy item now)")]
         public bool OnlyBin;
         [DataMember(Name = "whitelistAftermain")]
-        [SettingsDoc("with this on whitelist won't skip the main filter anymore")]
+        [SettingsDoc("whitelisted items will only show if they also meet main filters (min profit etc)")]
         public bool WhitelistAfterMain;
 
         private List<FlipFilter> blackListFilters;
