@@ -213,7 +213,6 @@ namespace Coflnet.Sky.Commands.Shared
                 }
             }
 
-
             if (flip.LowestBin == 0 && (settings.Visibility.LowestBin || settings.Visibility.SecondLowestBin || settings.BasedOnLBin))
             {
                 var lowestBin = await GetLowestBin(flip.Auction).ConfigureAwait(false);
