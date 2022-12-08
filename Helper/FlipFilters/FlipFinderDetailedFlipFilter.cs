@@ -13,7 +13,8 @@ namespace Coflnet.Sky.Commands.Shared
         public object[] Options => new LowPricedAuction.FinderType[]{
             LowPricedAuction.FinderType.FLIPPER,
             LowPricedAuction.FinderType.SNIPER,
-            LowPricedAuction.FinderType.SNIPER_MEDIAN
+            LowPricedAuction.FinderType.SNIPER_MEDIAN,
+            LowPricedAuction.FinderType.USER
         }.Select(t=> (object)t).ToArray();
 
         public FilterType FilterType => FilterType.Equal;

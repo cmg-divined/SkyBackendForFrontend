@@ -51,7 +51,7 @@ namespace Coflnet.Sky.Commands.Shared
 
         public Task<Channel<SearchResultItem>> Search(string search, CancellationToken token)
         {
-            if (search.Length > 40)
+            if (search.Length > 48)
                 return Task.FromResult(Channel.CreateBounded<SearchResultItem>(1));
             return CreateResponse(search, token);
         }
