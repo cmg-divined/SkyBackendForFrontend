@@ -59,12 +59,10 @@ namespace Coflnet.Sky.Commands.Shared
                                 flip.AdditionalProps?.TryAdd("long wait", LowPriced.Reader.Count.ToString());
                             }
                             var batch = new List<LowPricedAuction>();
-                            flip.AdditionalProps.TryAdd("da", (DateTime.UtcNow - flip.Auction.FindTime).ToString());
-                            batch.Add(Copy(flip));
+                            AddCopyOfFlipToBatch(flip, batch);
                             while (batch.Count < 20 && LowPriced.Reader.TryRead(out flip))
                             {
-                                flip.AdditionalProps.TryAdd("da", (DateTime.UtcNow - flip.Auction.FindTime).ToString());
-                                batch.Add(Copy(flip));
+                                AddCopyOfFlipToBatch(flip, batch);
                             }
                             //await limiter.WaitAsync();
                             await Connection.SendBatch(batch);
@@ -74,7 +72,7 @@ namespace Coflnet.Sky.Commands.Shared
                             Console.WriteLine($"worker {index} was canceled");
                             break;
                         }
-                        catch(ChannelClosedException)
+                        catch (ChannelClosedException)
                         {
                             break;
                         }
@@ -86,6 +84,13 @@ namespace Coflnet.Sky.Commands.Shared
                     }
                 }).ConfigureAwait(false);
             }
+        }
+
+        private static void AddCopyOfFlipToBatch(LowPricedAuction flip, List<LowPricedAuction> batch)
+        {
+            var copy = Copy(flip);
+            copy.AdditionalProps.TryAdd("da", (DateTime.UtcNow - flip.Auction.FindTime).ToString());
+            batch.Add(copy);
         }
 
         public bool AddLowPriced(LowPricedAuction lp)
