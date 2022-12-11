@@ -394,7 +394,6 @@ namespace Coflnet.Sky.Commands
                 }
                 else
                     yield return new("Recombobulator", (long)-priceService.GetPrice("RECOMBOBULATOR_3000"));
-
         }
     }
 }
