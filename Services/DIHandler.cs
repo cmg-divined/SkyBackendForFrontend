@@ -65,15 +65,16 @@ namespace Coflnet.Sky.Commands.Shared
                 var config = context.GetRequiredService<IConfiguration>();
                 return new SniperApi(config["SNIPER_BASE_URL"]);
             });
-            var craftsUrl = SimplerConfig.SConfig.Instance["CRAFTS_BASE_URL"] ?? "http://" + SimplerConfig.SConfig.Instance["CRAFTS_HOST"];
             services.AddSingleton<ICraftsApi>(context =>
             {
                 var config = context.GetRequiredService<IConfiguration>();
+                var craftsUrl = config["CRAFTS_BASE_URL"] ?? "http://" + config["CRAFTS_HOST"];
                 return new CraftsApi(craftsUrl);
             });
             services.AddSingleton<IKatApi>(context =>
             {
                 var config = context.GetRequiredService<IConfiguration>();
+                var craftsUrl = config["CRAFTS_BASE_URL"] ?? "http://" + config["CRAFTS_HOST"];
                 return new KatApi(craftsUrl);
             });
             services.AddSingleton<Api.Client.Api.IPricesApi>(context =>
@@ -101,9 +102,9 @@ namespace Coflnet.Sky.Commands.Shared
             services.AddSingleton<T>(context =>
             {
                 var config = context.GetRequiredService<IConfiguration>();
-                var url = SimplerConfig.Config.Instance["PAYMENTS_BASE_URL"];
+                var url = config["PAYMENTS_BASE_URL"];
                 if (url == null)
-                    url = "http://" + SimplerConfig.Config.Instance["PAYMENTS_HOST"];
+                    url = "http://" + config["PAYMENTS_HOST"];
                 return creator(url);
             });
         }
