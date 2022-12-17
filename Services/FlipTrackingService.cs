@@ -11,6 +11,7 @@ using Coflnet.Sky.FlipTracker.Client.Model;
 using OpenTracing.Util;
 using Newtonsoft.Json;
 using OpenTracing;
+using Microsoft.Extensions.Configuration;
 
 namespace Coflnet.Sky.Commands
 {
@@ -35,16 +36,17 @@ namespace Coflnet.Sky.Commands
             ProduceTopic = SimplerConfig.Config.Instance["TOPICS:FLIP_EVENT"];
         }
 
-        public FlipTrackingService(GemPriceService gemPriceService, UpgradePriceService priceService, ITracer tracer)
+        public FlipTrackingService(GemPriceService gemPriceService, UpgradePriceService priceService, ITracer tracer, IConfiguration config)
         {
             producer = new ProducerBuilder<string, FlipTracker.Client.Model.FlipEvent>(new ProducerConfig
             {
                 BootstrapServers = SimplerConfig.Config.Instance["KAFKA_HOST"],
                 CancellationDelayMaxMs = 1000
-            })
-                    .SetValueSerializer(SerializerFactory.GetSerializer<FlipTracker.Client.Model.FlipEvent>()).Build();
-            flipTracking = new TrackerApi("http://" + SimplerConfig.Config.Instance["FLIPTRACKER_HOST"]);
-            flipAnalyse = new AnalyseApi("http://" + SimplerConfig.Config.Instance["FLIPTRACKER_HOST"]);
+            }).SetValueSerializer(SerializerFactory.GetSerializer<FlipTracker.Client.Model.FlipEvent>()).Build();
+
+            var url = SimplerConfig.Config.Instance["SKYFLIPPER_BASE_URL"] ?? "http://" + SimplerConfig.Config.Instance["FLIPTRACKER_HOST"];
+            flipTracking = new TrackerApi(url);
+            flipAnalyse = new AnalyseApi(url);
             this.gemPriceService = gemPriceService;
             this.priceService = priceService;
             this.tracer = tracer;
@@ -338,7 +340,8 @@ namespace Coflnet.Sky.Commands
                 try
                 {
                     changeSumary.AddRange(GetChanges(b, sell));
-                } catch(Exception e)
+                }
+                catch (Exception e)
                 {
                     tracer.ActiveSpan.Log(e.ToString());
                     changeSumary.Add(new("Error occured " + tracer.ActiveSpan.Context.TraceId, -1));

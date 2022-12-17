@@ -31,7 +31,7 @@ namespace Coflnet.Sky.Commands.Shared
             services.AddSingleton<PlayerName.Client.Api.PlayerNameApi>(context =>
             {
                 var config = context.GetRequiredService<IConfiguration>();
-                return new PlayerName.Client.Api.PlayerNameApi(config["PLAYERNAME_URL"] ?? "http://" + config["PLAYERNAME_HOST"]);
+                return new PlayerName.Client.Api.PlayerNameApi(config["PLAYERNAME_BASE_URL"] ?? "http://" + config["PLAYERNAME_HOST"]);
             });
             services.AddSingleton<Bazaar.Client.Api.BazaarApi>(context =>
             {
@@ -65,15 +65,16 @@ namespace Coflnet.Sky.Commands.Shared
                 var config = context.GetRequiredService<IConfiguration>();
                 return new SniperApi(config["SNIPER_BASE_URL"]);
             });
+            var craftsUrl = SimplerConfig.SConfig.Instance["CRAFTS_BASE_URL"] ?? "http://" + SimplerConfig.SConfig.Instance["CRAFTS_HOST"];
             services.AddSingleton<ICraftsApi>(context =>
             {
                 var config = context.GetRequiredService<IConfiguration>();
-                return new CraftsApi("http://" + config["CRAFTS_HOST"]);
+                return new CraftsApi(craftsUrl);
             });
             services.AddSingleton<IKatApi>(context =>
             {
                 var config = context.GetRequiredService<IConfiguration>();
-                return new KatApi("http://" + config["CRAFTS_HOST"]);
+                return new KatApi(craftsUrl);
             });
             services.AddSingleton<Api.Client.Api.IPricesApi>(context =>
             {

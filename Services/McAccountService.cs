@@ -12,7 +12,7 @@ namespace Coflnet.Sky.Commands
     public class McAccountService
     {
         public static McAccountService Instance = new McAccountService();
-        RestClient mcAccountClient = new RestClient("http://" + SimplerConfig.Config.Instance["MCCONNECT_HOST"]);
+        RestClient mcAccountClient = new RestClient(SimplerConfig.Config.Instance["MCCONNECT_BASE_URL"] ?? "http://" + SimplerConfig.Config.Instance["MCCONNECT_HOST"]);
 
 
         public async Task<Coflnet.Sky.McConnect.Models.MinecraftUuid> GetActiveAccount(int userId)

@@ -8,7 +8,7 @@ namespace Coflnet.Sky.Commands.Shared
 {
     public class IndexerClient
     {
-        public static RestClient Client = new RestClient("http://" + SimplerConfig.SConfig.Instance["INDEXER_HOST"]);
+        public static RestClient Client = new RestClient(SimplerConfig.SConfig.Instance["INDEXER_BASE_URL"] ?? "http://" + SimplerConfig.SConfig.Instance["INDEXER_HOST"]);
         public static Task<RestSharp.RestResponse<Player>> TriggerNameUpdate(string uuid)
         {
             return Client.ExecuteAsync<Player>(new RestRequest("player/{uuid}", Method.Patch).AddUrlSegment("uuid", uuid));

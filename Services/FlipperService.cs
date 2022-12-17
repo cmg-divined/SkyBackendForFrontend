@@ -56,7 +56,7 @@ namespace Coflnet.Sky.Commands.Shared
         /// </summary>
         private Queue<FlipInstance> LoadBurst = new Queue<FlipInstance>();
         private ConcurrentDictionary<long, DateTime> SoldAuctions = new ConcurrentDictionary<long, DateTime>();
-        static RestClient SkyFlipperHost = new RestClient("http://" + SimplerConfig.Config.Instance["SKYFLIPPER_HOST"]);
+        static RestClient SkyFlipperHost = new RestClient(SimplerConfig.Config.Instance["SKYFLIPPER_BASE_URL"] ?? "http://" + SimplerConfig.Config.Instance["SKYFLIPPER_HOST"]);
 
         public void AddConnectionPlus(IFlipConnection connection, bool sendHistory = true)
         {
