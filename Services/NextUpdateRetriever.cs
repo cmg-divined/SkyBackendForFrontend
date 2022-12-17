@@ -15,6 +15,8 @@ namespace Coflnet.Sky.Commands.MC
                 while (last < new DateTime(2020, 1, 1))
                 {
                     last = (await client.ExecuteAsync<DateTime>(new RestRequest("/api/time"))).Data;
+                    if(last < new DateTime(2020, 1, 1))
+                        await Task.Delay(10000);
                 }
                 var next = last + TimeSpan.FromSeconds(60);
                 while (next < DateTime.Now)
