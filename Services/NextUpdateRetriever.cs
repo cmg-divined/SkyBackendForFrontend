@@ -6,7 +6,7 @@ namespace Coflnet.Sky.Commands.MC
 {
     public class NextUpdateRetriever
     {
-        static RestClient client = new RestClient("http://" + SimplerConfig.SConfig.Instance["UPDATER_HOST"]);
+        static RestClient client = new RestClient(SimplerConfig.SConfig.Instance["UPDATER_BASE_URL"]);
         public async Task<DateTime> Get()
         {
             try
