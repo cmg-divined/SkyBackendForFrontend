@@ -40,11 +40,11 @@ namespace Coflnet.Sky.Commands
         {
             producer = new ProducerBuilder<string, FlipTracker.Client.Model.FlipEvent>(new ProducerConfig
             {
-                BootstrapServers = SimplerConfig.Config.Instance["KAFKA_HOST"],
+                BootstrapServers = config["KAFKA_HOST"],
                 CancellationDelayMaxMs = 1000
             }).SetValueSerializer(SerializerFactory.GetSerializer<FlipTracker.Client.Model.FlipEvent>()).Build();
 
-            var url = SimplerConfig.Config.Instance["SKYFLIPPER_BASE_URL"] ?? "http://" + SimplerConfig.Config.Instance["FLIPTRACKER_HOST"];
+            var url = config["FLIPTRACKER_BASE_URL"] ?? "http://" + config["FLIPTRACKER_HOST"];
             flipTracking = new TrackerApi(url);
             flipAnalyse = new AnalyseApi(url);
             this.gemPriceService = gemPriceService;
