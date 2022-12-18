@@ -12,7 +12,7 @@ using System.Threading.Tasks;
 using dev;
 using Coflnet.Sky.Core;
 using Microsoft.EntityFrameworkCore;
-using RestSharp;
+using System.Diagnostics;
 using System.Threading.Channels;
 using Microsoft.Extensions.DependencyInjection;
 using System.Globalization;
@@ -192,8 +192,9 @@ namespace Coflnet.Sky.Commands.Shared
 
             searchTasks[0] = Task.Run(async () =>
             {
-                using var itemSpan = tracer.BuildSpan("itemSearch").AsChildOf(searchSpan).StartActive();
-                await FindItems(search, itemTask, Results, itemSpan);
+                var source = DiHandler.GetService<ActivitySource>();
+                using var activity = source.StartActivity("itemSearch");
+                await FindItems(search, itemTask, Results, activity);
             }, token).ConfigureAwait(false);
 
             searchTasks[1] = Task.Run(async () =>
@@ -302,7 +303,7 @@ namespace Coflnet.Sky.Commands.Shared
             AddFilterResult(Results, filter, auction.ItemName + " (Sells)", auction.Tag, 100_000);
         }
 
-        private async Task FindItems(string search, Task<IEnumerable<ItemDetails.ItemSearchResult>> itemTask, Channel<SearchResultItem> Results, OpenTracing.IScope itemSpan)
+        private async Task FindItems(string search, Task<IEnumerable<ItemDetails.ItemSearchResult>> itemTask, Channel<SearchResultItem> Results, Activity itemSpan)
         {
             IEnumerable<ItemDetails.ItemSearchResult> items;
             try
@@ -315,7 +316,7 @@ namespace Coflnet.Sky.Commands.Shared
                 items = await GetItems(search, 12);
             }
 
-            itemSpan.Span?.Log("received Items " + JsonConvert.SerializeObject(items));
+            itemSpan?.AddEvent(new ActivityEvent("received Items", DateTimeOffset.Now));
             foreach (var item in items.Select(item => new SearchResultItem(item)))
             {
                 await Results.Writer.WriteAsync(item);
