@@ -12,6 +12,7 @@ using OpenTracing.Util;
 using Newtonsoft.Json;
 using OpenTracing;
 using Microsoft.Extensions.Configuration;
+using System.Diagnostics;
 
 namespace Coflnet.Sky.Commands
 {
@@ -26,7 +27,7 @@ namespace Coflnet.Sky.Commands
         private static ProducerConfig producerConfig;
         private GemPriceService gemPriceService;
         private UpgradePriceService priceService;
-        private ITracer tracer;
+        private ActivitySource tracer;
 
         IProducer<string, FlipTracker.Client.Model.FlipEvent> producer;
 
@@ -36,7 +37,7 @@ namespace Coflnet.Sky.Commands
             ProduceTopic = SimplerConfig.Config.Instance["TOPICS:FLIP_EVENT"];
         }
 
-        public FlipTrackingService(GemPriceService gemPriceService, UpgradePriceService priceService, ITracer tracer, IConfiguration config)
+        public FlipTrackingService(GemPriceService gemPriceService, UpgradePriceService priceService, ActivitySource tracer, IConfiguration config)
         {
             producer = new ProducerBuilder<string, FlipTracker.Client.Model.FlipEvent>(new ProducerConfig
             {
@@ -310,8 +311,8 @@ namespace Coflnet.Sky.Commands
             }
             catch
             {
-                tracer.ActiveSpan.Log(JsonConvert.SerializeObject(b));
-                tracer.ActiveSpan.Log(JsonConvert.SerializeObject(sell));
+                Activity.Current?.AddTag("buy", JsonConvert.SerializeObject(b));
+                Activity.Current?.AddTag("sell", JsonConvert.SerializeObject(sell));
                 throw;
             }
         }
@@ -343,8 +344,8 @@ namespace Coflnet.Sky.Commands
                 }
                 catch (Exception e)
                 {
-                    tracer.ActiveSpan.Log(e.ToString());
-                    changeSumary.Add(new("Error occured " + tracer.ActiveSpan.Context.TraceId, -1));
+                    Activity.Current?.AddTag("exception", e.ToString());
+                    changeSumary.Add(new("Error occured " + Activity.Current.TraceId, -1));
                 }
                 var tax = sell.HighestBidAmount - sell.HighestBidAmount * 98 / 100;
                 changeSumary.Add(new PropertyChange()
