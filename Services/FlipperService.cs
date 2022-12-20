@@ -269,11 +269,11 @@ namespace Coflnet.Sky.Commands.Shared
             if (flip.Auction?.Start < DateTime.UtcNow - TimeSpan.FromMinutes(3) && flip.Auction?.Start != default)
                 return; // skip old flips
             runtroughTime.Observe((DateTime.UtcNow - flip.Auction.FindTime).TotalSeconds);
-            var tracer = OpenTracing.Util.GlobalTracer.Instance;
+            /*var tracer = OpenTracing.Util.GlobalTracer.Instance;
             var span = OpenTracing.Util.GlobalTracer.Instance.BuildSpan("SendFlip");
             if (flip.Auction.TraceContext != null)
                 span = span.AsChildOf(tracer.Extract(BuiltinFormats.TextMap, flip.Auction.TraceContext));
-            using var scope = span.StartActive();
+            using var scope = span.StartActive();*/
 
             flip.Finder = LowPricedAuction.FinderType.FLIPPER;
             await NotifyAll(flip, SuperSubs);
