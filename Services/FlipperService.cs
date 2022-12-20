@@ -310,14 +310,14 @@ namespace Coflnet.Sky.Commands.Shared
         {
             if (flip.Auction.Context != null)
                 flip.Auction.Context["crec"] = (DateTime.UtcNow - flip.Auction.FindTime).ToString();
-            var tracer = OpenTracing.Util.GlobalTracer.Instance;
-            var span = OpenTracing.Util.GlobalTracer.Instance.BuildSpan("DeliverFlip");
+            //var tracer = OpenTracing.Util.GlobalTracer.Instance;
+            //var span = OpenTracing.Util.GlobalTracer.Instance.BuildSpan("DeliverFlip");
             //if (flip.Auction.TraceContext != null)
             //    span = span.AsChildOf(tracer.Extract(BuiltinFormats.TextMap, flip.Auction.TraceContext));
-            using var scope = span.StartActive();
+            //using var scope = span.StartActive();
             var time = (DateTime.UtcNow - flip.Auction.FindTime).TotalSeconds;
-            if (time > 3)
-                scope.Span.SetTag("slow", true).SetTag("uuid", flip.Auction.Uuid);
+            //if (time > 3)
+            //    scope.Span.SetTag("slow", true).SetTag("uuid", flip.Auction.Uuid);
 
             if (flip.Auction != null && flip.Auction.NBTLookup == null)
                 flip.Auction.NBTLookup = NBT.CreateLookup(flip.Auction);
