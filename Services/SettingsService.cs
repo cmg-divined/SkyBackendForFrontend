@@ -49,7 +49,14 @@ namespace Coflnet.Sky.Commands.Shared
 
         public async Task<T> GetCurrentValue<T>(string userId, string key, Func<T> defaultGetter)
         {
-            var value = await api.SettingsUserIdSettingKeyGetAsync(userId, key);
+            string value = null;
+            for (int i = 0; i < 3; i++)
+            {
+                value = await api.SettingsUserIdSettingKeyGetAsync(userId, key);
+                if (value != null || i == 2)
+                    break;
+                await Task.Delay(50 * i);
+            }
             T val;
             if (value == null)
             {
@@ -81,7 +88,7 @@ namespace Coflnet.Sky.Commands.Shared
                 {
                     await Task.Delay(20 * i);
                     Console.WriteLine($"failed to update settings {e.Message} \n" + JsonConvert.SerializeObject(data));
-                    if(i == 2)
+                    if (i == 2)
                         throw;
                 }
             }
