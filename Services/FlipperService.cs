@@ -387,6 +387,7 @@ namespace Coflnet.Sky.Commands.Shared
                 {
                     if (SoldAuctions.ContainsKey(flip.UId))
                         flip.Sold = true;
+                    flip.Auction.FlatenedNBT.Add("queue", SlowFlips.Count.ToString());
                     await NotifyAll(flip, SlowSubs);
                     if (flip.Uuid[0] == 'a')
                         Console.Write("sf+" + SlowSubs.Count);
