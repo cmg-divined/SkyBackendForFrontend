@@ -5,7 +5,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Coflnet.Sky.Commands.Helper;
 using Confluent.Kafka;
-using OpenTracing.Propagation;
+using System.Diagnostics;
 using Microsoft.Extensions.DependencyInjection;
 using RestSharp;
 using Newtonsoft.Json;
@@ -269,11 +269,8 @@ namespace Coflnet.Sky.Commands.Shared
             if (flip.Auction?.Start < DateTime.UtcNow - TimeSpan.FromMinutes(3) && flip.Auction?.Start != default)
                 return; // skip old flips
             runtroughTime.Observe((DateTime.UtcNow - flip.Auction.FindTime).TotalSeconds);
-            /*var tracer = OpenTracing.Util.GlobalTracer.Instance;
-            var span = OpenTracing.Util.GlobalTracer.Instance.BuildSpan("SendFlip");
-            if (flip.Auction.TraceContext != null)
-                span = span.AsChildOf(tracer.Extract(BuiltinFormats.TextMap, flip.Auction.TraceContext));
-            using var scope = span.StartActive();*/
+            var tracer = DiHandler.GetService<ActivitySource>();
+            using var activity = tracer.StartActivity("DeliverFlip").SetTag("uuid", flip.Auction.Uuid);
 
             flip.Finder = LowPricedAuction.FinderType.FLIPPER;
             await NotifyAll(flip, SuperSubs);
@@ -310,14 +307,9 @@ namespace Coflnet.Sky.Commands.Shared
         {
             if (flip.Auction.Context != null)
                 flip.Auction.Context["crec"] = (DateTime.UtcNow - flip.Auction.FindTime).ToString();
-            //var tracer = OpenTracing.Util.GlobalTracer.Instance;
-            //var span = OpenTracing.Util.GlobalTracer.Instance.BuildSpan("DeliverFlip");
-            //if (flip.Auction.TraceContext != null)
-            //    span = span.AsChildOf(tracer.Extract(BuiltinFormats.TextMap, flip.Auction.TraceContext));
-            //using var scope = span.StartActive();
+            var tracer = DiHandler.GetService<ActivitySource>();
+            using var activity = tracer.StartActivity("DeliverFlip").SetTag("uuid", flip.Auction.Uuid);
             var time = (DateTime.UtcNow - flip.Auction.FindTime).TotalSeconds;
-            //if (time > 3)
-            //    scope.Span.SetTag("slow", true).SetTag("uuid", flip.Auction.Uuid);
 
             if (flip.Auction != null && flip.Auction.NBTLookup == null)
                 flip.Auction.NBTLookup = NBT.CreateLookup(flip.Auction);
@@ -381,28 +373,31 @@ namespace Coflnet.Sky.Commands.Shared
 
         public async Task ProcessSlowQueue()
         {
-            try
+            while(true)
             {
                 if (SlowFlips.TryDequeue(out FlipInstance flip))
                 {
-                    if (SoldAuctions.ContainsKey(flip.UId))
-                        flip.Sold = true;
-                    flip.Auction.FlatenedNBT.Add("queue", SlowFlips.Count.ToString());
-                    await NotifyAll(flip, SlowSubs);
-                    if (flip.Uuid[0] == 'a')
-                        Console.Write("sf+" + SlowSubs.Count);
-                    LoadBurst.Enqueue(flip);
-                    if (LoadBurst.Count > 5)
-                        LoadBurst.Dequeue();
+                    await SendSlowFlip(flip);
                 }
                 if (SlowFlips.Count > 800)
                     return; // to large queue, continue immediately
                 await Task.Delay(DelayTimeFor(SlowFlips.Count)).ConfigureAwait(false);
             }
-            catch (Exception e)
-            {
-                dev.Logger.Instance.Error(e, "slow queue processor");
-            }
+        }
+
+        private async Task SendSlowFlip(FlipInstance flip)
+        {
+            var activitySource = DiHandler.GetService<ActivitySource>();
+            using var activity = activitySource.StartActivity("SendSlowFlip").SetTag("uuid", flip.Auction.Uuid);
+            if (SoldAuctions.ContainsKey(flip.UId))
+                flip.Sold = true;
+            flip.Auction.FlatenedNBT.Add("queue", SlowFlips.Count.ToString());
+            await NotifyAll(flip, SlowSubs);
+            if (flip.Uuid[0] == 'a')
+                Console.Write("sf+" + SlowSubs.Count);
+            LoadBurst.Enqueue(flip);
+            if (LoadBurst.Count > 5)
+                LoadBurst.Dequeue();
         }
 
         ConsumerConfig consumerConf = new ConsumerConfig
@@ -636,7 +631,7 @@ namespace Coflnet.Sky.Commands.Shared
             RunIsolatedForever(ListenToLowPriced, "low priced auctions", stoppingToken);
             RunIsolatedForever(ConsumeNewAuctions, "consuming new auctions for user filter", stoppingToken);
 
-            RunIsolatedForever(ProcessSlowQueue, "flip process slow", stoppingToken, 200);
+            RunIsolatedForever(ProcessSlowQueue, "slow queue processor", stoppingToken, 200);
             return Task.CompletedTask;
         }
 
