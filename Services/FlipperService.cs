@@ -373,11 +373,21 @@ namespace Coflnet.Sky.Commands.Shared
 
         public async Task ProcessSlowQueue()
         {
-            while(true)
+            while (true)
             {
                 if (SlowFlips.TryDequeue(out FlipInstance flip))
                 {
-                    await SendSlowFlip(flip);
+                    _ = Task.Run(async () =>
+                    {
+                        try
+                        {
+                            await SendSlowFlip(flip);
+                        }
+                        catch (Exception e)
+                        {
+                            Console.WriteLine($"Failed to send slow flip {e.Message} {e.StackTrace}");
+                        }
+                    }, new CancellationTokenSource(30_000).Token);
                 }
                 if (SlowFlips.Count > 800)
                     return; // to large queue, continue immediately
