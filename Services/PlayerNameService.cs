@@ -16,11 +16,11 @@ namespace Coflnet.Sky.PlayerName
 
         public async Task<string> GetName(string uuid)
         {
-            return await client.PlayerNameNameUuidGetAsync(uuid);
+            return (await client.PlayerNameNameUuidGetAsync(uuid))?.Trim('"');
         }
         public async Task<string> GetUuid(string name)
         {
-            return await client.PlayerNameUuidNameGetAsync(name);
+            return (await client.PlayerNameUuidNameGetAsync(name))?.Trim('"');
         }
 
         public async Task<Dictionary<string,string>> GetNames(IEnumerable<string> uuids)
