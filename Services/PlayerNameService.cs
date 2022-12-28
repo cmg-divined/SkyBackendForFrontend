@@ -24,9 +24,8 @@ namespace Coflnet.Sky.PlayerName
             var playerUuid = (await client.PlayerNameUuidNameGetAsync(name))?.Trim('"');
             if (playerUuid == null)
             {
+                playerUuid = (await Coflnet.Sky.Core.PlayerSearch.Instance.GetMcProfile(name)).Id;
                 await IndexerClient.TriggerNameUpdate(playerUuid);
-                await Task.Delay(5000);
-                playerUuid = (await client.PlayerNameUuidNameGetAsync(name))?.Trim('"');
             }
             return playerUuid;
         }
