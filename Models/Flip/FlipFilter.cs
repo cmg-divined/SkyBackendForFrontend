@@ -53,12 +53,19 @@ namespace Coflnet.Sky.Commands.Shared
                     var match = filters.Where(f => f.Key.ToLower() == item.ToLower()).FirstOrDefault();
                     if (match.Key != default)
                     {
-                        filters.Remove(match.Key);
-                        var newPart = AdditionalFilters[item].GetExpression(filters, match.Value);
-                        if (expression == null)
-                            expression = newPart;
-                        else if (newPart != null)
-                            expression = newPart.And(expression);
+                        try
+                        {
+                            filters.Remove(match.Key);
+                            var newPart = AdditionalFilters[item].GetExpression(filters, match.Value);
+                            if (expression == null)
+                                expression = newPart;
+                            else if (newPart != null)
+                                expression = newPart.And(expression);
+                        }
+                        catch (Exception e)
+                        {
+                            throw new CoflnetException("filter_parsing", $"Error in filter {item} with value {match.Value} : {e.Message}");
+                        }
                     }
                 }
             var filterExpression = FilterEngine.GetMatchExpression(filters);
