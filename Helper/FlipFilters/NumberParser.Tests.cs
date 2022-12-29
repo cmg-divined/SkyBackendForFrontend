@@ -13,6 +13,7 @@ namespace Coflnet.Sky.Commands.Shared
         [TestCase("1,2k", 1_200)]
         [TestCase("12", 12)]
         [TestCase("0.1", 0.1)]
+        [TestCase("0.1dxy", 0.1)]
         public void ConvertInputs(string val, double target)
         {
             Assert.AreEqual(target, NumberParser.Double(val), 0.0001);
