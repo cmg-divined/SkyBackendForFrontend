@@ -17,6 +17,8 @@ namespace Coflnet.Sky.Commands.Shared
         public string DisplayName;
         [DataMember(Name = "filter")]
         public Dictionary<string, string> filter;
+        [DataMember(Name = "tags")]
+        public List<string> Tags;
 
         private Func<FlipInstance,bool> filterCache;
 
