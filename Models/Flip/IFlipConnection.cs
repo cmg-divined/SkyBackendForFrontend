@@ -28,6 +28,5 @@ namespace Coflnet.Sky.Commands
         /// <param name="message">The message to log</param>
         /// <param name="level"></param>
         void Log(string message, LogLevel level = LogLevel.Information);
-        void UpdateSettings(SettingsChange settings);
     }
 }
