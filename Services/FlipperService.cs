@@ -31,7 +31,10 @@ namespace Coflnet.Sky.Commands.Shared
         private ConcurrentQueue<FlipInstance> SlowFlips = new ConcurrentQueue<FlipInstance>();
         private ConcurrentQueue<LowPricedAuction> StarterFlips = new();
         public ServerFilterSumary FilterSumary { get; private set; } = new();
-
+        /// <summary>
+        /// Special hook
+        /// </summary>
+        public Func<FlipperService, LowPricedAuction, Task> PreApiLowPriceHandler { get; set; } = (s, auction) => Task.Delay(34_000);
 
         /// <summary>
         /// Wherether or not a given <see cref="SaveAuction.UId"/> was a flip or not
@@ -316,6 +319,10 @@ namespace Coflnet.Sky.Commands.Shared
 
             if (flip.Auction.Context != null)
                 flip.Auction.Context["csh"] = (DateTime.UtcNow - flip.Auction.FindTime).ToString();
+            if(flip.Auction.Context.TryGetValue("pre-api",out var preApi))
+            {
+                await PreApiLowPriceHandler(this, flip);
+            }
             foreach (var item in SuperSubs)
             {
                 item.Value.AddLowPriced(flip);

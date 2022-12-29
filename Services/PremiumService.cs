@@ -13,6 +13,7 @@ namespace Coflnet.Sky.Commands.Shared
         static string testpremiumPlanName;
         static string premiumPlusSlug;
         static string starterPremiumSlug;
+        static string preApiSlug;
 
         private UserApi userApi;
 
@@ -23,6 +24,7 @@ namespace Coflnet.Sky.Commands.Shared
             testpremiumPlanName = GetRequired(config, "PRODUCTS:TEST_PREMIUM");
             premiumPlusSlug = GetRequired(config, "PRODUCTS:PREMIUM_PLUS");
             starterPremiumSlug = GetRequired(config, "PRODUCTS:STARTER_PREMIUM");
+            preApiSlug = GetRequired(config, "PRODUCTS:PRE_API");
 
             static string GetRequired(IConfiguration config, string key)
             {
@@ -63,8 +65,10 @@ namespace Coflnet.Sky.Commands.Shared
             {
                 if (GoogleUser.EveryoneIsPremium)
                     return (AccountTier.PREMIUM_PLUS, DateTime.Now + TimeSpan.FromDays(30));
-                var owns = await userApi.UserUserIdOwnsUntilPostAsync(userId.ToString(), new() { premiumPlanName, premiumPlusSlug, starterPremiumSlug });
-                if (owns.TryGetValue(premiumPlusSlug, out DateTime end) && end > DateTime.UtcNow)
+                var owns = await userApi.UserUserIdOwnsUntilPostAsync(userId.ToString(), new() { premiumPlanName, premiumPlusSlug, starterPremiumSlug, preApiSlug });
+                if (owns.TryGetValue(preApiSlug, out DateTime end) && end > DateTime.UtcNow)
+                    return (AccountTier.SUPER_PREMIUM, end);
+                if (owns.TryGetValue(premiumPlusSlug, out end) && end > DateTime.UtcNow)
                     return (AccountTier.PREMIUM_PLUS, end);
                 if (owns.TryGetValue(premiumPlanName, out end) && end > DateTime.UtcNow)
                     return (AccountTier.PREMIUM, end);
