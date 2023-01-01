@@ -9,6 +9,9 @@ using Coflnet.Sky.Sniper.Client.Api;
 using Coflnet.Sky.Crafts.Client.Api;
 using Coflnet.Sky.Core;
 using Coflnet.Sky.Commands.Shared;
+using Microsoft.Extensions.Hosting;
+using System.Threading.Tasks;
+using System.Threading;
 
 namespace Coflnet.Sky.Commands.Shared
 {
@@ -93,8 +96,21 @@ namespace Coflnet.Sky.Commands.Shared
             services.AddSingleton<PlayerName.PlayerNameService>();
             services.AddSingleton<IdConverter>();
             services.AddSingleton<IStateUpdateService, StateUpdateService>();
+            services.AddHostedService<ServicePorter>();
 
             _servics = services;
+        }
+
+        public class ServicePorter : BackgroundService
+        {
+            public ServicePorter(IServiceProvider services)
+            {
+                _serviceProvider = services;
+            }
+            protected override Task ExecuteAsync(CancellationToken stoppingToken)
+            {
+                return Task.CompletedTask;
+            }
         }
 
         public static void AddPaymentSingleton<T>(this IServiceCollection services, Func<string, T> creator) where T : class, IApiAccessor
