@@ -34,7 +34,8 @@ namespace Coflnet.Sky.Commands.Shared
         {
             string title = "";
             if (type == "player")
-                title = await PlayerSearch.Instance.GetNameWithCacheAsync(id) + " auctions hypixel skyblock";
+                title = await Shared.DiHandler.GetService<PlayerName.PlayerNameService>()
+                    .GetName(id) + " auctions hypixel skyblock";
             else if (type == "item")
                 title = ItemDetails.TagToName(id) + " price hypixel skyblock";
             var entry = new PopularSite(title, $"{type}/{id}");
