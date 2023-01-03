@@ -52,7 +52,7 @@ namespace Coflnet.Sky.Commands.Shared
         [SettingsDoc("shows/hides copy message (website setting)", true)]
         public bool CopySuccessMessage;
         [DataMember(Name = "hideSold")]
-        [SettingsDoc("shows/hides sold auctions (website setting)", true)]
+        [SettingsDoc("Prevents sold auctions from showing", "hideSold")]
         public bool HideSoldAuction;
     }
 }
