@@ -45,7 +45,7 @@ namespace Coflnet.Sky.Commands.Shared
         [IgnoreDataMember]
         public long ProfitPercentage => (Profit * 100 / (LastKnownCost == 0 ? int.MaxValue : LastKnownCost));
 
-        [IgnoreDataMember]
+        [DataMember(Name = "context")]
         public Dictionary<string, string> Context { get; set; }
 
         [DataMember(Name = "finder")]
