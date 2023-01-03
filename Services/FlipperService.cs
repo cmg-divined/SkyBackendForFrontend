@@ -274,9 +274,21 @@ namespace Coflnet.Sky.Commands.Shared
             runtroughTime.Observe((DateTime.UtcNow - flip.Auction.FindTime).TotalSeconds);
             var tracer = DiHandler.GetService<ActivitySource>();
             using var activity = tracer.StartActivity("DeliverFlip").SetTag("uuid", flip.Auction.Uuid);
-
             flip.Finder = LowPricedAuction.FinderType.FLIPPER;
+
+            if (flip.Auction.Context?.ContainsKey("pre-api") ?? true)
+            {
+                await PreApiLowPriceHandler.Invoke(this, new()
+                {
+                    AdditionalProps = flip.Context,
+                    Auction = flip.Auction,
+                    DailyVolume = flip.Volume,
+                    Finder = flip.Finder,
+                    TargetPrice = flip.MedianPrice
+                });
+            }
             await NotifyAll(flip, SuperSubs);
+            await Task.Delay(1000);
             await NotifyAll(flip, Subs);
             PrepareSlow(flip);
         }
