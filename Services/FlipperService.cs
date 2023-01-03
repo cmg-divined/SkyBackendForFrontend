@@ -321,7 +321,7 @@ namespace Coflnet.Sky.Commands.Shared
                 flip.Auction.Context["csh"] = (DateTime.UtcNow - flip.Auction.FindTime).ToString();
             try
             {
-                if (flip.Auction.Context?.TryGetValue("pre-api", out var preApi) ?? false)
+                if (flip.Auction.Context?.TryGetValue("pre-api", out var preApi) ?? true)
                     await PreApiLowPriceHandler(this, flip);
             }
             catch (System.Exception e)
