@@ -12,6 +12,4 @@ namespace Coflnet.Sky.Commands.Shared
             return (f) => f.Profit;
         }
     }
-    
-
 }

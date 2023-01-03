@@ -4,11 +4,11 @@ using System.Linq.Expressions;
 
 namespace Coflnet.Sky.Commands.Shared
 {
-    public class BedFlipDetailedFlipFilter : BoolDetailedFlipFilter
+    public class PreApiDetailedFlipFilter : BoolDetailedFlipFilter
     {
         public override Expression<Func<FlipInstance, bool>> GetStateExpression(bool expected)
         {
-            return flip => (flip.Auction.Start + TimeSpan.FromSeconds(20) > DateTime.Now) == expected;
+            return flip => (flip.Auction.Context != null && flip.Auction.Context.ContainsKey("pre-api")) == expected;
         }
     }
 }
