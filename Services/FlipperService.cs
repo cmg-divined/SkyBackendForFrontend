@@ -426,7 +426,6 @@ namespace Coflnet.Sky.Commands.Shared
             using var activity = activitySource.StartActivity("SendSlowFlip").SetTag("uuid", flip.Auction.Uuid);
             if (SoldAuctions.ContainsKey(flip.UId))
                 flip.Sold = true;
-            flip.Auction.FlatenedNBT.Add("queue", SlowFlips.Count.ToString());
             await NotifyAll(flip, SlowSubs);
             if (flip.Uuid[0] == 'a')
                 Console.Write("sf+" + SlowSubs.Count);
