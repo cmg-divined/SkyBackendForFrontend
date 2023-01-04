@@ -44,6 +44,12 @@ namespace Coflnet.Sky.Commands.Shared
             instance.Value = valGet();
             return Task.FromResult(instance);
         }
+        public static SelfUpdatingValue<T> CreateNoUpdate(T value)
+        {
+            var instance = new SelfUpdatingValue<T>(null, null);
+            instance.Value = value;
+            return instance;
+        }
 
         private static SettingsService GetService()
         {
