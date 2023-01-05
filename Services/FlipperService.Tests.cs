@@ -54,7 +54,7 @@ namespace Coflnet.Sky.Commands.Tests
             public SettingsChange LatestSettings => new SettingsChange()
             {
                 Tier = AccountTier.PREMIUM,
-                ExpiresAt = DateTime.Now + TimeSpan.FromHours(2)
+                ExpiresAt = DateTime.UtcNow + TimeSpan.FromHours(2)
             };
 
             public AccountInfo AccountInfo => throw new NotImplementedException();

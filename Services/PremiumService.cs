@@ -64,7 +64,7 @@ namespace Coflnet.Sky.Commands.Shared
             try
             {
                 if (GoogleUser.EveryoneIsPremium)
-                    return (AccountTier.PREMIUM_PLUS, DateTime.Now + TimeSpan.FromDays(30));
+                    return (AccountTier.PREMIUM_PLUS, DateTime.UtcNow + TimeSpan.FromDays(30));
                 var owns = await userApi.UserUserIdOwnsUntilPostAsync(userId, new() { premiumPlanName, premiumPlusSlug, starterPremiumSlug, preApiSlug });
                 if (owns.TryGetValue(preApiSlug, out DateTime end) && end > DateTime.UtcNow)
                     return (AccountTier.SUPER_PREMIUM, end);
@@ -78,21 +78,21 @@ namespace Coflnet.Sky.Commands.Shared
             catch (Exception e)
             {
                 dev.Logger.Instance.Error(e, "retrieving premium status for " + userId);
-                return (AccountTier.PREMIUM, DateTime.Now + TimeSpan.FromMinutes(3));
+                return (AccountTier.PREMIUM, DateTime.UtcNow + TimeSpan.FromMinutes(3));
             }
-            return (AccountTier.NONE, DateTime.Now + TimeSpan.FromMinutes(3));
+            return (AccountTier.NONE, DateTime.UtcNow + TimeSpan.FromMinutes(3));
         }
 
         public async Task<DateTime> ExpiresWhen(string userId)
         {
             if (GoogleUser.EveryoneIsPremium)
-                return DateTime.Now + TimeSpan.FromDays(30);
+                return DateTime.UtcNow + TimeSpan.FromDays(30);
             var until = await userApi.UserUserIdOwnsLongestPostAsync(userId, new() { premiumPlanName, testpremiumPlanName });
             return until;
         }
         public async Task<bool> HasPremium(int userId)
         {
-            return (await ExpiresWhen(userId)) > DateTime.Now;
+            return (await ExpiresWhen(userId)) > DateTime.UtcNow;
         }
     }
 }

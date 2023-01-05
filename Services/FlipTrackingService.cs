@@ -177,7 +177,7 @@ namespace Coflnet.Sky.Commands
                 var buyUidLookup = buyLookup.Select(a => a.Key).ToHashSet();
                 var sellIds = await context.NBTLookups.Where(b => b.KeyId == uidKey && buyUidLookup.Contains(b.Value)).AsNoTracking().Select(n => n.AuctionId).ToListAsync();
                 var buyAuctionUidLookup = buyLookup.Select(a => a.Value.First().UId).ToHashSet();
-                var sells = await context.Auctions.Where(b => sellIds.Contains(b.Id) && !buyAuctionUidLookup.Contains(b.UId) && b.End > start && b.HighestBidAmount > 0 && b.End < DateTime.Now)
+                var sells = await context.Auctions.Where(b => sellIds.Contains(b.Id) && !buyAuctionUidLookup.Contains(b.UId) && b.End > start && b.HighestBidAmount > 0 && b.End < DateTime.UtcNow)
                                         .Select(s => new { s.End, s.HighestBidAmount, s.NBTLookup, s.Uuid }).AsNoTracking().ToListAsync().ConfigureAwait(false);
 
                 return sells.Select(s =>
@@ -230,10 +230,10 @@ namespace Coflnet.Sky.Commands
             using var context = new HypixelContext();
 
             var playerIds = await context.Players.Where(p => uuids.Contains(p.UuId)).AsNoTracking().Select(p => p.Id).ToListAsync();
-            var startTime = DateTime.Now - timeSpan;
+            var startTime = DateTime.UtcNow - timeSpan;
             var uidKey = NBT.Instance.GetKeyId("uid");
             var sellList = await context.Auctions.Where(a => playerIds.Contains(a.SellerId))
-                .Where(a => a.End > startTime && a.End < DateTime.Now && a.HighestBidAmount > 0)
+                .Where(a => a.End > startTime && a.End < DateTime.UtcNow && a.HighestBidAmount > 0)
                 .Include(a => a.NBTLookup)
                 .Include(a => a.Enchantments)
                 .AsNoTracking()
