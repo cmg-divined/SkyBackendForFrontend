@@ -9,7 +9,9 @@ namespace Coflnet.Sky.Commands.Shared
     public class AccountInfo
     {
         [DataMember(Name = "userId")]
-        public int UserId;
+        public int UserIdOld;
+        [DataMember(Name = "userIdString")]
+        public string UserId;
         [DataMember(Name = "mcIds")]
         public List<string> McIds = new List<string>();
 

@@ -49,7 +49,7 @@ namespace Coflnet.Sky.Commands.Tests
 
             public long Id => new Random().NextInt64();
 
-            public int UserId => 1;
+            public string UserId => "1";
 
             public SettingsChange LatestSettings => new SettingsChange()
             {

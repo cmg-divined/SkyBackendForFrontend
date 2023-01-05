@@ -21,7 +21,7 @@ namespace Coflnet.Sky.Commands
         FlipSettings Settings { get; }
         AccountInfo AccountInfo { get; }
         long Id { get; }
-        int UserId { get; }
+        string UserId { get; }
         /// <summary>
         /// Logs information to the connection
         /// </summary>

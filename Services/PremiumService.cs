@@ -59,13 +59,13 @@ namespace Coflnet.Sky.Commands.Shared
             return await ExpiresWhen(userId.ToString());
         }
 
-        public async Task<(AccountTier, DateTime)> GetCurrentTier(int userId)
+        public async Task<(AccountTier, DateTime)> GetCurrentTier(string userId)
         {
             try
             {
                 if (GoogleUser.EveryoneIsPremium)
                     return (AccountTier.PREMIUM_PLUS, DateTime.Now + TimeSpan.FromDays(30));
-                var owns = await userApi.UserUserIdOwnsUntilPostAsync(userId.ToString(), new() { premiumPlanName, premiumPlusSlug, starterPremiumSlug, preApiSlug });
+                var owns = await userApi.UserUserIdOwnsUntilPostAsync(userId, new() { premiumPlanName, premiumPlusSlug, starterPremiumSlug, preApiSlug });
                 if (owns.TryGetValue(preApiSlug, out DateTime end) && end > DateTime.UtcNow)
                     return (AccountTier.SUPER_PREMIUM, end);
                 if (owns.TryGetValue(premiumPlusSlug, out end) && end > DateTime.UtcNow)
