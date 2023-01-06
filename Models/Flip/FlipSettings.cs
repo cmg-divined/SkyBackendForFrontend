@@ -87,8 +87,6 @@ namespace Coflnet.Sky.Commands.Shared
         [SettingsDoc("", true)]
         public string LastChanged { get; set; }
 
-        private static List<(string, ListMatcher, bool)> list;
-
         /// <summary>
         /// Determines if a flip matches a the <see cref="Filters"/>> of this instance
         /// </summary>
@@ -104,36 +102,55 @@ namespace Coflnet.Sky.Commands.Shared
 
             MakeSureMatchersAreInitialized();
 
-            foreach (var filterstage in list)
+            try
             {
-                var title = filterstage.Item1;
-                var matcher = filterstage.Item2;
-                var responseOnMatch = filterstage.Item3;
+                var forceBlacklistMatch = ForcedBlackListMatcher.IsMatch(flip);
+                if (forceBlacklistMatch.Item1)
+                    return (false, "forced blacklist " + forceBlacklistMatch.Item2);
+            }
+            catch (System.Exception e)
+            {
+                LogError(flip, "forced blacklist", ForcedBlackListMatcher, e);
+            }
+            try
+            {
+                var match = WhiteListMatcher.IsMatch(flip);
+                if (match.Item1)
+                    return (true, "whitelist " + match.Item2);
+            }
+            catch (System.Exception e)
+            {
+                LogError(flip, "whitelist ", WhiteListMatcher, e);
+            }
 
-                if (matcher == null)
-                {
-                    var main = MainSettingsMatch(flip);
-                    if (!main.Item1)
-                        return main;
-                    continue;
-                }
-                try
-                {
-                    var forceBlacklistMatch = matcher.IsMatch(flip);
-                    if (forceBlacklistMatch.Item1)
-                        return (responseOnMatch, title + " " + forceBlacklistMatch.Item2);
-                }
-                catch (System.Exception e)
-                {
-                    Activity.Current?.AddTag("flip", JSON.Stringify(flip));
-                    Activity.Current?.AddTag("filter", JSON.Stringify(matcher.FullList.Select(x => new { x.ItemTag, x.filter })).Truncate(38_000));
-                    throw new Exception("Error while matching " + title + " " + e.Message, e);
-                }
+            var main = MainSettingsMatch(flip);
+            if (!main.Item1)
+                return main;
+
+            var awmatch = AfterMainWhiteListMatcher.IsMatch(flip);
+            if (awmatch.Item1)
+                return (true, "whitelist am " + awmatch.Item2);
+
+            try
+            {
+                var match = BlackListMatcher.IsMatch(flip);
+                if (match.Item1)
+                    return (false, "blacklist " + match.Item2);
+            }
+            catch (System.Exception e)
+            {
+                LogError(flip, "blacklist ", BlackListMatcher, e);
             }
 
             return (true, "general filter");
         }
 
+        private static void LogError(FlipInstance flip, string title, ListMatcher matcher, Exception e)
+        {
+            Activity.Current?.AddTag("flip", JSON.Stringify(flip));
+            Activity.Current?.AddTag("filter", JSON.Stringify(matcher.FullList.Select(x => new { x.ItemTag, x.filter })));
+            throw new Exception("Error while matching " + title + " " + e.Message, e);
+        }
 
         private void MakeSureMatchersAreInitialized()
         {
@@ -145,15 +162,6 @@ namespace Coflnet.Sky.Commands.Shared
                 AfterMainWhiteListMatcher = new ListMatcher(GetAfterMainWhitelist());
             if (BlackListMatcher == null)
                 BlackListMatcher = new ListMatcher(BlackList?.Except(GetForceBlacklist()).ToList());
-
-            if (list == null)
-                list = new List<(string, ListMatcher, bool)>() {
-                ("forced blacklist", BlackListMatcher, false),
-                ("whitelist", WhiteListMatcher, true),
-                ("main", null, true),
-                ("whitelist after main", AfterMainWhiteListMatcher, true),
-                ("blacklist", BlackListMatcher, false),
-            };
         }
 
         private (bool, string) MainSettingsMatch(FlipInstance flip)
