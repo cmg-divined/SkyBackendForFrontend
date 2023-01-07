@@ -334,7 +334,10 @@ namespace Coflnet.Sky.Commands.Shared
             try
             {
                 if (flip.Auction.Context?.TryGetValue("pre-api", out var preApi) ?? true)
+                {
                     await PreApiLowPriceHandler(this, flip);
+                    minAccountTier = AccountTier.PREMIUM_PLUS;
+                }
             }
             catch (System.Exception e)
             {
@@ -347,7 +350,7 @@ namespace Coflnet.Sky.Commands.Shared
             }
 
             if (minAccountTier >= AccountTier.PREMIUM_PLUS)
-                await Task.Delay(900).ConfigureAwait(false);
+                await Task.Delay(1000).ConfigureAwait(false);
 
             foreach (var item in Subs)
             {
