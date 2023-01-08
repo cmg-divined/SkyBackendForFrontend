@@ -25,7 +25,7 @@ namespace Coflnet.Sky.Commands.Shared
         {
             if (!Enum.TryParse<LowPricedAuction.FinderType>(val, true, out LowPricedAuction.FinderType targetType))
                 throw new CoflnetException("invalid_finder", "the specified finder {val} does not exist");
-            return flip => flip.Finder == targetType;
+            return flip => targetType.HasFlag(flip.Finder);
         }
     }
 }

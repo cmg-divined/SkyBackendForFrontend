@@ -350,6 +350,26 @@ namespace Coflnet.Sky.Commands.Shared
             Matches(settings, sampleFlip);
         }
 
+        [Test]
+        public void CheckCombinedFinder()
+        {
+            var settings = new FlipSettings()
+            {
+                MinProfit = 35000000,
+                WhiteList = new List<ListEntry>() { new ListEntry() { ItemTag = "PET_ENDER_DRAGON",
+                filter = new Dictionary<string, string>() {
+                    { "FlipFinder", "FLIPPER_AND_SNIPERS" },
+                    { "MinProfitPercentage", "5" }
+                } } },
+                BlackList = new List<ListEntry>() { new ListEntry() { ItemTag = "PET_ENDER_DRAGON" } }
+            };
+            sampleFlip.Auction.Tag = "PET_ENDER_DRAGON";
+            sampleFlip.Auction.StartingBid = 250000000;
+            sampleFlip.MedianPrice = 559559559;
+            sampleFlip.Finder = LowPricedAuction.FinderType.SNIPER_MEDIAN;
+            Matches(settings, sampleFlip);
+        }
+
         private static void Matches(FlipSettings targetSettings, FlipInstance flip)
         {
             var matches = targetSettings.MatchesSettings(flip);
