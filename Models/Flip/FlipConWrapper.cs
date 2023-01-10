@@ -13,8 +13,7 @@ namespace Coflnet.Sky.Commands.Shared
     {
         public IFlipConnection Connection;
 
-        private Channel<LowPricedAuction> LowPriced = Channel.CreateBounded<LowPricedAuction>(
-                new BoundedChannelOptions(100) { FullMode = BoundedChannelFullMode.DropWrite });
+        private Channel<LowPricedAuction> LowPriced = Channel.CreateBounded<LowPricedAuction>(50);
 
         private CancellationTokenSource cancellationTokenSource = null;
         private bool stopWrites;
@@ -40,6 +39,8 @@ namespace Coflnet.Sky.Commands.Shared
                 AccountTier.SUPER_PREMIUM => 6,
                 _ => 1
             };
+            LowPriced = Channel.CreateBounded<LowPricedAuction>(
+                new BoundedChannelOptions(count * 80) { FullMode = BoundedChannelFullMode.DropWrite });
             var limiter = new SemaphoreSlim(count);
 
             for (int i = 0; i < count; i++)
