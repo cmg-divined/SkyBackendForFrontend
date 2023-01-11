@@ -145,7 +145,7 @@ namespace Coflnet.Sky.Commands.Shared
             if (bazaarItems?.Contains(itemTag) ?? false)
             {
                 var val = await bazaarClient.ApiBazaarItemIdSnapshotGetAsync(itemTag, DateTime.UtcNow);
-                if(val == null)
+                if (val == null)
                     return null;
 
                 return new CurrentPrice()
@@ -158,14 +158,21 @@ namespace Coflnet.Sky.Commands.Shared
             else
             {
                 var filter = new Dictionary<string, string>();
-                var lowestBins = await ItemPrices.GetLowestBin(itemTag, filter, count <= 2 ? 2 : count);
+                var lowestBins = await context.Auctions
+                        .Where(a => a.ItemId == id && a.End > DateTime.Now && a.HighestBidAmount == 0 && a.Bin)
+                        .Include(a => a.Enchantments)
+                        .Include(a => a.NbtData)
+                        .OrderBy(a => a.StartingBid)
+                        .Take(count <= 1 ? 1 : count)
+                        .AsNoTracking()
+                        .ToListAsync();
                 if (lowestBins == null || lowestBins.Count == 0)
                 {
                     var sumary = await GetSumary(itemTag, filter);
                     return new CurrentPrice() { Buy = sumary.Med, Sell = sumary.Min };
                 }
-                var cost = count == 1 ? lowestBins.FirstOrDefault().Price : lowestBins.Sum(a => a.Price);
-                return new CurrentPrice() { Buy = cost, Sell = (lowestBins.FirstOrDefault()?.Price ?? 0) * 0.99 , Available = lowestBins.Count };
+                var cost = count == 1 ? lowestBins.FirstOrDefault().StartingBid : lowestBins.Sum(a => a.StartingBid);
+                return new CurrentPrice() { Buy = cost, Sell = (lowestBins.FirstOrDefault()?.StartingBid ?? 0) * 0.98, Available = lowestBins.Count };
             }
         }
 
