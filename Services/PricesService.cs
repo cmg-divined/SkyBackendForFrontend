@@ -38,6 +38,24 @@ namespace Coflnet.Sky.Commands.Shared
         public async Task<PriceSumary> GetSumary(string itemTag, Dictionary<string, string> filter)
         {
             int id = GetItemId(itemTag);
+
+            var bazaarItems = await itemClient.ItemsBazaarTagsGetAsync();
+            if (bazaarItems?.Contains(itemTag) ?? false)
+            {
+                var val = await bazaarClient.ApiBazaarItemIdHistoryGetAsync(itemTag, DateTime.UtcNow - TimeSpan.FromDays(3), DateTime.UtcNow);
+                if (val == null)
+                    return null;
+
+                return new PriceSumary()
+                {
+                    Max = (long)val.Max(p => p.MaxBuy),
+                    Med = (long)val.Select(v => (v.Sell + v.Buy) / 2).OrderByDescending(v => v).Skip(val.Count() / 2).FirstOrDefault(),
+                    Min = (long)val.Min(p => p.MinSell),
+                    Mean = (long)val.Average(p => p.Buy),
+                    Mode = (long)val.GroupBy(p => p.Buy).OrderByDescending(p => p.Count()).FirstOrDefault().Key,
+                    Volume = (long)val.Sum(p => p.SellVolume)
+                };
+            }
             var days = 2;
             var minTime = DateTime.Now.Subtract(TimeSpan.FromDays(days));
             var mainSelect = context.Auctions.Where(a => a.ItemId == id && a.End < DateTime.Now && a.End > minTime && a.HighestBidAmount > 0);
