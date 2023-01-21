@@ -227,10 +227,40 @@ namespace Coflnet.Sky.Commands
 
         public async Task<FlipSumary> GetPlayerFlips(IEnumerable<string> uuids, System.TimeSpan timeSpan)
         {
-            using var context = new HypixelContext();
-
-            var playerIds = await context.Players.Where(p => uuids.Contains(p.UuId)).AsNoTracking().Select(p => p.Id).ToListAsync();
             var startTime = DateTime.UtcNow - timeSpan;
+            var playerGuids = uuids.Select(u => Guid.Parse(u)).ToHashSet();
+            // use flipTracking.FlipsPlayerIdGetAsync(uuid)
+            var allSoldFlips = await Task.WhenAll(uuids.Select(async uuid =>
+            {
+                return await flipTracking.FlipsPlayerIdGetAsync(Guid.Parse(uuid), startTime, DateTime.UtcNow);
+            }));
+
+            var relevantFlips = allSoldFlips.SelectMany(f => f).Where(f => f.Profit > 0).GroupBy(f => f.PurchaseAuctionId).Select(g => g.Last()).ToList();
+            var newFlips = relevantFlips.Select(f => new FlipDetails()
+            {
+                BuyTime = f.PurchaseTime,
+                Finder = (LowPricedAuction.FinderType)f.FinderType - 1,
+                ItemName = f.ItemName,
+                ItemTag = f.ItemTag,
+                OriginAuction = f.PurchaseAuctionId.ToString("N"),
+                PricePaid = f.PurchaseCost,
+                SellTime = f.SellTime,
+                SoldAuction = f.SellAuctionId.ToString("N"),
+                SoldFor = f.SellPrice,
+                Tier = f.ItemTier.ToString(),
+                uId = f.Uid,
+                PropertyChanges = f.ProfitChanges.Select(c => new PropertyChange(c.Label, c.Amount)).ToList(),
+                Profit = f.Profit
+            }).ToArray();
+
+            return new FlipSumary()
+            {
+                Flips = newFlips,
+                TotalProfit = newFlips.Sum(r => r.Profit)
+            };
+
+            using var context = new HypixelContext();
+            var playerIds = await context.Players.Where(p => uuids.Contains(p.UuId)).AsNoTracking().Select(p => p.Id).ToListAsync();
             var uidKey = NBT.Instance.GetKeyId("uid");
             var sellList = await context.Auctions.Where(a => playerIds.Contains(a.SellerId))
                 .Where(a => a.End > startTime && a.End < DateTime.UtcNow && a.HighestBidAmount > 0)
