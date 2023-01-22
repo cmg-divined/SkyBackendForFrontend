@@ -81,7 +81,7 @@ namespace Coflnet.Sky.Commands.Shared
             {
                 try
                 {
-                    await api.SettingsUserIdSettingKeyPostAsync(userId, key, JsonConvert.SerializeObject(JsonConvert.SerializeObject(data)));
+                    await api.SettingsUserIdSettingKeyPostAsync(userId, key, JsonConvert.SerializeObject(JsonConvert.SerializeObject(data)), 0, new System.Threading.CancellationTokenSource(3000).Token);
                     return;
                 }
                 catch (System.Exception e)
