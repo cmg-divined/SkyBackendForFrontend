@@ -235,7 +235,7 @@ namespace Coflnet.Sky.Commands
                 return await flipTracking.FlipsPlayerIdGetAsync(Guid.Parse(uuid), startTime, DateTime.UtcNow);
             }));
 
-            var relevantFlips = allSoldFlips.SelectMany(f => f).Where(f => f.Profit > 0).GroupBy(f => f.PurchaseAuctionId).Select(g => g.Last()).ToList();
+            var relevantFlips = allSoldFlips.SelectMany(f => f).Where(f => f.Profit != 0).GroupBy(f => f.PurchaseAuctionId).Select(g => g.Last()).ToList();
             var newFlips = relevantFlips.Select(f => new FlipDetails()
             {
                 BuyTime = f.PurchaseTime,
