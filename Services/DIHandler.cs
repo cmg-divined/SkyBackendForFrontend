@@ -12,6 +12,7 @@ using Coflnet.Sky.Commands.Shared;
 using Microsoft.Extensions.Hosting;
 using System.Threading.Tasks;
 using System.Threading;
+using Coflnet.Sky.FlipTracker.Client.Api;
 
 namespace Coflnet.Sky.Commands.Shared
 {
@@ -92,6 +93,16 @@ namespace Coflnet.Sky.Commands.Shared
             {
                 var config = context.GetRequiredService<IConfiguration>();
                 return new Api.Client.Api.SearchApi(config["API_BASE_URL"]);
+            });
+            services.AddSingleton<IAnalyseApi>(context =>
+            {
+                var config = context.GetRequiredService<IConfiguration>();
+                return new AnalyseApi(config["FLIPTRACKER_BASE_URL"]);
+            });
+            services.AddSingleton<ITrackerApi>(context =>
+            {
+                var config = context.GetRequiredService<IConfiguration>();
+                return new TrackerApi(config["FLIPTRACKER_BASE_URL"]);
             });
 
             services.AddSingleton<PremiumService>();
