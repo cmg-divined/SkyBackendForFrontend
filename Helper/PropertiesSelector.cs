@@ -85,6 +85,13 @@ namespace Coflnet.Sky.Commands.Helper
             if (enchants != null)
                 properties.AddRange(enchants);
 
+            if(data.TryGetValue("drill_part_engine", out string engine))
+                properties.Add(new Property($"Engine: {ItemDetails.TagToName(engine)}", 15));
+            if(data.TryGetValue("drill_part_fuel_tank", out string tank))
+                properties.Add(new Property($"Tank: {ItemDetails.TagToName(tank)}", 15));
+            if(data.TryGetValue("drill_part_upgrade_module", out string module))
+                properties.Add(new Property($"Module: {ItemDetails.TagToName(module)}", 15));
+
             return properties;
         }
     }
