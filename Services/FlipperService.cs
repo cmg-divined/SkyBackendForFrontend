@@ -526,8 +526,9 @@ namespace Coflnet.Sky.Commands.Shared
             {
                 try
                 {
-                    await DeliverLowPricedAuctions(flips.ToList()).ConfigureAwait(false);
-                    snipesReceived.Inc(flips.Count());
+                    var collection = flips.ToList();
+                    await DeliverLowPricedAuctions(collection).ConfigureAwait(false);
+                    snipesReceived.Inc(collection.Count);
                 }
                 catch (Exception e)
                 {
