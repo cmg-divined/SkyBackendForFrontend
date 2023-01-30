@@ -79,5 +79,8 @@ namespace Coflnet.Sky.Commands.Shared
         [DataMember(Name = "autoStartFlipper")]
         [SettingsDoc("Start showing flips automatically when joining skyblock", false, "fas")]
         public bool AutoStartFlipper;
+        [DataMember(Name = "normalSoldFlips")]
+        [SettingsDoc("Don't add [SOLD] to sold flips, send them normally instead")]
+        public bool NormalSoldFlips;
     }
 }
