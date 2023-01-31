@@ -13,6 +13,7 @@ using Microsoft.Extensions.Hosting;
 using System.Threading.Tasks;
 using System.Threading;
 using Coflnet.Sky.FlipTracker.Client.Api;
+using Coflnet.Sky.Mayor.Client.Api;
 
 namespace Coflnet.Sky.Commands.Shared
 {
@@ -104,6 +105,11 @@ namespace Coflnet.Sky.Commands.Shared
             {
                 var config = context.GetRequiredService<IConfiguration>();
                 return new TrackerApi(config["FLIPTRACKER_BASE_URL"]);
+            });
+            services.AddSingleton<IMayorApi>(context =>
+            {
+                var config = context.GetRequiredService<IConfiguration>();
+                return new MayorApi(config["MAYOR_BASE_URL"]);
             });
 
             services.AddSingleton<PremiumService>();
