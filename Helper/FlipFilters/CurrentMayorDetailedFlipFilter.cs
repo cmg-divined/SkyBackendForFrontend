@@ -15,7 +15,8 @@ public class CurrentMayorDetailedFlipFilter : DetailedFlipFilter
     public Expression<Func<FlipInstance, bool>> GetExpression(Dictionary<string, string> filters, string val)
     {
         // normalize the name
-        val = Options.FirstOrDefault(t => t.ToString().ToLower() == val.ToLower()).ToString();
+        val = Options.FirstOrDefault(t => t.ToString().ToLower() == val.ToLower())?.ToString();
+        Console.WriteLine(val);
         if (val == null)
             throw new CoflnetException("invalid_mayor", "The specified mayor does not exist");
         var current = DiHandler.GetService<Sky.Mayor.Client.Api.IMayorApi>().MayorCurrentGet();

@@ -66,6 +66,7 @@ namespace Coflnet.Sky.Commands.Shared
                         }
                         catch (Exception e)
                         {
+                            Console.WriteLine(e);
                             throw new CoflnetException("filter_parsing", $"Error in filter {item} with value {match.Value} : {e.Message}");
                         }
                     }
