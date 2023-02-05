@@ -90,7 +90,7 @@ namespace Coflnet.Sky.Commands.Shared
         private static void AddCopyOfFlipToBatch(LowPricedAuction flip, List<LowPricedAuction> batch)
         {
             var copy = Copy(flip);
-            copy.AdditionalProps.TryAdd("da", (DateTime.UtcNow - flip.Auction.FindTime).ToString());
+            copy.AdditionalProps["da"] = (DateTime.UtcNow - flip.Auction.FindTime).ToString();
             batch.Add(copy);
         }
 
