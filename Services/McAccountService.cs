@@ -20,7 +20,7 @@ namespace Coflnet.Sky.Commands
             var mcRequest = new RestRequest("connect/user/{userId}")
                                 .AddUrlSegment("userId", userId);
             McConnect.Models.User mcAccounts = await ExecuteUserRequest(mcRequest);
-            return mcAccounts.Accounts.OrderByDescending(a => a.LastRequestedAt).Where(a => a.Verified).FirstOrDefault();
+            return mcAccounts.Accounts.Where(a => a.Verified).OrderByDescending(a => a.LastRequestedAt).FirstOrDefault();
         }
         public async Task<IEnumerable<string>> GetAllAccounts(string userId, DateTime oldest = default)
         {
