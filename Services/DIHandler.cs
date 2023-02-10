@@ -7,6 +7,7 @@ using Coflnet.Sky.Items.Client.Api;
 using Coflnet.Sky.Referral.Client.Api;
 using Coflnet.Sky.Sniper.Client.Api;
 using Coflnet.Sky.Crafts.Client.Api;
+using Coflnet.Sky.McConnect.Api;
 using Coflnet.Sky.Core;
 using Coflnet.Sky.Commands.Shared;
 using Microsoft.Extensions.Hosting;
@@ -111,6 +112,8 @@ namespace Coflnet.Sky.Commands.Shared
                 var config = context.GetRequiredService<IConfiguration>();
                 return new MayorApi(config["MAYOR_BASE_URL"]);
             });
+            services.AddSingleton<IConnectApi, ConnectApi>(
+                sp => new ConnectApi(sp.GetRequiredService<IConfiguration>()["MCCONNECT_BASE_URL"]));
 
             services.AddSingleton<PremiumService>();
             services.AddSingleton<EventBrokerClient>();

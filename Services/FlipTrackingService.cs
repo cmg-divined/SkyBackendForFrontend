@@ -12,6 +12,9 @@ using Newtonsoft.Json;
 using OpenTracing;
 using Microsoft.Extensions.Configuration;
 using System.Diagnostics;
+using Coflnet.Sky.McConnect.Api;
+using Coflnet.Payments.Client.Api;
+using System.Collections.Concurrent;
 
 namespace Coflnet.Sky.Commands
 {
@@ -27,6 +30,9 @@ namespace Coflnet.Sky.Commands
         private GemPriceService gemPriceService;
         private UpgradePriceService priceService;
         private ActivitySource tracer;
+        private IConnectApi connectApi;
+        private IProductsApi productApi;
+
 
         IProducer<string, FlipTracker.Client.Model.FlipEvent> producer;
 
@@ -36,7 +42,13 @@ namespace Coflnet.Sky.Commands
             ProduceTopic = SimplerConfig.Config.Instance["TOPICS:FLIP_EVENT"];
         }
 
-        public FlipTrackingService(GemPriceService gemPriceService, UpgradePriceService priceService, ActivitySource tracer, IConfiguration config)
+        public FlipTrackingService(
+            GemPriceService gemPriceService,
+            UpgradePriceService priceService,
+            ActivitySource tracer,
+            IConfiguration config,
+            IConnectApi connectApi,
+            IProductsApi productApi)
         {
             producer = new ProducerBuilder<string, FlipTracker.Client.Model.FlipEvent>(new ProducerConfig
             {
@@ -50,6 +62,8 @@ namespace Coflnet.Sky.Commands
             this.gemPriceService = gemPriceService;
             this.priceService = priceService;
             this.tracer = tracer;
+            this.connectApi = connectApi;
+            this.productApi = productApi;
         }
 
 
@@ -126,6 +140,44 @@ namespace Coflnet.Sky.Commands
             var breakdown = await GetSpeedComp(playerIds);
             var hourCount = breakdown?.Times?.Where(t => t.TotalSeconds > 1).GroupBy(t => System.TimeSpan.Parse(t.Age).Hours).Count() ?? 0;
             return (System.TimeSpan.FromSeconds(breakdown?.Penalty ?? 0), hourCount);
+        }
+
+        public async Task<long> GetPreApiProfit()
+        {
+            var ownedAt = await productApi.ProductsServiceServiceSlugOwnedGetAsync("pre_api", DateTime.UtcNow - System.TimeSpan.FromDays(1), DateTime.UtcNow);
+            var minecraftConnnectionResponse = await connectApi.ConnectUsersIdsGetAsync(ownedAt.Select(o => o.UserId).Distinct().ToList());
+            var includeMap = new ConcurrentDictionary<string, List<(DateTime start, DateTime end)>>();
+            foreach (var user in minecraftConnnectionResponse)
+            {
+                foreach (var ownership in ownedAt)
+                {
+                    if (ownership.UserId != user.ExternalId)
+                    {
+                        continue;
+                    }
+                    foreach (var account in user.Accounts)
+                    {
+                        includeMap.GetOrAdd(account.AccountUuid, (k) => new()).Add((ownership.Start, ownership.End));
+                    }
+                }
+            }
+            var accountsToCheck = minecraftConnnectionResponse.SelectMany(m => m.Accounts).Where(a => a.LastRequestedAt > DateTime.UtcNow - TimeSpan.FromDays(3)).ToList();
+            var result = await Task.WhenAll(accountsToCheck.Select(a => flipTracking.FlipsPlayerIdGetAsync(Guid.Parse(a.AccountUuid))));
+            Console.WriteLine($"Found total {result.Sum(r => r.Count)} flips");
+            var totalProfit = 0L;
+            var count = 0;
+            foreach (var flip in result.SelectMany(r => r))
+            {
+                if (!includeMap.TryGetValue(flip.Flipper.ToString(), out var include))
+                    continue;
+                if (include.Any(i => flip.PurchaseTime > i.start && flip.PurchaseTime < i.end))
+                {
+                    totalProfit += flip.Profit;
+                    count++;
+                }
+            }
+            Console.WriteLine($"Found {count} preapi flips");
+            return totalProfit;
         }
 
         /// <summary>
