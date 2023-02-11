@@ -146,7 +146,7 @@ namespace Coflnet.Sky.Commands
         {
             var ownedAt = await productApi.ProductsServiceServiceSlugOwnedGetAsync("pre_api", DateTime.UtcNow - System.TimeSpan.FromDays(1), DateTime.UtcNow);
             var minecraftConnnectionResponse = await connectApi.ConnectUsersIdsGetAsync(ownedAt.Select(o => o.UserId).Distinct().ToList());
-            var includeMap = new ConcurrentDictionary<string, List<(DateTime start, DateTime end)>>();
+            var includeMap = new ConcurrentDictionary<Guid, List<(DateTime start, DateTime end)>>();
             foreach (var user in minecraftConnnectionResponse)
             {
                 foreach (var ownership in ownedAt)
@@ -157,7 +157,7 @@ namespace Coflnet.Sky.Commands
                     }
                     foreach (var account in user.Accounts)
                     {
-                        includeMap.GetOrAdd(account.AccountUuid, (k) => new()).Add((ownership.Start, ownership.End));
+                        includeMap.GetOrAdd(Guid.Parse(account.AccountUuid), (k) => new()).Add((ownership.Start, ownership.End));
                     }
                 }
             }
@@ -170,7 +170,7 @@ namespace Coflnet.Sky.Commands
             var count = 0;
             foreach (var flip in result.SelectMany(r => r))
             {
-                if (!includeMap.TryGetValue(flip.Flipper.ToString(), out var include))
+                if (!includeMap.TryGetValue(flip.Flipper, out var include))
                     continue;
                 if (include.Any(i => flip.PurchaseTime > i.start && flip.PurchaseTime < i.end))
                 {
