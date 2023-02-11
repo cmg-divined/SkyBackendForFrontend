@@ -142,7 +142,7 @@ namespace Coflnet.Sky.Commands
             return (System.TimeSpan.FromSeconds(breakdown?.Penalty ?? 0), hourCount);
         }
 
-        public async Task<long> GetPreApiProfit()
+        public async Task<TierSumary> GetPreApiProfit()
         {
             var ownedAt = await productApi.ProductsServiceServiceSlugOwnedGetAsync("pre_api", DateTime.UtcNow - System.TimeSpan.FromDays(1), DateTime.UtcNow);
             var minecraftConnnectionResponse = await connectApi.ConnectUsersIdsGetAsync(ownedAt.Select(o => o.UserId).Distinct().ToList());
@@ -166,20 +166,28 @@ namespace Coflnet.Sky.Commands
             Console.WriteLine($"Checked {accountsToCheck.Count} accounts");
             Console.WriteLine($"Owned {ownedAt.Count} accounts, including {includeMap.Count} accounts");
             Console.WriteLine($"Found total {result.Sum(r => r.Count)} flips");
-            var totalProfit = 0L;
-            var count = 0;
+            var flipsBoughtWhile = new List<PastFlip>();
             foreach (var flip in result.SelectMany(r => r))
             {
                 if (!includeMap.TryGetValue(flip.Flipper, out var include))
                     continue;
                 if (include.Any(i => flip.PurchaseTime > i.start && flip.PurchaseTime < i.end))
                 {
-                    totalProfit += flip.Profit;
-                    count++;
+                    flipsBoughtWhile.Add(flip);
                 }
             }
-            Console.WriteLine($"Found {count} preapi flips");
-            return totalProfit;
+            var totalProfit = flipsBoughtWhile.Sum(f => f.Profit);
+            Console.WriteLine($"Found {flipsBoughtWhile.Count} preapi flips");
+            return new()
+            {
+                AverageProfit = totalProfit / Math.Max(1, includeMap.Count),
+                HourCount = ownedAt.Count,
+                FlipCount = flipsBoughtWhile.Count,
+                PlayerCount = includeMap.Count,
+                BestProfit = flipsBoughtWhile.Select(f => f.Profit).DefaultIfEmpty(0L).Max(),
+                BestProfitName = flipsBoughtWhile.MaxBy(f => f.Profit)?.ItemName,
+                Profit = totalProfit
+            };
         }
 
         /// <summary>
