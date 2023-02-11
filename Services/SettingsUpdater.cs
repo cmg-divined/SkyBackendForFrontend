@@ -22,6 +22,7 @@ namespace Coflnet.Sky.Commands.Shared
             public string Info;
             public bool Hide;
             public string ShortHand;
+            public string Type;
 
             public string Prefix { get; set; }
         }
@@ -61,7 +62,8 @@ namespace Coflnet.Sky.Commands.Shared
                 Prefix = prefix,
                 Info = doc?.Description,
                 Hide = (doc?.Hide ?? false) || isShortHand,
-                ShortHand = doc?.ShortHand
+                ShortHand = doc?.ShortHand,
+                Type = item.FieldType.Name
             };
         }
 
@@ -111,6 +113,49 @@ namespace Coflnet.Sky.Commands.Shared
                 UpdateValueOnObject(value, doc.RealName, con.Settings);
             }
             return value;
+        }
+
+        public async Task<object> GetCurrentValue(IFlipConnection con, string key)
+        {
+            if (key == "blacklist")
+                return con.Settings.BlackList;
+            else if (key == "whitelist")
+                return con.Settings.WhiteList;
+            else if (key == "filter")
+                return con.Settings.Filters;
+            else if (!options.TryGetValue(key, out SettingDoc doc))
+            {
+                var closest = options.Keys.OrderBy(k => Fastenshtein.Levenshtein.Distance(k.ToLower(), key.ToLower())).First();
+                throw new UnkownSettingException(key, closest);
+            }
+            else if (doc.Prefix == "show")
+            {
+                if (con.Settings.Visibility == null)
+                    con.Settings.Visibility = new VisibilitySettings();
+                return GetValueOnObject(doc.RealName, con.Settings.Visibility);
+            }
+            else if (doc.Prefix == "mod")
+            {
+                if (con.Settings.ModSettings == null)
+                    con.Settings.ModSettings = new ModSettings();
+                return GetValueOnObject(doc.RealName, con.Settings.ModSettings);
+            }
+            else if (doc.Prefix == "privacy")
+            {
+                var settingsService = DiHandler.GetService<SettingsService>();
+                var current = await settingsService.GetCurrentValue<PrivacySettings>(con.UserId.ToString(), "privacySettings", () => PrivacySettings.Default);
+                return GetValueOnObject(doc.RealName, current);
+            }
+            else
+            {
+                return GetValueOnObject(doc.RealName, con.Settings);
+            }
+        }
+
+        private object GetValueOnObject(string realKey, object obj)
+        {
+            var field = obj.GetType().GetField(realKey);
+            return field.GetValue(obj);
         }
 
 
