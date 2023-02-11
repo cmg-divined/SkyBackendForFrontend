@@ -162,7 +162,7 @@ namespace Coflnet.Sky.Commands
                 }
             }
             var accountsToCheck = minecraftConnnectionResponse.SelectMany(m => m.Accounts).Where(a => a.LastRequestedAt > DateTime.UtcNow - TimeSpan.FromDays(3)).ToList();
-            var result = await Task.WhenAll(accountsToCheck.Select(a => flipTracking.FlipsPlayerIdGetAsync(Guid.Parse(a.AccountUuid))));
+            var result = await Task.WhenAll(accountsToCheck.Select(a => flipTracking.FlipsPlayerIdGetAsync(Guid.Parse(a.AccountUuid), DateTime.UtcNow - TimeSpan.FromDays(1), DateTime.UtcNow)));
             Console.WriteLine($"Checked {accountsToCheck.Count} accounts");
             Console.WriteLine($"Owned {ownedAt.Count} accounts, including {includeMap.Count} accounts");
             Console.WriteLine($"Found total {result.Sum(r => r.Count)} flips");
