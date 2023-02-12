@@ -176,6 +176,12 @@ namespace Coflnet.Sky.Commands
                     flipsBoughtWhile.Add(flip);
                 }
             }
+            var profitPerAccount = flipsBoughtWhile.GroupBy(f => f.Flipper).ToDictionary(g => g.Key, g => g.Sum(f => f.Profit));
+            var profitPerUser = minecraftConnnectionResponse.Select(m => new
+            {
+                m.ExternalId,
+                Profit = m.Accounts.Sum(a => profitPerAccount.GetValueOrDefault(Guid.Parse(a.AccountUuid), 0))
+            }).ToList();
             var totalProfit = flipsBoughtWhile.Sum(f => f.Profit);
             Console.WriteLine($"Found {flipsBoughtWhile.Count} preapi flips");
             return new()
@@ -183,10 +189,11 @@ namespace Coflnet.Sky.Commands
                 AverageProfit = totalProfit / Math.Max(1, includeMap.Count),
                 HourCount = ownedAt.Count,
                 FlipCount = flipsBoughtWhile.Count,
-                PlayerCount = includeMap.Count,
+                PlayerCount = minecraftConnnectionResponse.Count(),
                 BestProfit = flipsBoughtWhile.Select(f => f.Profit).DefaultIfEmpty(0L).Max(),
                 BestProfitName = flipsBoughtWhile.MaxBy(f => f.Profit)?.ItemName,
-                Profit = totalProfit
+                Profit = totalProfit,
+                MostUserProfit = profitPerUser.Select(f => f.Profit).DefaultIfEmpty(0L).Max()
             };
         }
 
