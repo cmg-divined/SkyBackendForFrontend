@@ -24,5 +24,5 @@ public class CurrentMayorDetailedFlipFilter : DetailedFlipFilter
             throw new CoflnetException("no_mayor", "Current mayor could not be retrieved");
         return (f) => val == current.Name;
     }
-    public Filter.FilterType FilterType => Filter.FilterType.SIMPLE;
+    public Filter.FilterType FilterType => Filter.FilterType.Equal;
 }
