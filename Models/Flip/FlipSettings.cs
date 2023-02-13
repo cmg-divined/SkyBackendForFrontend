@@ -183,6 +183,20 @@ namespace Coflnet.Sky.Commands.Shared
             return (true, null);
         }
 
+        public void CopyListMatchers(FlipSettings other)
+        {
+            if(other == null)
+                return;
+            if(other.ForcedBlackListMatcher != null && other.BlackList?.Count == BlackList.Count)
+                ForcedBlackListMatcher = other.ForcedBlackListMatcher;
+            if(other.WhiteListMatcher != null && other.WhiteList?.Count == WhiteList.Count)
+                WhiteListMatcher = other.WhiteListMatcher;
+            if(other.AfterMainWhiteListMatcher != null && other.WhiteList?.Count == WhiteList.Count)
+                AfterMainWhiteListMatcher = other.AfterMainWhiteListMatcher;
+            if(other.BlackListMatcher != null && other.BlackList?.Count == BlackList.Count)
+                BlackListMatcher = other.BlackListMatcher;
+        }
+
         public List<ListEntry> GetForceBlacklist()
         {
             return BlackList?.Where(b => b.filter?.Where(f => f.Key == "ForceBlacklist").Any() ?? false).ToList();
