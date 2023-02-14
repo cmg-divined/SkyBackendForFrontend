@@ -197,6 +197,20 @@ namespace Coflnet.Sky.Commands.Shared
                 BlackListMatcher = other.BlackListMatcher;
         }
 
+        public void RecompileMatchers()
+        {
+            ClearListMatchers();
+            MakeSureMatchersAreInitialized();
+        }
+
+        public void ClearListMatchers()
+        {
+            ForcedBlackListMatcher = null;
+            WhiteListMatcher = null;
+            AfterMainWhiteListMatcher = null;
+            BlackListMatcher = null;
+        }
+
         public List<ListEntry> GetForceBlacklist()
         {
             return BlackList?.Where(b => b.filter?.Where(f => f.Key == "ForceBlacklist").Any() ?? false).ToList();
