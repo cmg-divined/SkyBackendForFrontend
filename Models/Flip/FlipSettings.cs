@@ -187,13 +187,13 @@ namespace Coflnet.Sky.Commands.Shared
         {
             if(other == null)
                 return;
-            if(other.ForcedBlackListMatcher != null && other.BlackList?.Count == BlackList.Count)
+            if(other.ForcedBlackListMatcher != null && other.BlackList?.SequenceEqual(BlackList) == true)
                 ForcedBlackListMatcher = other.ForcedBlackListMatcher;
-            if(other.WhiteListMatcher != null && other.WhiteList?.Count == WhiteList.Count)
+            if(other.WhiteListMatcher != null && other.WhiteList?.SequenceEqual(WhiteList) == true)
                 WhiteListMatcher = other.WhiteListMatcher;
-            if(other.AfterMainWhiteListMatcher != null && other.WhiteList?.Count == WhiteList.Count)
+            if(other.AfterMainWhiteListMatcher != null && other.WhiteList?.SequenceEqual(WhiteList) == true)
                 AfterMainWhiteListMatcher = other.AfterMainWhiteListMatcher;
-            if(other.BlackListMatcher != null && other.BlackList?.Count == BlackList.Count)
+            if(other.BlackListMatcher != null && other.BlackList?.SequenceEqual(BlackList) == true)
                 BlackListMatcher = other.BlackListMatcher;
         }
 
@@ -342,7 +342,7 @@ namespace Coflnet.Sky.Commands.Shared
 
             private void AddElement(ListEntry item)
             {
-                if (item.filter == null || item.filter.Count == 0)
+                if (item.filter == null || item.filter.Count == 0 || (item.filter.Count == 1 && item.filter.First().Key == "ForceBlacklist"))
                     Ids.Add(item.ItemTag);
                 else
                     RemainingFilters.Add(item);
