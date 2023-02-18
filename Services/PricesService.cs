@@ -45,7 +45,8 @@ namespace Coflnet.Sky.Commands.Shared
                 var val = await bazaarClient.ApiBazaarItemIdHistoryGetAsync(itemTag, DateTime.UtcNow - TimeSpan.FromDays(3), DateTime.UtcNow);
                 if (val == null)
                     return null;
-
+                if (val.Count() == 0)
+                    return new();
                 return new PriceSumary()
                 {
                     Max = (long)val.Max(p => p.MaxBuy),
