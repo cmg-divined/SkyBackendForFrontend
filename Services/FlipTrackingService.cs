@@ -162,7 +162,13 @@ namespace Coflnet.Sky.Commands
                 }
             }
             var accountsToCheck = minecraftConnnectionResponse.SelectMany(m => m.Accounts).Where(a => a.LastRequestedAt > DateTime.UtcNow - TimeSpan.FromDays(3)).ToList();
-            var result = await Task.WhenAll(accountsToCheck.Select(a => flipTracking.FlipsPlayerIdGetAsync(Guid.Parse(a.AccountUuid), DateTime.UtcNow - TimeSpan.FromDays(1), DateTime.UtcNow)));
+            var sentRequest = ownedAt.SelectMany(o => minecraftConnnectionResponse.Where(m => m.ExternalId == o.UserId)
+                    .SelectMany(m => m.Accounts.Where(a => a.LastRequestedAt > DateTime.UtcNow - TimeSpan.FromDays(3)).Select(a => new FlipTimeSelection(a.AccountUuid, o.Start, o.End)))).ToList();
+            var multiRequests = Task.WhenAll(accountsToCheck.Select(a => flipTracking.FlipsPlayerIdGetAsync(Guid.Parse(a.AccountUuid), DateTime.UtcNow - TimeSpan.FromDays(1), DateTime.UtcNow)));
+
+            long totalProfitSent = await LoadProfitOfSentFlips(sentRequest);
+
+            var result = await multiRequests;
             Console.WriteLine($"Checked {accountsToCheck.Count} accounts");
             Console.WriteLine($"Owned {ownedAt.Count} accounts, including {includeMap.Count} accounts");
             Console.WriteLine($"Found total {result.Sum(r => r.Count)} flips");
@@ -193,8 +199,34 @@ namespace Coflnet.Sky.Commands
                 BestProfit = flipsBoughtWhile.Select(f => f.Profit).DefaultIfEmpty(0L).Max(),
                 BestProfitName = flipsBoughtWhile.MaxBy(f => f.Profit)?.ItemName,
                 Profit = totalProfit,
+                ProfitSent = totalProfitSent,
                 MostUserProfit = profitPerUser.Select(f => f.Profit).DefaultIfEmpty(0L).Max()
             };
+        }
+
+        private async Task<long> LoadProfitOfSentFlips(List<FlipTimeSelection> sentRequest)
+        {
+            var totalSent = await flipAnalyse.FlipsSentPostAsync(sentRequest);
+            var sentAuctionids = totalSent.Select(f => long.Parse(f.AuctionId)).ToHashSet();
+            var sentMap = new Dictionary<string, (string, long)>();
+            using (var context = new HypixelContext())
+            {
+                var auctions = await context.Auctions.Include(a => a.Bids).Where(a => sentAuctionids.Contains(a.UId))
+                    .Select(a => new
+                    {
+                        a.UId,
+                        a.HighestBidAmount,
+                        Buyer = a.Bids.OrderByDescending(b => b.Amount).Select(b => b.Bidder).FirstOrDefault()
+                    })
+                    .ToListAsync();
+                foreach (var auction in auctions)
+                {
+                    sentMap[auction.UId.ToString()] = (auction.Buyer, auction.HighestBidAmount);
+                }
+            }
+            var totalProfitSent = totalSent.Where(f => sentMap.TryGetValue(f.AuctionId, out var sent)).Sum(f => f.Worth - sentMap[f.AuctionId].Item2);
+            Console.WriteLine($"Sent {sentMap.Count} flips value {totalProfitSent}");
+            return totalProfitSent;
         }
 
         /// <summary>
