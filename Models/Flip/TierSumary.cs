@@ -9,4 +9,5 @@ public class TierSumary
     public string BestProfitName { get; set; }
     public long AverageProfit { get; set; }
     public long MostUserProfit { get; set; }
+    public long ProfitSent { get; set; }
 }
