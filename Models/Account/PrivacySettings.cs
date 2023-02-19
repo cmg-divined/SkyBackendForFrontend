@@ -23,8 +23,10 @@ namespace Coflnet.Sky.Commands.Shared
         public bool CollectChatClicks;
         [SettingsDoc("Collect which server you are on")]
         public bool CollectLobbyChanges;
-        [SettingsDoc("Collect entities near you (1.5.x mod feature)")]
+        [SettingsDoc("Collect entities near you (1.6.x mod feature)")]
         public bool CollectEntities;
+        [SettingsDoc("Collect player position and orientation")]
+        public bool CollectLocation;
         /// <summary>
         /// Wherever or not to send item descriptions for extending to the server
         /// </summary>
