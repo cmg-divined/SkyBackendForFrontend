@@ -86,7 +86,7 @@ namespace Coflnet.Sky.Commands.Shared
                 }
                 catch (System.Exception e)
                 {
-                    await Task.Delay(20 * i);
+                    await Task.Delay(300 * (i + 1));
                     if (i > 0)
                         Console.WriteLine($"failed to update settings {e.Message} \n" + JsonConvert.SerializeObject(data));
                     if (i == 2)
