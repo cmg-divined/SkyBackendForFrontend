@@ -240,12 +240,12 @@ namespace Coflnet.Sky.Commands.Shared
                 filters["Reforge"] = auction.Reforge.ToString();
             }
             filters["Rarity"] = auction.Tier.ToString();
-
-            var exactLowestTask = ItemPrices.GetLowestBin(auction.Tag, filters);
+            var auctionsApi = DiHandler.GetService<Coflnet.Sky.Api.Client.Api.AuctionsApi>();
+            var exactLowestTask = auctionsApi.ApiAuctionsTagItemTagActiveBinGetAsync(auction.Tag, filters); ;
             List<ItemPrices.AuctionPreview> lowestBin = await ItemPrices.GetLowestBin(auction.Tag, auction.Tier);
             var exactLowest = await exactLowestTask;
             if (exactLowest?.Count > 1)
-                return exactLowest;
+                return exactLowest.Select(a => new ItemPrices.AuctionPreview() { Price = Math.Max(a.StartingBid, a.HighestBidAmount), Uuid = a.Uuid, End = a.End, Seller = a.AuctioneerId }).ToList();
             return lowestBin;
         }
 
