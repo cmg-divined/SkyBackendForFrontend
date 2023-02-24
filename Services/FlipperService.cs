@@ -64,6 +64,7 @@ namespace Coflnet.Sky.Commands.Shared
         public void AddConnectionPlus(IFlipConnection connection, bool sendHistory = true)
         {
             SubToTier(connection, sendHistory, SuperSubs);
+            Subs.TryRemove(connection.Id, out _);
         }
 
         public void AddConnection(IFlipConnection connection, bool sendHistory = true)

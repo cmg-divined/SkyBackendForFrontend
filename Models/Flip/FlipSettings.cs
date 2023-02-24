@@ -185,15 +185,15 @@ namespace Coflnet.Sky.Commands.Shared
 
         public void CopyListMatchers(FlipSettings other)
         {
-            if(other == null)
+            if (other == null)
                 return;
-            if(other.ForcedBlackListMatcher != null && other.BlackList?.SequenceEqual(BlackList) == true)
+            if (other.ForcedBlackListMatcher != null && other.BlackList?.SequenceEqual(BlackList) == true)
                 ForcedBlackListMatcher = other.ForcedBlackListMatcher;
-            if(other.WhiteListMatcher != null && other.WhiteList?.SequenceEqual(WhiteList) == true)
+            if (other.WhiteListMatcher != null && other.WhiteList?.SequenceEqual(WhiteList) == true)
                 WhiteListMatcher = other.WhiteListMatcher;
-            if(other.AfterMainWhiteListMatcher != null && other.WhiteList?.SequenceEqual(WhiteList) == true)
+            if (other.AfterMainWhiteListMatcher != null && other.WhiteList?.SequenceEqual(WhiteList) == true)
                 AfterMainWhiteListMatcher = other.AfterMainWhiteListMatcher;
-            if(other.BlackListMatcher != null && other.BlackList?.SequenceEqual(BlackList) == true)
+            if (other.BlackListMatcher != null && other.BlackList?.SequenceEqual(BlackList) == true)
                 BlackListMatcher = other.BlackListMatcher;
         }
 
@@ -298,11 +298,13 @@ namespace Coflnet.Sky.Commands.Shared
 
             public ListMatcher(List<ListEntry> BlackList)
             {
-                this.FullList = BlackList;
                 if (BlackList == null || BlackList.Count == 0)
                     return;
-                foreach (var item in BlackList)
+                this.FullList = new(BlackList.Select(b => b.Clone()));
+                ConcurrentDictionary<string, List<ListEntry>> forTags = ExtractFiltersForTags();
+                foreach (var item in FullList)
                 {
+                    AddFiltersBasedOnTags(forTags, item);
                     AddElement(item);
                     if (item.ItemTag != null)
                         AddElement(new ListEntry()
@@ -317,6 +319,11 @@ namespace Coflnet.Sky.Commands.Shared
                     string key = KeyFromTag(item.ItemTag);
                     isMatch.AddOrUpdate(key, item.GetExpression(), (k, old) => old.Or(item.GetExpression()));
                 }
+                AssignMatchers(isMatch);
+            }
+
+            private void AssignMatchers(ConcurrentDictionary<string, Expression<Func<FlipInstance, bool>>> isMatch)
+            {
                 foreach (var item in isMatch)
                 {
                     try
@@ -328,6 +335,46 @@ namespace Coflnet.Sky.Commands.Shared
                     {
                         Console.WriteLine($"Could not compile matcher for {item.Key}  {item.Value}");
                         throw e;
+                    }
+                }
+            }
+
+            private ConcurrentDictionary<string, List<ListEntry>> ExtractFiltersForTags()
+            {
+                var forTags = new ConcurrentDictionary<string, List<ListEntry>>();
+                foreach (var item in FullList.Where(b => b.filter != null && b.filter.Any(f => f.Key == FlipFilter.FilterForName)).ToList())
+                {
+                    var tags = item.filter.Where(f => f.Key == FlipFilter.FilterForName).Select(f => f.Value).First().Split(',');
+                    foreach (var tag in tags)
+                    {
+                        var element = forTags.GetOrAdd(tag, new List<ListEntry>());
+                        element.Add(item);
+                    }
+                    FullList.Remove(item);
+                }
+
+                return forTags;
+            }
+
+            private static void AddFiltersBasedOnTags(ConcurrentDictionary<string, List<ListEntry>> forTags, ListEntry item)
+            {
+                if (item.Tags != null && item.Tags.Any())
+                {
+                    foreach (var tag in item.Tags)
+                    {
+                        if (!forTags.TryGetValue(tag, out var list))
+                            continue;
+                        if (item.filter == null)
+                            item.filter = new();
+                        foreach (var element in list)
+                        {
+                            foreach (var filter in element.filter)
+                            {
+                                if (item.filter.Any(f => f.Key == filter.Key) || filter.Key == FlipFilter.FilterForName)
+                                    continue;
+                                item.filter.Add(filter.Key, filter.Value);
+                            }
+                        }
                     }
                 }
             }

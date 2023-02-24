@@ -24,7 +24,7 @@ namespace Coflnet.Sky.Commands.Shared
         [DataMember(Name = "group")]
         public string Group;
 
-        private Func<FlipInstance,bool> filterCache;
+        private Func<FlipInstance, bool> filterCache;
 
         public bool MatchesSettings(FlipInstance flip)
         {
@@ -33,10 +33,10 @@ namespace Coflnet.Sky.Commands.Shared
             return (ItemTag == null || ItemTag == flip.Auction.Tag) && filterCache(flip);
         }
 
-        public Expression<Func<FlipInstance,bool>> GetExpression()
+        public Expression<Func<FlipInstance, bool>> GetExpression()
         {
             var filterCache = new FlipFilter(this.filter);
-       //     Expression<Func<FlipInstance,bool>> normal = (flip) => (ItemTag == null || ItemTag == flip.Auction.Tag);
+            //     Expression<Func<FlipInstance,bool>> normal = (flip) => (ItemTag == null || ItemTag == flip.Auction.Tag);
             return filterCache.GetExpression();
         }
 
@@ -51,6 +51,19 @@ namespace Coflnet.Sky.Commands.Shared
         public override int GetHashCode()
         {
             return HashCode.Combine(ItemTag, filter);
+        }
+
+        public ListEntry Clone()
+        {
+            return new ListEntry()
+            {
+                ItemTag = ItemTag,
+                DisplayName = DisplayName,
+                filter = filter == null ? null : new(filter),
+                Tags = Tags == null ? null : new(Tags),
+                Order = Order,
+                Group = Group
+            };
         }
     }
 }

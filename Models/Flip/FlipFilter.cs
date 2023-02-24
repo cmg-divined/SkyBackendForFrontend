@@ -19,9 +19,11 @@ namespace Coflnet.Sky.Commands.Shared
         public static CamelCaseNameDictionary<DetailedFlipFilter> AdditionalFilters { private set; get; } = new();
 
         public static IEnumerable<string> AllFilters => FilterEngine.AvailableFilters.Select(f => f.Name).Concat(AdditionalFilters.Keys);
+        public static string FilterForName = "ForTag";
 
         static FlipFilter()
         {
+            AdditionalFilters.Add<ForTagDetailedFlipFilter>();
             AdditionalFilters.Add<VolumeDetailedFlipFilter>();
             AdditionalFilters.Add<ProfitDetailedFlipFilter>();
             AdditionalFilters.Add<ProfitPercentageDetailedFlipFilter>();
@@ -38,6 +40,8 @@ namespace Coflnet.Sky.Commands.Shared
             AdditionalFilters.Add<ForceBlacklistDetailedFlipFilter>();
             AdditionalFilters.Add<AfterMainFilterDetailedFlipFilter>();
             AdditionalFilters.Add<PriorityOpenDetailedFlipFilter>();
+            AdditionalFilters.Add<UtcHourOfDayDetailedFlipFilter>();
+            AdditionalFilters.Add<UtcDayOfWeekDetailedFlipFilter>();
         }
 
         public FlipFilter(Dictionary<string, string> originalf)
@@ -48,29 +52,27 @@ namespace Coflnet.Sky.Commands.Shared
                 return;
             }
             var filters = new Dictionary<string, string>(originalf);
-            //   Expression<Func<FlipInstance, bool>> expression = null;
-            if (filters != null)
-                foreach (var item in AdditionalFilters.Keys)
+            foreach (var item in AdditionalFilters.Keys)
+            {
+                var match = filters.Where(f => f.Key.ToLower() == item.ToLower()).FirstOrDefault();
+                if (match.Key != default)
                 {
-                    var match = filters.Where(f => f.Key.ToLower() == item.ToLower()).FirstOrDefault();
-                    if (match.Key != default)
+                    try
                     {
-                        try
-                        {
-                            filters.Remove(match.Key);
-                            var newPart = AdditionalFilters[item].GetExpression(filters, match.Value);
-                            if (expression == null)
-                                expression = newPart;
-                            else if (newPart != null)
-                                expression = newPart.And(expression);
-                        }
-                        catch (Exception e)
-                        {
-                            Console.WriteLine(e);
-                            throw new CoflnetException("filter_parsing", $"Error in filter {item} with value {match.Value} : {e.Message}");
-                        }
+                        filters.Remove(match.Key);
+                        var newPart = AdditionalFilters[item].GetExpression(filters, match.Value);
+                        if (expression == null)
+                            expression = newPart;
+                        else if (newPart != null)
+                            expression = newPart.And(expression);
+                    }
+                    catch (Exception e)
+                    {
+                        Console.WriteLine(e);
+                        throw new CoflnetException("filter_parsing", $"Error in filter {item} with value {match.Value} : {e.Message}");
                     }
                 }
+            }
             var filterExpression = FilterEngine.GetMatchExpression(filters);
             Expression<Func<FlipInstance, SaveAuction>> flipToAuction = f => f.Auction;
             var invoke = Expression.Invoke(filterExpression, flipToAuction.Body);

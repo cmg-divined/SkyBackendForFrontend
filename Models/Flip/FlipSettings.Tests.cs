@@ -152,6 +152,31 @@ namespace Coflnet.Sky.Commands.Shared
             var matcher = new FlipSettings.ListMatcher(null);
             Assert.IsFalse(matcher.IsMatch(flipA).Item1);
         }
+        [Test]
+        public void PreProcessor()
+        {
+            var matcher = new FlipSettings.ListMatcher(new(){
+                new()
+                {
+                    filter = new()
+                    {
+                        { "Enchantment","critical"}, {"EnchantLvl", "6"},
+                        { "ForTag", "Xy"}
+                    }
+                },
+                new()
+                {
+                    ItemTag = "A",
+                    Tags = new() { "Xy" },
+                    filter = new()
+                    {
+                    }
+                },
+            });
+            Assert.AreEqual(1, matcher.FullList.Count);
+            Assert.AreEqual(1, matcher.FullList[0].Tags.Count);
+            Assert.AreEqual(2, matcher.FullList[0].filter.Count);
+        }
 
         [Test]
         public void ReportFromartificialair()
