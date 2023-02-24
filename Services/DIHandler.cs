@@ -97,6 +97,11 @@ namespace Coflnet.Sky.Commands.Shared
                 var config = context.GetRequiredService<IConfiguration>();
                 return new Api.Client.Api.SearchApi(config["API_BASE_URL"]);
             });
+            services.AddSingleton<Api.Client.Api.IAuctionsApi>(context =>
+            {
+                var config = context.GetRequiredService<IConfiguration>();
+                return new Api.Client.Api.AuctionsApi(config["API_BASE_URL"]);
+            });
             services.AddSingleton<IAnalyseApi>(context =>
             {
                 var config = context.GetRequiredService<IConfiguration>();
