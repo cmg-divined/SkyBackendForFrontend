@@ -6,6 +6,7 @@ using Coflnet.Sky.Filter;
 
 namespace Coflnet.Sky.Commands.Shared
 {
+    [FilterDescription("Moves this whitelist after the main filters (minprofit, maxcost etc)")]
     public class AfterMainFilterDetailedFlipFilter : DetailedFlipFilter
     {
         public object[] Options => new object[] { "true" };

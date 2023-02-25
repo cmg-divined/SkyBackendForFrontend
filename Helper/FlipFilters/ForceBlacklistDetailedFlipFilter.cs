@@ -6,6 +6,7 @@ using Coflnet.Sky.Filter;
 
 namespace Coflnet.Sky.Commands.Shared
 {
+    [FilterDescription("Moves this blacklist before the whitelist")]
     public class ForceBlacklistDetailedFlipFilter : DetailedFlipFilter
     {
         public object[] Options => new object[] { "true" };
