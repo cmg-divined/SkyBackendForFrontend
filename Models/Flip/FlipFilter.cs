@@ -26,6 +26,7 @@ namespace Coflnet.Sky.Commands.Shared
             AdditionalFilters.Add<ForTagDetailedFlipFilter>();
             AdditionalFilters.Add<VolumeDetailedFlipFilter>();
             AdditionalFilters.Add<ProfitDetailedFlipFilter>();
+            AdditionalFilters.Add<ProfitPerUnitDetailedFlipFilter>();
             AdditionalFilters.Add<ProfitPercentageDetailedFlipFilter>();
             AdditionalFilters.Add<FlipFinderDetailedFlipFilter>();
             AdditionalFilters.Add<BedFlipDetailedFlipFilter>();
