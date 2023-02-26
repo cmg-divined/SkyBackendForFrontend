@@ -34,7 +34,7 @@ namespace Coflnet.Sky.Commands.Shared
                 if (con == null)
                     return null;
 
-                var sub = await subTask;
+                var sub = await subTask.ConfigureAwait(false);
                 sub.OnMessage(a =>
                 {
                     update(Deserialize<T>(a.Message));
@@ -55,7 +55,7 @@ namespace Coflnet.Sky.Commands.Shared
                 value = await api.SettingsUserIdSettingKeyGetAsync(userId, key);
                 if (value != null || i == 2)
                     break;
-                await Task.Delay(50 * i);
+                await Task.Delay(150 * i);
             }
             T val;
             if (value == null)
