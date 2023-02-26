@@ -98,6 +98,18 @@ namespace Coflnet.Sky.Commands.Shared
             {
                 if (con.Settings.ModSettings == null)
                     con.Settings.ModSettings = new ModSettings();
+                if (doc.RealName == "Format")
+                {
+                    try
+                    {
+                        var formatted = string.Format(value, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20);
+                    }
+                    catch (Exception e)
+                    {
+                        dev.Logger.Instance.Error(e, "format check");
+                        throw new CoflnetException("invalid_format", "Format update rejected. \nMake sure any squirly brackets are closed again or prefixed with another bracket to escape it, eg {{ will result in {.");
+                    }
+                }
                 return UpdateValueOnObject(value, doc.RealName, con.Settings.ModSettings);
             }
             else if (doc.Prefix == "privacy")
