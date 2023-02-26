@@ -7,6 +7,7 @@ using Coflnet.Sky.Core;
 using Coflnet.Sky.Filter;
 using Coflnet.Sky.Items.Client.Model;
 using Microsoft.Extensions.DependencyInjection;
+using System.Collections.Concurrent;
 
 namespace Coflnet.Sky.Commands.Shared
 {
@@ -16,7 +17,7 @@ namespace Coflnet.Sky.Commands.Shared
 
         public FilterType FilterType => FilterType.Equal;
 
-        private static readonly Dictionary<ItemCategory, HashSet<string>> categoryToTags = new Dictionary<ItemCategory, HashSet<string>>();
+        private static readonly ConcurrentDictionary<ItemCategory, HashSet<string>> categoryToTags = new ();
         private static DateTime lastUpdate = DateTime.MinValue;
 
         public Expression<Func<FlipInstance, bool>> GetExpression(Dictionary<string, string> filters, string val)
@@ -37,7 +38,7 @@ namespace Coflnet.Sky.Commands.Shared
             var response = DiHandler.ServiceProvider.GetService<Sky.Items.Client.Api.IItemsApi>().ItemsCategoryCategoryItemsGet(itemCategory).ToHashSet();
             if (response.Count == 0)
                 throw new CoflnetException("no_items", $"No items found for category {itemCategory}");
-            categoryToTags.Add(itemCategory, response);
+            categoryToTags[itemCategory] = response;
             return flip => response.Contains(flip.Auction.Tag);
         }
     }
