@@ -53,6 +53,7 @@ namespace Coflnet.Sky.Commands.Shared
                 Buckets = Prometheus.Histogram.LinearBuckets(start: 1, width: 2, count: 10)
             });
         static Prometheus.Counter snipesReceived = Prometheus.Metrics.CreateCounter("sky_commands_snipes_received", "How many snipes were received");
+        static Prometheus.Counter auctionsConsumed = Prometheus.Metrics.CreateCounter("sky_commands_auctions_received", "How many auctions were consumed");
 
         /// <summary>
         /// Special load burst queue that will send out 5 flips at load
@@ -74,10 +75,10 @@ namespace Coflnet.Sky.Commands.Shared
 
         private void SubToTier(IFlipConnection connection, bool sendHistory, ConcurrentDictionary<long, FlipConWrapper> targetType)
         {
-            RemoveNonConnection(connection);
             var con = new FlipConWrapper(connection);
             targetType.AddOrUpdate(con.Connection.Id, cid => con, (cid, oldMId) => { oldMId.Stop(); return con; });
 
+            RemoveNonConnection(connection);
             var toSendFlips = Flipps.Reverse().Take(25);
             if (sendHistory)
                 SendFlipHistory(connection, toSendFlips, 200);
@@ -517,6 +518,7 @@ namespace Coflnet.Sky.Commands.Shared
                         Finder = LowPricedAuction.FinderType.USER,
                         TargetPrice = auction.StartingBid
                     }));
+                auctionsConsumed.Inc(auctions.Count());
                 return Task.CompletedTask;
             }, token, consumerConf.GroupId, 50, AutoOffsetReset.Latest).ConfigureAwait(false);
         }
