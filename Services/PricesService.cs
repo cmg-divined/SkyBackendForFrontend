@@ -75,6 +75,37 @@ namespace Coflnet.Sky.Commands.Shared
             };
         }
 
+        public async Task<(long cost, string uuid, long slbin)> GetLowestBinData(string itemTag, Dictionary<string, string> filters = null)
+        {
+            var itemId = GetItemId(itemTag);
+            var select = context.Auctions
+                        .Where(auction => auction.ItemId == itemId)
+                        .Where(auction => auction.End > DateTime.Now)
+                        .Where(auction => auction.HighestBidAmount == 0);
+            if (filters != null && filters.Count > 0)
+            {
+                filters["ItemId"] = itemId.ToString();
+                select = FilterEngine.AddFilters(select, filters);
+            }
+
+            var dbResult = await select
+                .Select(item =>
+                    new
+                    {
+                        item.Uuid,
+                        item.StartingBid
+                    })
+                .OrderBy(a => a.StartingBid)
+                .Take(2)
+                .ToListAsync();
+
+            if (dbResult.Count == 0)
+                return (0, null, 0);
+            if (dbResult.Count == 1)
+                return (dbResult[0].StartingBid, dbResult[0].Uuid, 0);
+            return (dbResult[0].StartingBid, dbResult[0].Uuid, dbResult[1].StartingBid);
+        }
+
         public async Task<PriceSumary> GetSumaryCache(string itemTag, Dictionary<string, string> filters = null)
         {
             var filterString = Newtonsoft.Json.JsonConvert.SerializeObject(filters);
