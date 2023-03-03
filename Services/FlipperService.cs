@@ -445,7 +445,8 @@ namespace Coflnet.Sky.Commands.Shared
         {
             GroupId = System.Net.Dns.GetHostName(),
             BootstrapServers = Program.KafkaHost,
-            AutoOffsetReset = AutoOffsetReset.Latest
+            AutoOffsetReset = AutoOffsetReset.Latest,
+            PartitionAssignmentStrategy = PartitionAssignmentStrategy.CooperativeSticky,
         };
 
 
