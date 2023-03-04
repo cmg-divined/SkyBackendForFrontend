@@ -224,7 +224,7 @@ namespace Coflnet.Sky.Commands.Shared
         {
             return finder == LowPricedAuction.FinderType.UNKOWN ||
                     AllowedFinders == LowPricedAuction.FinderType.UNKOWN && 
-                        (LowPricedAuction.FinderType.FLIPPER | LowPricedAuction.FinderType.USER | LowPricedAuction.FinderType.STONKS | LowPricedAuction.FinderType.TFM).HasFlag(finder)
+                        !(LowPricedAuction.FinderType.SNIPERS).HasFlag(finder)
                                                 || AllowedFinders != LowPricedAuction.FinderType.UNKOWN && !AllowedFinders.HasFlag(finder)
                                                 && (int)finder != 3;
         }
