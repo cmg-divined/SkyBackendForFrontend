@@ -79,6 +79,16 @@ namespace Coflnet.Sky.Commands.Shared
         }
 
         /// <summary>
+        /// Updates the current value by applying the given action
+        /// tires to lock the value
+        /// </summary>
+        public async Task Update(Action<T> update)
+        {
+            update(Value);
+            await Update(Value);
+        }
+
+        /// <summary>
         /// Updates the current value
         /// </summary>
         /// <returns></returns>

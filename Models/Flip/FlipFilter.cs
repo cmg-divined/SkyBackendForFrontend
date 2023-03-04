@@ -35,6 +35,7 @@ namespace Coflnet.Sky.Commands.Shared
             AdditionalFilters.Add<DoNotOpenDetailedFlipFilter>();
             AdditionalFilters.Add<MinProfitPercentageDetailedFlipFilter>();
             AdditionalFilters.Add<ItemCategoryDetailedFlipFilter>();
+            AdditionalFilters.Add<ArmorSetDetailedFlipFilter>();
             AdditionalFilters.Add<MinProfitDetailedFlipFilter>();
             AdditionalFilters.Add<MaxCostDetailedFlipFilter>();
             AdditionalFilters.Add<ReferenceAgeDetailedFlipFilter>();
