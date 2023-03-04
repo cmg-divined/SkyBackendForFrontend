@@ -253,6 +253,8 @@ namespace Coflnet.Sky.Commands.Shared
             var settings = new FlipSettings() { };
             Assert.IsTrue(settings.IsFinderBlocked(LowPricedAuction.FinderType.USER));
             Assert.IsTrue(settings.IsFinderBlocked(LowPricedAuction.FinderType.FLIPPER));
+            Assert.IsTrue(settings.IsFinderBlocked(LowPricedAuction.FinderType.STONKS));
+            Assert.IsTrue(settings.IsFinderBlocked(LowPricedAuction.FinderType.TFM));
             Assert.IsFalse(settings.IsFinderBlocked(LowPricedAuction.FinderType.SNIPER));
             Assert.IsFalse(settings.IsFinderBlocked(LowPricedAuction.FinderType.SNIPER_MEDIAN));
         }
