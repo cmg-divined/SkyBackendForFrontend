@@ -164,7 +164,18 @@ namespace Coflnet.Sky.Commands
             var accountsToCheck = minecraftConnnectionResponse.SelectMany(m => m.Accounts).Where(a => a.LastRequestedAt > DateTime.UtcNow - TimeSpan.FromDays(3)).ToList();
             var sentRequest = ownedAt.SelectMany(o => minecraftConnnectionResponse.Where(m => m.ExternalId == o.UserId)
                     .SelectMany(m => m.Accounts.Where(a => a.LastRequestedAt > DateTime.UtcNow - TimeSpan.FromDays(3)).Select(a => new FlipTimeSelection(a.AccountUuid, o.Start, o.End)))).ToList();
-            var multiRequests = Task.WhenAll(accountsToCheck.Select(a => flipTracking.FlipsPlayerIdGetAsync(Guid.Parse(a.AccountUuid), DateTime.UtcNow - TimeSpan.FromDays(1), DateTime.UtcNow)));
+            var multiRequests = Task.WhenAll(accountsToCheck.Select(async a =>
+            {
+                try
+                {
+                    return await flipTracking.FlipsPlayerIdGetAsync(Guid.Parse(a.AccountUuid), DateTime.UtcNow - TimeSpan.FromDays(1), DateTime.UtcNow);
+                }
+                catch (System.Exception)
+                {
+                    return null;
+                }
+            }
+            ));
 
             long totalProfitSent = await LoadProfitOfSentFlips(sentRequest);
 
@@ -173,7 +184,7 @@ namespace Coflnet.Sky.Commands
             Console.WriteLine($"Owned {ownedAt.Count} accounts, including {includeMap.Count} accounts");
             Console.WriteLine($"Found total {result.Sum(r => r.Count)} flips");
             var flipsBoughtWhile = new List<PastFlip>();
-            foreach (var flip in result.SelectMany(r => r))
+            foreach (var flip in result.Where(r => r != null).SelectMany(r => r))
             {
                 if (!includeMap.TryGetValue(flip.Flipper, out var include))
                     continue;
