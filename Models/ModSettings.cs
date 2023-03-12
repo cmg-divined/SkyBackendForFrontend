@@ -82,5 +82,8 @@ namespace Coflnet.Sky.Commands.Shared
         [DataMember(Name = "normalSoldFlips")]
         [SettingsDoc("Don't add [SOLD] to sold flips, send them normally instead")]
         public bool NormalSoldFlips;
+        [SettingsDoc("Autmatically add items to the blacklist for 8 hours if they show up more than 5 times in 2 minutes")]
+        [DataMember(Name = "tempBlacklistSpam")]
+        public bool TempBlacklistSpam;
     }
 }
