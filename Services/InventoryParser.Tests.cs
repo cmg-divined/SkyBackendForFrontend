@@ -109,6 +109,13 @@ public class InventoryParserTests
                                 "type": "string",
                                 "value": "heavy"
                             },
+                            "mined_crops": {
+                                "type": "long",
+                                "value": [
+                                    1,
+                                    8314091
+                                ]
+                            },
                             "petInfo": {
                                 "type": "string",
                                 "value": "{\"type\":\"ELEPHANT\",\"active\":false,\"exp\":3.397827122665796E7,\"tier\":\"LEGENDARY\",\"hideInfo\":false,\"heldItem\":\"PET_ITEM_FARMING_SKILL_BOOST_EPIC\",\"candyUsed\":10,\"uuid\":\"8760755f-f72b-4624-8cf2-c51b21e35acc\",\"hideRightClick\":false}"
@@ -142,6 +149,8 @@ public class InventoryParserTests
         Assert.AreEqual("PET_ITEM_FARMING_SKILL_BOOST_EPIC", item.First().FlatenedNBT["heldItem"]);
         Assert.AreEqual("FINE", item.First().FlatenedNBT["JADE_0"]);
         Assert.AreEqual("FINE", item.First().FlatenedNBT["AMBER_0"]);
+        Assert.AreEqual("4303281387", item.First().FlatenedNBT["mined_crops"]);
         Assert.AreEqual(ItemReferences.Reforge.Heavy, item.First().Reforge);
+
     }
 }

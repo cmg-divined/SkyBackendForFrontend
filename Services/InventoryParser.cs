@@ -88,6 +88,13 @@ public class InventoryParser
                                     }
                                 }
                             },
+                            "mined_crops": {
+                                "type": "long",
+                                "value": [
+                                    1,
+                                    8314091
+                                ]
+                            },
                             "uuid": {
                                 "type": "string",
                                 "value": "0cf52647-c130-43ec-9c46-e2dc162d4894"
@@ -153,8 +160,19 @@ public class InventoryParser
             {
                 var p = new Newtonsoft.Json.Linq.JProperty("a");
                 // p.Name
-                if (attribute.Value.type == "compound")
+                if (attribute.Value.type == "list")
+                {
+                    var list = new List<object>();
+                    foreach (var item in attribute.Value.value.value)
+                    {
+                        list.Add(item.value);
+                    }
+                    attributesWithoutEnchantments[attribute.Name] = list;
+                }
+                else if (attribute.Value.type == "compound")
                     Denest(attribute.Value.value, attributesWithoutEnchantments);
+                else if (attribute.Value.type == "long")
+                    attributesWithoutEnchantments[attribute.Name] = ((long)attribute.Value.value[0] << 32) + (int)attribute.Value.value[1];
                 else
                     attributesWithoutEnchantments[attribute.Name] = attribute.Value.value;
             }
