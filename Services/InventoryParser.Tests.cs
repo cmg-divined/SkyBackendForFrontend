@@ -79,6 +79,19 @@ public class InventoryParserTests
                                 "type": "string",
                                 "value": "IRON_HELMET"
                             },
+                            "gems": {
+                                "type": "compound",
+                                "value": {
+                                    "JADE_0": {
+                                        "type": "string",
+                                        "value": "FINE"
+                                    },
+                                    "AMBER_0": {
+                                        "type": "string",
+                                        "value": "FINE"
+                                    }
+                                }
+                            },
                             "enchantments": {
                                 "type": "compound",
                                 "value": {
@@ -91,6 +104,14 @@ public class InventoryParserTests
                             "uuid": {
                                 "type": "string",
                                 "value": "0cf52647-c130-43ec-9c46-e2dc162d4894"
+                            },
+                            "modifier": {
+                                "type": "string",
+                                "value": "heavy"
+                            },
+                            "petInfo": {
+                                "type": "string",
+                                "value": "{\"type\":\"ELEPHANT\",\"active\":false,\"exp\":3.397827122665796E7,\"tier\":\"LEGENDARY\",\"hideInfo\":false,\"heldItem\":\"PET_ITEM_FARMING_SKILL_BOOST_EPIC\",\"candyUsed\":10,\"uuid\":\"8760755f-f72b-4624-8cf2-c51b21e35acc\",\"hideRightClick\":false}"
                             },
                             "timestamp": {
                                 "type": "string",
@@ -117,6 +138,10 @@ public class InventoryParserTests
         Assert.AreEqual("Iron Helmet", item.First().ItemName);
         Assert.AreEqual(1, item.First().Enchantments.Count);
         Assert.AreEqual(1, item.First().Enchantments.Where(e => e.Type == Core.Enchantment.EnchantmentType.growth).First().Level);
-        Assert.AreEqual("0cf52647-c130-43ec-9c46-e2dc162d4894", item.First().FlatenedNBT.Where(e => e.Key == "uuid").First().Value);
+        Assert.AreEqual("0cf52647-c130-43ec-9c46-e2dc162d4894", item.First().FlatenedNBT["uuid"]);
+        Assert.AreEqual("PET_ITEM_FARMING_SKILL_BOOST_EPIC", item.First().FlatenedNBT["heldItem"]);
+        Assert.AreEqual("FINE", item.First().FlatenedNBT["JADE_0"]);
+        Assert.AreEqual("FINE", item.First().FlatenedNBT["AMBER_0"]);
+        Assert.AreEqual(ItemReferences.Reforge.Heavy, item.First().Reforge);
     }
 }

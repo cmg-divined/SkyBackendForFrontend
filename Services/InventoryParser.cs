@@ -118,33 +118,46 @@ public class InventoryParser
             var ExtraAttributes = item.nbt.value.ExtraAttributes.value;
             System.Console.WriteLine(ExtraAttributes.id.value);
             var attributesWithoutEnchantments = new Dictionary<string, object>();
-            foreach (var attribute in ExtraAttributes)
-            {
-                if (attribute.Name != "enchantments")
-                {
-                    var p = new Newtonsoft.Json.Linq.JProperty("a");
-                   // p.Name
-                    attributesWithoutEnchantments.Add(attribute.Name, attribute.Value.value);
-                }
-            }
+            Denest(ExtraAttributes, attributesWithoutEnchantments);
             var enchantments = new Dictionary<string, int>();
             foreach (var enchantment in ExtraAttributes.enchantments.value)
             {
                 Console.WriteLine(enchantment.Value.value.GetType());
                 var val = new Newtonsoft.Json.Linq.JValue(2);
-                
+
                 enchantments.Add(enchantment.Name, (int)enchantment.Value.value);
             }
             ;
             var auction = new SaveAuction
             {
                 Tag = ExtraAttributes.id.value,
-                Enchantments = enchantments.Select(e => new Enchantment() { Type = Enum.Parse<Enchantment.EnchantmentType>(e.Key), Level = (byte) e.Value }).ToList(),
+                Enchantments = enchantments.Select(e => new Enchantment() { Type = Enum.Parse<Enchantment.EnchantmentType>(e.Key), Level = (byte)e.Value }).ToList(),
                 Count = item.count,
                 ItemName = item.displayName
             };
-            auction.SetFlattenedNbt(NBT.FlattenNbtData(attributesWithoutEnchantments));
+            if (attributesWithoutEnchantments.ContainsKey("modifier"))
+            {
+                auction.Reforge = Enum.Parse<ItemReferences.Reforge>(attributesWithoutEnchantments["modifier"].ToString(), true);
+                attributesWithoutEnchantments.Remove("modifier");
+            }
+            auction.SetFlattenedNbt(NBT.FlattenNbtData(attributesWithoutEnchantments).GroupBy(e => e.Key).Select(e => e.First()).ToList());
             yield return auction;
+        }
+    }
+
+    private static void Denest(dynamic ExtraAttributes, Dictionary<string, object> attributesWithoutEnchantments)
+    {
+        foreach (var attribute in ExtraAttributes)
+        {
+            if (attribute.Name != "enchantments")
+            {
+                var p = new Newtonsoft.Json.Linq.JProperty("a");
+                // p.Name
+                if (attribute.Value.type == "compound")
+                    Denest(attribute.Value.value, attributesWithoutEnchantments);
+                else
+                    attributesWithoutEnchantments[attribute.Name] = attribute.Value.value;
+            }
         }
     }
 }
