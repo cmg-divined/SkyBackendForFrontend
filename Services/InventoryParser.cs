@@ -121,7 +121,10 @@ public class InventoryParser
         foreach (var item in full.slots)
         {
             if (item == null)
+            {
+                yield return null;
                 continue;
+            }
 
             var ExtraAttributes = item.nbt.value.ExtraAttributes.value;
             System.Console.WriteLine(ExtraAttributes.id.value);
@@ -148,7 +151,14 @@ public class InventoryParser
                 auction.Reforge = Enum.Parse<ItemReferences.Reforge>(attributesWithoutEnchantments["modifier"].ToString(), true);
                 attributesWithoutEnchantments.Remove("modifier");
             }
-            auction.SetFlattenedNbt(NBT.FlattenNbtData(attributesWithoutEnchantments).GroupBy(e => e.Key).Select(e => e.First()).ToList());
+            try
+            {
+                auction.SetFlattenedNbt(NBT.FlattenNbtData(attributesWithoutEnchantments).GroupBy(e => e.Key).Select(e => e.First()).ToList());
+            }
+            catch (System.Exception e)
+            {
+                dev.Logger.Instance.Error(e, "Error while parsing inventory");
+            }
             yield return auction;
         }
     }
@@ -171,7 +181,7 @@ public class InventoryParser
                 }
                 attributesWithoutEnchantments[attribute.Name] = list;
             }
-            else if ((attribute.Name.EndsWith("_0") || attribute.Name.EndsWith("_1") || attribute.Name.EndsWith("_2") || attribute.Name.EndsWith("_3")|| attribute.Name.EndsWith("_4")) 
+            else if ((attribute.Name.EndsWith("_0") || attribute.Name.EndsWith("_1") || attribute.Name.EndsWith("_2") || attribute.Name.EndsWith("_3") || attribute.Name.EndsWith("_4"))
                         && type == "compound")
             {
                 // has uuid

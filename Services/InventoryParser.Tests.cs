@@ -159,18 +159,19 @@ public class InventoryParserTests
     public void Parse()
     {
         var parser = new InventoryParser();
-        var item = MessagePackSerializer.Deserialize<List<SaveAuction>>(MessagePackSerializer.Serialize(parser.Parse(jsonSample)));
-        Assert.AreEqual("IRON_HELMET", item.First().Tag);
-        Assert.AreEqual("Iron Helmet", item.First().ItemName);
-        Assert.AreEqual(1, item.First().Enchantments.Count);
-        Assert.AreEqual(1, item.First().Enchantments.Where(e => e.Type == Core.Enchantment.EnchantmentType.growth).First().Level);
-        Assert.AreEqual("0cf52647-c130-43ec-9c46-e2dc162d4894", item.First().FlatenedNBT["uuid"]);
-        Assert.AreEqual("PET_ITEM_FARMING_SKILL_BOOST_EPIC", item.First().FlatenedNBT["heldItem"]);
-        Assert.AreEqual("FINE", item.First().FlatenedNBT["JADE_0"]);
-        Assert.AreEqual("PERFECT", item.First().FlatenedNBT["COMBAT_0"]);
-        Assert.AreEqual("4303281387", item.First().FlatenedNBT["mined_crops"]);
-        Assert.AreEqual("SHADOW_WARP_SCROLL WITHER_SHIELD_SCROLL", item.First().FlatenedNBT["ability_scroll"]);
-        Assert.AreEqual(ItemReferences.Reforge.Heavy, item.First().Reforge);
-
+        var serialized = MessagePackSerializer.Serialize(parser.Parse(jsonSample));
+        var item = MessagePackSerializer.Deserialize<List<SaveAuction>>(serialized)
+                        .Where(i => i != null).First();
+        Assert.AreEqual("IRON_HELMET", item.Tag);
+        Assert.AreEqual("Iron Helmet", item.ItemName);
+        Assert.AreEqual(1, item.Enchantments.Count);
+        Assert.AreEqual(1, item.Enchantments.Where(e => e.Type == Core.Enchantment.EnchantmentType.growth).First().Level);
+        Assert.AreEqual("0cf52647-c130-43ec-9c46-e2dc162d4894", item.FlatenedNBT["uuid"]);
+        Assert.AreEqual("PET_ITEM_FARMING_SKILL_BOOST_EPIC", item.FlatenedNBT["heldItem"]);
+        Assert.AreEqual("FINE", item.FlatenedNBT["JADE_0"]);
+        Assert.AreEqual("PERFECT", item.FlatenedNBT["COMBAT_0"]);
+        Assert.AreEqual("4303281387", item.FlatenedNBT["mined_crops"]);
+        Assert.AreEqual("SHADOW_WARP_SCROLL WITHER_SHIELD_SCROLL", item.FlatenedNBT["ability_scroll"]);
+        Assert.AreEqual(ItemReferences.Reforge.Heavy, item.Reforge);
     }
 }
