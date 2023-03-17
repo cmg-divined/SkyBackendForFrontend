@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Coflnet.Sky.Core;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 
 namespace Coflnet.Sky.Commands.Shared;
 
@@ -154,28 +155,36 @@ public class InventoryParser
 
     private static void Denest(dynamic ExtraAttributes, Dictionary<string, object> attributesWithoutEnchantments)
     {
-        foreach (var attribute in ExtraAttributes)
+        foreach (JProperty attribute in ExtraAttributes)
         {
-            if (attribute.Name != "enchantments")
+            if (attribute.Name == "enchantments")
+                continue;
+
+            // p.Name
+            var type = attribute.Value["type"].ToString();
+            if (type == "list")
             {
-                var p = new Newtonsoft.Json.Linq.JProperty("a");
-                // p.Name
-                if (attribute.Value.type == "list")
+                var list = new List<object>();
+                foreach (var item in attribute.Value["value"]["value"])
                 {
-                    var list = new List<object>();
-                    foreach (var item in attribute.Value.value.value)
-                    {
-                        list.Add(item.value);
-                    }
-                    attributesWithoutEnchantments[attribute.Name] = list;
+                    list.Add(item.ToString());
                 }
-                else if (attribute.Value.type == "compound")
-                    Denest(attribute.Value.value, attributesWithoutEnchantments);
-                else if (attribute.Value.type == "long")
-                    attributesWithoutEnchantments[attribute.Name] = ((long)attribute.Value.value[0] << 32) + (int)attribute.Value.value[1];
-                else
-                    attributesWithoutEnchantments[attribute.Name] = attribute.Value.value;
+                attributesWithoutEnchantments[attribute.Name] = list;
             }
+            else if ((attribute.Name.EndsWith("_0") || attribute.Name.EndsWith("_1") || attribute.Name.EndsWith("_2") || attribute.Name.EndsWith("_3")|| attribute.Name.EndsWith("_4")) 
+                        && type == "compound")
+            {
+                // has uuid
+                var values = attribute.Value["value"];
+                attributesWithoutEnchantments[attribute.Name] = values["quality"]["value"].ToString();
+                attributesWithoutEnchantments[attribute.Name + ".uuid"] = values["uuid"].ToString();
+            }
+            else if (type == "compound")
+                Denest(attribute.Value["value"], attributesWithoutEnchantments);
+            else if (type == "long")
+                attributesWithoutEnchantments[attribute.Name] = ((long)attribute.Value["value"][0] << 32) + (int)attribute.Value["value"][1];
+            else
+                attributesWithoutEnchantments[attribute.Name] = attribute.Value["value"];
         }
     }
 }

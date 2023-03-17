@@ -86,10 +86,29 @@ public class InventoryParserTests
                                         "type": "string",
                                         "value": "FINE"
                                     },
-                                    "AMBER_0": {
-                                        "type": "string",
-                                        "value": "FINE"
+                                    "COMBAT_0": {
+                                        "type": "compound",
+                                        "value": {
+                                            "uuid": {
+                                                "type": "string",
+                                                "value": "a5c233ba-9554-4c80-a697-1a78c66c045d"
+                                            },
+                                            "quality": {
+                                                "type": "string",
+                                                "value": "PERFECT"
+                                            }
+                                        }
                                     }
+                                }
+                            },
+                            "ability_scroll": {
+                                "type": "list",
+                                "value": {
+                                    "type": "string",
+                                    "value": [
+                                        "WITHER_SHIELD_SCROLL",
+                                        "SHADOW_WARP_SCROLL"
+                                    ]
                                 }
                             },
                             "enchantments": {
@@ -148,8 +167,9 @@ public class InventoryParserTests
         Assert.AreEqual("0cf52647-c130-43ec-9c46-e2dc162d4894", item.First().FlatenedNBT["uuid"]);
         Assert.AreEqual("PET_ITEM_FARMING_SKILL_BOOST_EPIC", item.First().FlatenedNBT["heldItem"]);
         Assert.AreEqual("FINE", item.First().FlatenedNBT["JADE_0"]);
-        Assert.AreEqual("FINE", item.First().FlatenedNBT["AMBER_0"]);
+        Assert.AreEqual("PERFECT", item.First().FlatenedNBT["COMBAT_0"]);
         Assert.AreEqual("4303281387", item.First().FlatenedNBT["mined_crops"]);
+        Assert.AreEqual("SHADOW_WARP_SCROLL WITHER_SHIELD_SCROLL", item.First().FlatenedNBT["ability_scroll"]);
         Assert.AreEqual(ItemReferences.Reforge.Heavy, item.First().Reforge);
 
     }
