@@ -221,8 +221,17 @@ namespace Coflnet.Sky.Commands.Shared
                     var sumary = await GetSumary(itemTag, filter);
                     return new CurrentPrice() { Buy = sumary.Med, Sell = sumary.Min };
                 }
-                var cost = count == 1 ? lowestBins.FirstOrDefault().StartingBid : lowestBins.Sum(a => a.StartingBid);
-                return new CurrentPrice() { Buy = cost, Sell = (lowestBins.FirstOrDefault()?.StartingBid ?? 0) * 0.98, Available = lowestBins.Count };
+                var foundcount = 0;
+                var cost = count == 1 ? lowestBins.FirstOrDefault().StartingBid
+                        : lowestBins.TakeWhile(a =>
+                        {
+                            foundcount += a.Count;
+                            return foundcount < count;
+                        }).Sum(a => a.StartingBid);
+                var sell = 0L;
+                if(lowestBins.Count > 0)
+                    sell = lowestBins.First().StartingBid / lowestBins.First().Count * count;
+                return new CurrentPrice() { Buy = cost, Sell = sell * 0.98, Available = lowestBins.Count };
             }
         }
 
