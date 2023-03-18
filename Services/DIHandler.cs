@@ -121,6 +121,7 @@ namespace Coflnet.Sky.Commands.Shared
                 sp => new ConnectApi(sp.GetRequiredService<IConfiguration>()["MCCONNECT_BASE_URL"]));
 
             services.AddSingleton<PremiumService>();
+            services.AddSingleton<ISniperClient, SniperClient>();
             services.AddSingleton<EventBrokerClient>();
             services.AddSingleton<PlayerName.PlayerNameService>();
             services.AddSingleton<IdConverter>();
