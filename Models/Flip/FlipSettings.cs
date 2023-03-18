@@ -53,7 +53,7 @@ namespace Coflnet.Sky.Commands.Shared
         public ModSettings ModSettings;
 
         [DataMember(Name = "finders")]
-        [SettingsDoc("Calculate profit based on lowest bin")]
+        [SettingsDoc("Which algorithms are selected for price estimation")]
         public LowPricedAuction.FinderType AllowedFinders;
 
         [DataMember(Name = "fastMode")]
