@@ -126,7 +126,12 @@ public class InventoryParser
                 continue;
             }
 
-            var ExtraAttributes = item.nbt.value.ExtraAttributes.value;
+            var ExtraAttributes = item.nbt.value?.ExtraAttributes?.value;
+            if (ExtraAttributes == null)
+            {
+                yield return null;
+                continue;
+            }
             System.Console.WriteLine(ExtraAttributes.id.value);
             var attributesWithoutEnchantments = new Dictionary<string, object>();
             Denest(ExtraAttributes, attributesWithoutEnchantments);
@@ -138,7 +143,7 @@ public class InventoryParser
 
                 enchantments.Add(enchantment.Name, (int)enchantment.Value.value);
             }
-            ;
+            
             var auction = new SaveAuction
             {
                 Tag = ExtraAttributes.id.value,

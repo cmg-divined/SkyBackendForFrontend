@@ -20,7 +20,44 @@ public class InventoryParserTests
         null,
         null,
         null,
-        null,
+        {
+            "type": 160,
+            "count": 1,
+            "metadata": 7,
+            "nbt": {
+                "type": "compound",
+                "name": "",
+                "value": {
+                    "display": {
+                        "type": "compound",
+                        "value": {
+                            "Lore": {
+                                "type": "list",
+                                "value": {
+                                    "type": "string",
+                                    "value": [
+                                        "§7This slot may be changed to a",
+                                        "§7shortcut for your favorite game",
+                                        "§7or mode!",
+                                        "",
+                                        "§7You may change this slot at any",
+                                        "§7time using Right Click."
+                                    ]
+                                }
+                            },
+                            "Name": {
+                                "type": "string",
+                                "value": "§eCustom Slot"
+                            }
+                        }
+                    }
+                }
+            },
+            "name": "stained_glass_pane",
+            "displayName": "Stained Glass Pane",
+            "stackSize": 64,
+            "slot": 16
+        },
         {
             "type": 306,
             "count": 1,
@@ -161,7 +198,7 @@ public class InventoryParserTests
         var parser = new InventoryParser();
         var serialized = MessagePackSerializer.Serialize(parser.Parse(jsonSample));
         var item = MessagePackSerializer.Deserialize<List<SaveAuction>>(serialized)
-                        .Where(i => i != null).First();
+                        .Where(i => i != null).Last();
         Assert.AreEqual("IRON_HELMET", item.Tag);
         Assert.AreEqual("Iron Helmet", item.ItemName);
         Assert.AreEqual(1, item.Enchantments.Count);
@@ -174,4 +211,6 @@ public class InventoryParserTests
         Assert.AreEqual("SHADOW_WARP_SCROLL WITHER_SHIELD_SCROLL", item.FlatenedNBT["ability_scroll"]);
         Assert.AreEqual(ItemReferences.Reforge.Heavy, item.Reforge);
     }
+
+
 }
