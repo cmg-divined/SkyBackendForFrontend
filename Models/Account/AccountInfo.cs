@@ -13,7 +13,7 @@ namespace Coflnet.Sky.Commands.Shared
         [DataMember(Name = "userIdString")]
         public string UserId;
         [DataMember(Name = "mcIds")]
-        public List<string> McIds = new List<string>();
+        public HashSet<string> McIds = new HashSet<string>();
 
         [DataMember(Name = "conIds")]
         public HashSet<string> ConIds = new HashSet<string>();
