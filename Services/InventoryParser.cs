@@ -132,39 +132,45 @@ public class InventoryParser
                 yield return null;
                 continue;
             }
-            System.Console.WriteLine(ExtraAttributes.id.value);
-            var attributesWithoutEnchantments = new Dictionary<string, object>();
-            Denest(ExtraAttributes, attributesWithoutEnchantments);
-            var enchantments = new Dictionary<string, int>();
-            foreach (var enchantment in ExtraAttributes.enchantments.value)
-            {
-                Console.WriteLine(enchantment.Value.value.GetType());
-                var val = new Newtonsoft.Json.Linq.JValue(2);
-
-                enchantments.Add(enchantment.Name, (int)enchantment.Value.value);
-            }
-            
-            var auction = new SaveAuction
-            {
-                Tag = ExtraAttributes.id.value,
-                Enchantments = enchantments.Select(e => new Enchantment() { Type = Enum.Parse<Enchantment.EnchantmentType>(e.Key), Level = (byte)e.Value }).ToList(),
-                Count = item.count,
-                ItemName = item.displayName
-            };
-            if (attributesWithoutEnchantments.ContainsKey("modifier"))
-            {
-                auction.Reforge = Enum.Parse<ItemReferences.Reforge>(attributesWithoutEnchantments["modifier"].ToString(), true);
-                attributesWithoutEnchantments.Remove("modifier");
-            }
+            Dictionary<string, object> attributesWithoutEnchantments = null;
+            SaveAuction auction = null;
             try
             {
-                auction.SetFlattenedNbt(NBT.FlattenNbtData(attributesWithoutEnchantments).GroupBy(e => e.Key).Select(e => e.First()).ToList());
+                NewMethod(item, ExtraAttributes, out attributesWithoutEnchantments, out auction);
+                auction?.SetFlattenedNbt(NBT.FlattenNbtData(attributesWithoutEnchantments).GroupBy(e => e.Key).Select(e => e.First()).ToList());
             }
             catch (System.Exception e)
             {
                 dev.Logger.Instance.Error(e, "Error while parsing inventory");
             }
             yield return auction;
+        }
+    }
+
+    private void NewMethod(dynamic item, dynamic ExtraAttributes, out Dictionary<string, object> attributesWithoutEnchantments, out SaveAuction auction)
+    {
+        attributesWithoutEnchantments = new Dictionary<string, object>();
+        Denest(ExtraAttributes, attributesWithoutEnchantments);
+        var enchantments = new Dictionary<string, int>();
+        foreach (var enchantment in ExtraAttributes.enchantments.value)
+        {
+            Console.WriteLine(enchantment.Value.value.GetType());
+            var val = new Newtonsoft.Json.Linq.JValue(2);
+
+            enchantments.Add(enchantment.Name, (int)enchantment.Value.value);
+        }
+
+        auction = new SaveAuction
+        {
+            Tag = ExtraAttributes.id.value,
+            Enchantments = enchantments.Select(e => new Enchantment() { Type = Enum.Parse<Enchantment.EnchantmentType>(e.Key), Level = (byte)e.Value }).ToList(),
+            Count = item.count,
+            ItemName = item.displayName
+        };
+        if (attributesWithoutEnchantments.ContainsKey("modifier"))
+        {
+            auction.Reforge = Enum.Parse<ItemReferences.Reforge>(attributesWithoutEnchantments["modifier"].ToString(), true);
+            attributesWithoutEnchantments.Remove("modifier");
         }
     }
 
