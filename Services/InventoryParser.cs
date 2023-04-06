@@ -149,7 +149,8 @@ public class InventoryParser
             }
             catch (System.Exception e)
             {
-                Activity.Current?.AddEvent(new ActivityEvent("Log", default, new(new Dictionary<string, object>() { { "message", "Error while parsing inventory" }, { "error", e } })));
+                Activity.Current?.AddEvent(new ActivityEvent("Log", default, new(new Dictionary<string, object>() { {
+                    "message", "Error while parsing inventory" }, { "error", e }, {"item", JsonConvert.SerializeObject(item)} })));
                 dev.Logger.Instance.Error(e, "Error while parsing inventory");
             }
             yield return auction;
