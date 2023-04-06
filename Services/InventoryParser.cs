@@ -162,13 +162,14 @@ public class InventoryParser
         attributesWithoutEnchantments = new Dictionary<string, object>();
         Denest(ExtraAttributes, attributesWithoutEnchantments);
         var enchantments = new Dictionary<string, int>();
-        foreach (var enchantment in ExtraAttributes.enchantments.value)
-        {
-            Console.WriteLine(enchantment.Value.value.GetType());
-            var val = new Newtonsoft.Json.Linq.JValue(2);
+        if (ExtraAttributes.enchantments?.value != null)
+            foreach (var enchantment in ExtraAttributes.enchantments.value)
+            {
+                Console.WriteLine(enchantment.Value.value.GetType());
+                var val = new Newtonsoft.Json.Linq.JValue(2);
 
-            enchantments.Add(enchantment.Name, (int)enchantment.Value.value);
-        }
+                enchantments.Add(enchantment.Name, (int)enchantment.Value.value);
+            }
 
         auction = new SaveAuction
         {
