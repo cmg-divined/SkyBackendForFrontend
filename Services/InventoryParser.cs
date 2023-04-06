@@ -131,7 +131,7 @@ public class InventoryParser
             {
                 yield return new SaveAuction()
                 {
-                    Tag = ExtraAttributes.id.value,
+                    Tag = "UNKOWN",
                     Enchantments = new(),
                     Count = 1,
                     ItemName = item.displayName,
