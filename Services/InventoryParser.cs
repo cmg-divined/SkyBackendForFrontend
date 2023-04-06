@@ -129,7 +129,14 @@ public class InventoryParser
             var ExtraAttributes = item.nbt.value?.ExtraAttributes?.value;
             if (ExtraAttributes == null)
             {
-                yield return null;
+                yield return new SaveAuction()
+                {
+                    Tag = ExtraAttributes.id.value,
+                    Enchantments = new(),
+                    Count = 1,
+                    ItemName = item.displayName,
+                    Uuid = ExtraAttributes?.uuid?.value ?? Random.Shared.Next().ToString(),
+                };
                 continue;
             }
             Dictionary<string, object> attributesWithoutEnchantments = null;
