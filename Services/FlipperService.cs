@@ -313,7 +313,8 @@ namespace Coflnet.Sky.Commands.Shared
 
         public async Task DeliverLowPricedAuctions(IEnumerable<LowPricedAuction> flips)
         {
-            await Parallel.ForEachAsync(flips, async (item, s) =>
+            var stopAfterOneMinute = new System.Threading.CancellationTokenSource(TimeSpan.FromMinutes(1));
+            await Parallel.ForEachAsync(flips, stopAfterOneMinute.Token, async (item, s) =>
             {
                 await DeliverLowPricedAuction(item);
             }).ConfigureAwait(false);
