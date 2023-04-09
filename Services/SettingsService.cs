@@ -24,27 +24,31 @@ namespace Coflnet.Sky.Commands.Shared
 
         public async Task<ChannelMessageQueue> GetAndSubscribe<T>(string userId, string key, Action<T> update, Func<T> defaultGetter = null)
         {
-            try
-            {
-                // subscribe, get then process subscription to not loose any update
-                var subTask = con?.GetSubscriber().SubscribeAsync(GetSubKey(userId, key));
-                T val = await GetCurrentValue(userId, key, defaultGetter);
-                update(val);
-
-                if (con == null)
-                    return null;
-
-                var sub = await subTask.ConfigureAwait(false);
-                sub.OnMessage(a =>
+            for (int i = 0; i < 3; i++)
+                try
                 {
-                    update(Deserialize<T>(a.Message));
-                });
-                return sub;
-            }
-            catch (Exception e)
-            {
-                throw new Exception("Could not subscribe to setting ", e);
-            }
+                    // subscribe, get then process subscription to not loose any update
+                    var subTask = con?.GetSubscriber().SubscribeAsync(GetSubKey(userId, key));
+                    T val = await GetCurrentValue(userId, key, defaultGetter);
+                    update(val);
+
+                    if (con == null)
+                        return null;
+
+                    var sub = await subTask.ConfigureAwait(false);
+                    sub.OnMessage(a =>
+                    {
+                        update(Deserialize<T>(a.Message));
+                    });
+                    return sub;
+                }
+                catch (Exception e)
+                {
+                    if (i == 2)
+                    throw new Exception("Could not subscribe to setting ", e);
+                    await Task.Delay(150 * (i + 1));
+                }
+            throw new Exception("Could not subscribe to setting (should not be reached)");
         }
 
         public async Task<T> GetCurrentValue<T>(string userId, string key, Func<T> defaultGetter)
