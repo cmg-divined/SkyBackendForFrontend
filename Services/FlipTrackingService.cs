@@ -52,7 +52,7 @@ namespace Coflnet.Sky.Commands
             IProductsApi productApi,
             KafkaCreator kafkaCreator)
         {
-            producer = kafkaCreator.BuildProducer<string, FlipTracker.Client.Model.FlipEvent>();
+            producer = kafkaCreator?.BuildProducer<string, FlipTracker.Client.Model.FlipEvent>();
 
             var url = config["FLIPTRACKER_BASE_URL"] ?? "http://" + config["FLIPTRACKER_HOST"];
             flipTracking = new TrackerApi(url);
