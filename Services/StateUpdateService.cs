@@ -1,4 +1,5 @@
 using System;
+using Coflnet.Kafka;
 using Coflnet.Sky.Core;
 using Confluent.Kafka;
 using Microsoft.Extensions.Configuration;
@@ -17,22 +18,19 @@ namespace Coflnet.Sky.Commands.Shared
         ILogger<StateUpdateService> logger;
         IProducer<string, UpdateMessage> producer;
 
-        public StateUpdateService(IConfiguration config, ILogger<StateUpdateService> logger)
+        public StateUpdateService(IConfiguration config, ILogger<StateUpdateService> logger, KafkaCreator kafkaCreator)
         {
             this.logger = logger;
             this.config = config;
-            var producerConfig = new ProducerConfig
-            {
-                BootstrapServers = config["KAFKA_HOST"],
-                LingerMs = 100
-            };
-            producer = new ProducerBuilder<string, UpdateMessage>(producerConfig).SetValueSerializer(SerializerFactory.GetSerializer<UpdateMessage>()).SetDefaultPartitioner((topic, pcount, key, isNull) =>
+            producer = kafkaCreator.BuildProducer<string, UpdateMessage>(true, b=>b.SetDefaultPartitioner((topic, pcount, key, isNull) =>
             {
                 if (isNull)
                     return Random.Shared.Next() % pcount;
                 int partition = Math.Abs((int)key[0] << 8 | key[1] ^ key[2]) % pcount;
                 return partition;
-            }).Build();
+            }));
+            
+            _ = kafkaCreator.CreateTopicIfNotExist(config["TOPICS:STATE_UPDATE"]);
         }
 
         public void Produce(string playerId, UpdateMessage message)

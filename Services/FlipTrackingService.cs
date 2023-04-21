@@ -15,6 +15,7 @@ using System.Diagnostics;
 using Coflnet.Sky.McConnect.Api;
 using Coflnet.Payments.Client.Api;
 using System.Collections.Concurrent;
+using Coflnet.Kafka;
 
 namespace Coflnet.Sky.Commands
 {
@@ -48,13 +49,10 @@ namespace Coflnet.Sky.Commands
             ActivitySource tracer,
             IConfiguration config,
             IConnectApi connectApi,
-            IProductsApi productApi)
+            IProductsApi productApi,
+            KafkaCreator kafkaCreator)
         {
-            producer = new ProducerBuilder<string, FlipTracker.Client.Model.FlipEvent>(new ProducerConfig
-            {
-                BootstrapServers = config["KAFKA_HOST"],
-                CancellationDelayMaxMs = 1000
-            }).SetValueSerializer(SerializerFactory.GetSerializer<FlipTracker.Client.Model.FlipEvent>()).Build();
+            producer = kafkaCreator.BuildProducer<string, FlipTracker.Client.Model.FlipEvent>();
 
             var url = config["FLIPTRACKER_BASE_URL"] ?? "http://" + config["FLIPTRACKER_HOST"];
             flipTracking = new TrackerApi(url);
