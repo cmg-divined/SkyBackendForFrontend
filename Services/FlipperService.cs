@@ -12,6 +12,7 @@ using Newtonsoft.Json;
 using Coflnet.Sky.Core;
 using Microsoft.Extensions.Hosting;
 using System.Threading;
+using Microsoft.Extensions.Configuration;
 
 namespace Coflnet.Sky.Commands.Shared
 {
@@ -21,8 +22,6 @@ namespace Coflnet.Sky.Commands.Shared
     /// </summary>
     public class FlipperService : BackgroundService
     {
-        public static FlipperService Instance = new FlipperService();
-
         private ConcurrentDictionary<long, FlipConWrapper> Subs = new ConcurrentDictionary<long, FlipConWrapper>();
         private ConcurrentDictionary<long, FlipConWrapper> SlowSubs = new ConcurrentDictionary<long, FlipConWrapper>();
         private ConcurrentDictionary<long, FlipConWrapper> StarterSubs = new ConcurrentDictionary<long, FlipConWrapper>();
@@ -61,6 +60,12 @@ namespace Coflnet.Sky.Commands.Shared
         private Queue<FlipInstance> LoadBurst = new Queue<FlipInstance>();
         private ConcurrentDictionary<long, DateTime> SoldAuctions = new ConcurrentDictionary<long, DateTime>();
         static RestClient SkyFlipperHost = new RestClient(SimplerConfig.Config.Instance["SKYFLIPPER_BASE_URL"] ?? "http://" + SimplerConfig.Config.Instance["SKYFLIPPER_HOST"]);
+        IConfiguration config;
+
+        public FlipperService(IConfiguration config)
+        {
+            this.config = config;
+        }
 
         public void AddConnectionPlus(IFlipConnection connection, bool sendHistory = true)
         {
@@ -492,7 +497,7 @@ namespace Coflnet.Sky.Commands.Shared
         {
             string[] topics = new string[] { LowPriceConsumeTopic };
 
-            await Kafka.KafkaConsumer.ConsumeBatch<LowPricedAuction>(this.consumerConf.BootstrapServers, topics, flips =>
+            await Kafka.KafkaConsumer.ConsumeBatch<LowPricedAuction>(config, topics, flips =>
             {
                 var time = (DateTime.UtcNow - flips.First().Auction.FindTime).TotalSeconds;
                 runtroughTime.Observe(time);
@@ -507,7 +512,7 @@ namespace Coflnet.Sky.Commands.Shared
         {
             string[] topics = new string[] { AuctionConsumeTopic };
 
-            await Kafka.KafkaConsumer.ConsumeBatch<SaveAuction>(this.consumerConf.BootstrapServers, topics, auctions =>
+            await Kafka.KafkaConsumer.ConsumeBatch<SaveAuction>(config, topics, auctions =>
             {
                 if (FilterSumary.UserFinderEnabledCount == 0)
                     return Task.CompletedTask;
@@ -650,7 +655,6 @@ namespace Coflnet.Sky.Commands.Shared
 
         protected override Task ExecuteAsync(CancellationToken stoppingToken)
         {
-            Instance = this;
             RunIsolatedForever(async () =>
             {
                 while (!stoppingToken.IsCancellationRequested)
