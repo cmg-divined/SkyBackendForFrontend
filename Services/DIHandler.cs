@@ -130,6 +130,7 @@ namespace Coflnet.Sky.Commands.Shared
             services.AddSingleton<EventBrokerClient>();
             services.AddSingleton<PlayerName.PlayerNameService>();
             services.AddSingleton<IdConverter>();
+            services.AddSingleton<FlipperService>();
             services.AddSingleton<Kafka.KafkaCreator>();
             services.AddSingleton<IStateUpdateService, StateUpdateService>();
             services.AddHostedService<ServicePorter>();
