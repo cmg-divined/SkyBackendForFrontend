@@ -331,7 +331,7 @@ namespace Coflnet.Sky.Commands.Shared
             if (flip.Auction.Context != null)
                 flip.Auction.Context["crec"] = (DateTime.UtcNow - flip.Auction.FindTime).ToString();
             var tracer = DiHandler.GetService<ActivitySource>();
-            using var activity = tracer.StartActivity("DeliverFlip").SetTag("uuid", flip.Auction.Uuid);
+            using var activity = tracer.StartActivity("DeliverLP").SetTag("uuid", flip.Auction.Uuid);
             var time = (DateTime.UtcNow - flip.Auction.FindTime).TotalSeconds;
 
             if (flip.Auction != null && flip.Auction.NBTLookup == null)
