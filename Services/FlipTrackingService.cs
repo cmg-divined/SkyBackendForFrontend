@@ -62,6 +62,7 @@ namespace Coflnet.Sky.Commands
             this.tracer = tracer;
             this.connectApi = connectApi;
             this.productApi = productApi;
+            _ = kafkaCreator.CreateTopicIfNotExist(ProduceTopic, 6);
         }
 
 
