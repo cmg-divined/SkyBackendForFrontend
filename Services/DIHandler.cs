@@ -15,7 +15,6 @@ using System.Threading.Tasks;
 using System.Threading;
 using Coflnet.Sky.FlipTracker.Client.Api;
 using Coflnet.Sky.Mayor.Client.Api;
-using Coflnet.Sky.PlayerState.Client.Api;
 
 namespace Coflnet.Sky.Commands.Shared
 {
@@ -125,8 +124,8 @@ namespace Coflnet.Sky.Commands.Shared
             });
             services.AddSingleton<IConnectApi, ConnectApi>(
                 sp => new ConnectApi(sp.GetRequiredService<IConfiguration>()["MCCONNECT_BASE_URL"]));
-            services.AddSingleton<IPlayerStateApi, PlayerStateApi>(
-                sp => new PlayerStateApi(sp.GetRequiredService<IConfiguration>()["PLAYERSTATE_BASE_URL"]));
+            services.AddSingleton<PlayerState.Client.Api.IPlayerStateApi, PlayerState.Client.Api.PlayerStateApi>(
+                sp => new PlayerState.Client.Api.PlayerStateApi(sp.GetRequiredService<IConfiguration>()["PLAYERSTATE_BASE_URL"]));
 
             services.AddSingleton<PremiumService>();
             services.AddSingleton<ISniperClient, SniperClient>();
