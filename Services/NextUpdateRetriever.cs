@@ -15,7 +15,7 @@ namespace Coflnet.Sky.Commands.MC
                 while (last < new DateTime(2020, 1, 1))
                 {
                     last = (await client.ExecuteAsync<DateTime>(new RestRequest("/api/time"))).Data;
-                    if(last < new DateTime(2020, 1, 1))
+                    if (last < new DateTime(2020, 1, 1))
                         await Task.Delay(10000);
                 }
                 var next = last + TimeSpan.FromSeconds(60);
@@ -26,7 +26,7 @@ namespace Coflnet.Sky.Commands.MC
             catch (Exception e)
             {
                 dev.Logger.Instance.Error(e, "getting next update time");
-                throw e;
+                throw new Exception("Could not get next update time", e);
             }
         }
     }
