@@ -73,7 +73,10 @@ namespace Coflnet.Sky.Commands.Helper
             if (data.ContainsKey("unlocked_slots"))
                 properties.Add(new Property($"Unlocked: {(data["unlocked_slots"].Sum(c => c == ',' ? 1 : 0) + 1)}", 15));
 
-            properties.AddRange(data.Where(p => p.Value == "PERFECT" || p.Value == "FLAWLESS").Select(p => new Property($"{p.Value} gem", p.Value == "PERFECT" ? 14 : 7)));
+            properties.AddRange(data.Where(p => p.Value == "PERFECT" || p.Value == "FLAWLESS")
+                // Jasper0 slot can't be accessed on starred (Fragged) items
+                .Where(p => !(auction.Tag?.StartsWith("STARRED_SHADOW_ASSASSIN") ?? false && p.Key.StartsWith("JASPER_0")))
+                .Select(p => new Property($"{p.Value} gem", p.Value == "PERFECT" ? 14 : 7)));
 
             var isBook = auction.Tag == "ENCHANTED_BOOK";
 
@@ -85,11 +88,11 @@ namespace Coflnet.Sky.Commands.Helper
             if (enchants != null)
                 properties.AddRange(enchants);
 
-            if(data.TryGetValue("drill_part_engine", out string engine))
+            if (data.TryGetValue("drill_part_engine", out string engine))
                 properties.Add(new Property($"Engine: {ItemDetails.TagToName(engine)}", 15));
-            if(data.TryGetValue("drill_part_fuel_tank", out string tank))
+            if (data.TryGetValue("drill_part_fuel_tank", out string tank))
                 properties.Add(new Property($"Tank: {ItemDetails.TagToName(tank)}", 15));
-            if(data.TryGetValue("drill_part_upgrade_module", out string module))
+            if (data.TryGetValue("drill_part_upgrade_module", out string module))
                 properties.Add(new Property($"Module: {ItemDetails.TagToName(module)}", 15));
 
             return properties;
