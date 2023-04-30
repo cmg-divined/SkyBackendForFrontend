@@ -119,6 +119,13 @@ public class InventoryParser
     public IEnumerable<SaveAuction> Parse(string json)
     {
         dynamic full = JsonConvert.DeserializeObject(json);
+        if (full.slots == null)
+        {
+            Activity.Current?.AddEvent(new ActivityEvent("Log", default, new(new Dictionary<string, object>() {
+                { "message", "The inventory json at key `jsonNbt` is missing the slots property. Make sure you serialized bot.inventory" },
+                { "json", json } })));
+            throw new CoflnetException("missing_slots", "The inventory json at key `jsonNbt` is missing the slots property. Make sure you serialized bot.inventory");
+        }
         foreach (var item in full.slots)
         {
             if (item == null)
