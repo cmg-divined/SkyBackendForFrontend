@@ -172,9 +172,6 @@ public class InventoryParser
         if (ExtraAttributes.enchantments?.value != null)
             foreach (var enchantment in ExtraAttributes.enchantments.value)
             {
-                Console.WriteLine(enchantment.Value.value.GetType());
-                var val = new Newtonsoft.Json.Linq.JValue(2);
-
                 enchantments.Add(enchantment.Name, (int)enchantment.Value.value);
             }
 
