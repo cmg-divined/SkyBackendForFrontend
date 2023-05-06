@@ -180,7 +180,7 @@ public class InventoryParser
             Tag = ExtraAttributes.id.value,
             Enchantments = enchantments.Select(e => new Enchantment() { Type = Enum.Parse<Enchantment.EnchantmentType>(e.Key), Level = (byte)e.Value }).ToList(),
             Count = item.count,
-            ItemName = item.displayName,
+            ItemName = item.nbt.value?.display?.value?.Name?.value ?? item.displayName,
             Uuid = ExtraAttributes?.uuid?.value ?? Random.Shared.Next().ToString(),
         };
         if (attributesWithoutEnchantments.ContainsKey("modifier"))

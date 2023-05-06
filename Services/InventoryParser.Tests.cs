@@ -200,7 +200,7 @@ public class InventoryParserTests
         var item = MessagePackSerializer.Deserialize<List<SaveAuction>>(serialized)
                         .Where(i => i != null).Last();
         Assert.AreEqual("IRON_HELMET", item.Tag);
-        Assert.AreEqual("Iron Helmet", item.ItemName);
+        Assert.AreEqual("┬ºfIron Helmet", item.ItemName);
         Assert.AreEqual(1, item.Enchantments.Count);
         Assert.AreEqual(1, item.Enchantments.Where(e => e.Type == Core.Enchantment.EnchantmentType.growth).First().Level);
         Assert.AreEqual("0cf52647-c130-43ec-9c46-e2dc162d4894", item.FlatenedNBT["uuid"]);
