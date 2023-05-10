@@ -119,6 +119,12 @@ public class InventoryParser
     public IEnumerable<SaveAuction> Parse(string json)
     {
         dynamic full = JsonConvert.DeserializeObject(json);
+        if (full is JArray array)
+        {
+            foreach (var item in ParseChatTriggers(array))
+                yield return item;
+            yield break;
+        }
         if (full.slots == null)
         {
             Activity.Current?.AddEvent(new ActivityEvent("Log", default, new(new Dictionary<string, object>() {
@@ -134,7 +140,7 @@ public class InventoryParser
                 continue;
             }
 
-            var ExtraAttributes = item.nbt.value?.ExtraAttributes?.value;
+            var ExtraAttributes = item.nbt.value?.ExtraAttributes?.value ?? item.ExtraAttributes;
             if (ExtraAttributes == null)
             {
                 yield return new SaveAuction()
@@ -183,12 +189,52 @@ public class InventoryParser
             ItemName = item.nbt.value?.display?.value?.Name?.value ?? item.displayName,
             Uuid = ExtraAttributes?.uuid?.value ?? Random.Shared.Next().ToString(),
         };
+        var description = item.nbt.value?.display?.value?.Lore?.value?.value?.ToObject<string[]>() as string[];
+        NBT.GetAndAssignTier(auction, description.LastOrDefault()?.ToString());
         if (attributesWithoutEnchantments.ContainsKey("modifier"))
         {
             auction.Reforge = Enum.Parse<ItemReferences.Reforge>(attributesWithoutEnchantments["modifier"].ToString(), true);
             attributesWithoutEnchantments.Remove("modifier");
         }
     }
+
+
+    private IEnumerable<SaveAuction> ParseChatTriggers(JArray full)
+    {
+        foreach (var item in full)
+        {
+            var extraAttributes = item["tag"]["ExtraAttributes"];
+            if (extraAttributes == null)
+            {
+                yield return new SaveAuction()
+                {
+                    Count = (int)item["Count"],
+                    ItemName = item["display"]["Name"].ToString(),
+                    Enchantments = new(),
+                };
+                continue;
+            }
+            var enchants = extraAttributes["enchantments"]?.ToObject<Dictionary<string, int>>()?
+                    .Select(e => new Enchantment() { Type = Enum.Parse<Enchantment.EnchantmentType>(e.Key), Level = (byte)e.Value })
+                    .ToList();
+
+            var flatNbt = NBT.FlattenNbtData(extraAttributes.ToObject<Dictionary<string, object>>()
+                        .Where(e => e.Key != "enchantments").ToDictionary(e => e.Key, e => e.Value));
+            var auction = new SaveAuction()
+            {
+                Count = (int)item["Count"],
+                ItemName = item["tag"]["display"]["Name"].ToString(),
+                Enchantments = enchants,
+                Tag = extraAttributes["id"].ToString(),
+                Uuid = extraAttributes["uuid"]?.ToString() ?? Random.Shared.Next().ToString(),
+            };
+            NBT.GetAndAssignTier(auction, item["tag"]["display"]["Lore"]?.LastOrDefault()?.ToString());
+            auction.SetFlattenedNbt(flatNbt);
+
+            yield return auction;
+        }
+    }
+
 
     private static void Denest(dynamic ExtraAttributes, Dictionary<string, object> attributesWithoutEnchantments)
     {

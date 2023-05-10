@@ -210,7 +210,31 @@ public class InventoryParserTests
         Assert.AreEqual("4303281387", item.FlatenedNBT["mined_crops"]);
         Assert.AreEqual("SHADOW_WARP_SCROLL WITHER_SHIELD_SCROLL", item.FlatenedNBT["ability_scroll"]);
         Assert.AreEqual(ItemReferences.Reforge.Heavy, item.Reforge);
+        Assert.AreEqual(Tier.COMMON, item.Tier);
     }
-
+private string jsonSampleCT = """
+[{"id":"minecraft:tnt","Count":2,"tag":{"ench":[],"HideFlags":254,"display":{"Lore":["§7Breaks weak walls. Can be used","§7to blow up Crypts in §cThe","§cCatacombs §7and §3Crystal","§3Hollows§7.","","§9§lRARE"],
+"Name":"§9Superboom TNT"},"ExtraAttributes":{"id":"SUPERBOOM_TNT"}},"Damage":0},
+{"id":"minecraft:stained_glass","Count":1,"tag":{"HideFlags":254,"display":{"Lore":["§7§oA rare space helmet forged","§7§ofrom shards of moon glass.","","§7§8This item can be reforged!","§c§lSPECIAL HELMET"],
+"Name":"§cSpace Helmet"},"ExtraAttributes":{"id":"DCTR_SPACE_HELM","uuid":"b14aefbd-cbf8-4ca1-aa2e-5c0422807c60","timestamp":"4/8/23 10:01 AM", enchantments:{impaling:3,chance:4,piercing:1,infinite_quiver:10,ultimate_soul_eater:5,snipe:3,telekinesis:1,power:7}}},"Damage":14}]
+""";
+    [Test]
+    public void ParseCT()
+    {
+        var parser = new InventoryParser();
+        var serialized = MessagePackSerializer.Serialize(parser.Parse(jsonSampleCT));
+        var item = MessagePackSerializer.Deserialize<List<SaveAuction>>(serialized)
+                        .Where(i => i != null).Last();
+        Assert.AreEqual("DCTR_SPACE_HELM", item.Tag);
+        Assert.AreEqual("§cSpace Helmet", item.ItemName);
+        Assert.AreEqual(ItemReferences.Reforge.None, item.Reforge);
+        Assert.AreEqual(8, item.Enchantments.Count);
+        Assert.AreEqual(3, item.Enchantments.Where(e => e.Type == Core.Enchantment.EnchantmentType.impaling).First().Level);
+        Assert.AreEqual(4, item.Enchantments.Where(e => e.Type == Core.Enchantment.EnchantmentType.chance).First().Level);
+        Assert.AreEqual(1, item.Count);
+        Assert.AreEqual("b14aefbd-cbf8-4ca1-aa2e-5c0422807c60", item.FlatenedNBT["uuid"]);
+        Assert.AreEqual("4/8/23 10:01 AM", item.FlatenedNBT["timestamp"]);
+        Assert.AreEqual(Tier.SPECIAL, item.Tier);
+    }
 
 }
