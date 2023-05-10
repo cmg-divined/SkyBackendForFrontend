@@ -7,9 +7,10 @@ using Coflnet.Sky.Core;
 
 namespace Coflnet.Sky.Commands.Shared
 {
+    [FilterDescription("Maximum cost of an auction")]
     public class MaxCostDetailedFlipFilter : DetailedFlipFilter
     {
-        public object[] Options => new string[] { "0", int.MaxValue.ToString() };
+        public object[] Options => new string[] { "0", 10_000_000_000.ToString() };
 
         public FilterType FilterType => FilterType.NUMERICAL;
 
