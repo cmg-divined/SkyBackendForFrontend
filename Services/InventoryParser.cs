@@ -116,9 +116,13 @@ public class InventoryParser
         }
 	  ]
 }*/
-    public IEnumerable<SaveAuction> Parse(string json)
+    public IEnumerable<SaveAuction> Parse(dynamic data)
     {
-        dynamic full = JsonConvert.DeserializeObject(json);
+        dynamic full = null;
+        if (data is string json)
+            full = JsonConvert.DeserializeObject(json);
+        else
+            full = data;
         if (full is JArray array)
         {
             foreach (var item in ParseChatTriggers(array))
@@ -129,7 +133,7 @@ public class InventoryParser
         {
             Activity.Current?.AddEvent(new ActivityEvent("Log", default, new(new Dictionary<string, object>() {
                 { "message", "The inventory json at key `jsonNbt` is missing the slots property. Make sure you serialized bot.inventory" },
-                { "json", json } })));
+                { "json", JsonConvert.SerializeObject(data) } })));
             throw new CoflnetException("missing_slots", "The inventory json at key `jsonNbt` is missing the slots property. Make sure you serialized bot.inventory");
         }
         foreach (var item in full.slots)

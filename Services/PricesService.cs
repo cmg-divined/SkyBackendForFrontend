@@ -50,7 +50,7 @@ namespace Coflnet.Sky.Commands.Shared
                 return new PriceSumary()
                 {
                     Max = (long)val.Max(p => p.MaxBuy),
-                    Med = (long)val.Select(v => (v.Sell + v.Buy) / 2).OrderByDescending(v => v).Skip(val.Count() / 2).FirstOrDefault(),
+                    Med = (long)val.Select(v => (v.Sell + (v.Buy == 0 ? v.Sell : v.Buy)) / 2).OrderByDescending(v => v).Skip(val.Count() / 2).FirstOrDefault(),
                     Min = (long)val.Min(p => p.MinSell),
                     Mean = (long)val.Average(p => p.Buy),
                     Mode = (long)val.GroupBy(p => p.Buy).OrderByDescending(p => p.Count()).FirstOrDefault().Key,
