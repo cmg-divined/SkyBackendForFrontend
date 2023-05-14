@@ -57,7 +57,10 @@ public enum DescriptionField
     /// Breakdown of relevant price modifying stats
     /// </summary>
     ITEM_KEY,
-
+    /// <summary>
+    /// Enchant Cost Summary
+    /// </summary>
+    EnchantCost,
     // anything over 9000 gets hidden
     BAZAAR_COST = 9001
 }
