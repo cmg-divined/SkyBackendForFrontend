@@ -35,6 +35,11 @@ namespace Coflnet.Sky.Commands
         private async Task<McConnect.Models.User> ExecuteUserRequest(RestRequest mcRequest)
         {
             var mcResponse = await mcAccountClient.ExecuteAsync(mcRequest);
+            if (mcResponse.StatusCode != System.Net.HttpStatusCode.OK)
+            {
+                dev.Logger.Instance.Error("Error getting mc-accounts: " + mcResponse.Content);
+                return null;
+            }
             var mcAccounts = JsonConvert.DeserializeObject<Coflnet.Sky.McConnect.Models.User>(mcResponse.Content);
             return mcAccounts;
         }

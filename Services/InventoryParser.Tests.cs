@@ -1,7 +1,9 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using Coflnet.Sky.Core;
 using MessagePack;
+using Newtonsoft.Json;
 using NUnit.Framework;
 
 namespace Coflnet.Sky.Commands.Shared;
@@ -114,7 +116,7 @@ public class InventoryParserTests
                         "value": {
                             "id": {
                                 "type": "string",
-                                "value": "IRON_HELMET"
+                                "value": "PET"
                             },
                             "gems": {
                                 "type": "compound",
@@ -199,12 +201,14 @@ public class InventoryParserTests
         var serialized = MessagePackSerializer.Serialize(parser.Parse(jsonSample));
         var item = MessagePackSerializer.Deserialize<List<SaveAuction>>(serialized)
                         .Where(i => i != null).Last();
-        Assert.AreEqual("IRON_HELMET", item.Tag);
+        Console.WriteLine(JsonConvert.SerializeObject(item, Formatting.Indented));
+        Assert.AreEqual("PET_ELEPHANT", item.Tag);
         Assert.AreEqual("┬ºfIron Helmet", item.ItemName);
         Assert.AreEqual(1, item.Enchantments.Count);
         Assert.AreEqual(1, item.Enchantments.Where(e => e.Type == Core.Enchantment.EnchantmentType.growth).First().Level);
         Assert.AreEqual("0cf52647-c130-43ec-9c46-e2dc162d4894", item.FlatenedNBT["uuid"]);
         Assert.AreEqual("PET_ITEM_FARMING_SKILL_BOOST_EPIC", item.FlatenedNBT["heldItem"]);
+        Assert.AreEqual("33978271,22665796", item.FlatenedNBT["exp"].Replace('.', ','));
         Assert.AreEqual("FINE", item.FlatenedNBT["JADE_0"]);
         Assert.AreEqual("PERFECT", item.FlatenedNBT["COMBAT_0"]);
         Assert.AreEqual("4303281387", item.FlatenedNBT["mined_crops"]);

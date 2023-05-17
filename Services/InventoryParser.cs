@@ -163,6 +163,10 @@ public class InventoryParser
             {
                 NewMethod(item, ExtraAttributes, out attributesWithoutEnchantments, out auction);
                 auction?.SetFlattenedNbt(NBT.FlattenNbtData(attributesWithoutEnchantments).GroupBy(e => e.Key).Select(e => e.First()).ToList());
+                if (auction.Tag == "PET")
+                {
+                    auction.Tag += "_" + auction.FlatenedNBT.FirstOrDefault(e => e.Key == "type").Value.ToString();
+                }
             }
             catch (System.Exception e)
             {
