@@ -17,7 +17,8 @@ namespace Coflnet.Sky.Commands.Shared
             LowPricedAuction.FinderType.USER,
             LowPricedAuction.FinderType.FLIPPER_AND_SNIPERS,
             LowPricedAuction.FinderType.SNIPERS,
-            LowPricedAuction.FinderType.STONKS
+            LowPricedAuction.FinderType.STONKS,
+            LowPricedAuction.FinderType.TFM,
         }.Select(t=> (object)t).ToArray();
 
         public FilterType FilterType => FilterType.Equal;
