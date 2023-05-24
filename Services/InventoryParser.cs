@@ -256,10 +256,20 @@ public class InventoryParser
             if (type == "list")
             {
                 var list = new List<object>();
-                foreach (var item in attribute.Value["value"]["value"])
+                if (((string)attribute.Value["value"]["type"]) == "compound")
                 {
-                    list.Add(item.ToString());
+                    foreach (var item in attribute.Value["value"]["value"])
+                    {
+                        var dict = new Dictionary<string, object>();
+                        Denest(item, dict);
+                        list.Add(dict);
+                    }
                 }
+                else
+                    foreach (var item in attribute.Value["value"]["value"])
+                    {
+                        list.Add(item.ToString());
+                    }
                 attributesWithoutEnchantments[attribute.Name] = list;
             }
             else if ((attribute.Name.EndsWith("_0") || attribute.Name.EndsWith("_1") || attribute.Name.EndsWith("_2") || attribute.Name.EndsWith("_3") || attribute.Name.EndsWith("_4"))

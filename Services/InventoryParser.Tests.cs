@@ -174,6 +174,50 @@ public class InventoryParserTests
                                     8314091
                                 ]
                             },
+                            "necromancer_souls": {
+                                "type": "list",
+                                "value": {
+                                    "type": "compound",
+                                    "value": [
+                                        {
+                                            "mob_id": {
+                                                "type": "string",
+                                                "value": "MASTER_CRYPT_TANK_ZOMBIE_70"
+                                            }
+                                        },
+                                        {
+                                            "mob_id": {
+                                                "type": "string",
+                                                "value": "MASTER_CRYPT_TANK_ZOMBIE_70"
+                                            }
+                                        },
+                                        {
+                                            "mob_id": {
+                                                "type": "string",
+                                                "value": "MASTER_CRYPT_TANK_ZOMBIE_70"
+                                            }
+                                        },
+                                        {
+                                            "mob_id": {
+                                                "type": "string",
+                                                "value": "MASTER_CRYPT_TANK_ZOMBIE_70"
+                                            }
+                                        },
+                                        {
+                                            "mob_id": {
+                                                "type": "string",
+                                                "value": "MASTER_CRYPT_TANK_ZOMBIE_70"
+                                            }
+                                        },
+                                        {
+                                            "mob_id": {
+                                                "type": "string",
+                                                "value": "MASTER_CRYPT_TANK_ZOMBIE_70"
+                                            }
+                                        }
+                                    ]
+                                }
+                            },
                             "petInfo": {
                                 "type": "string",
                                 "value": "{\"type\":\"ELEPHANT\",\"active\":false,\"exp\":3.397827122665796E7,\"tier\":\"LEGENDARY\",\"hideInfo\":false,\"heldItem\":\"PET_ITEM_FARMING_SKILL_BOOST_EPIC\",\"candyUsed\":10,\"uuid\":\"8760755f-f72b-4624-8cf2-c51b21e35acc\",\"hideRightClick\":false}"
@@ -213,6 +257,7 @@ public class InventoryParserTests
         Assert.AreEqual("PERFECT", item.FlatenedNBT["COMBAT_0"]);
         Assert.AreEqual("4303281387", item.FlatenedNBT["mined_crops"]);
         Assert.AreEqual("SHADOW_WARP_SCROLL WITHER_SHIELD_SCROLL", item.FlatenedNBT["ability_scroll"]);
+        Assert.AreEqual("6", item.FlatenedNBT["MASTER_CRYPT_TANK_ZOMBIE_70"]);
         Assert.AreEqual(ItemReferences.Reforge.Heavy, item.Reforge);
         Assert.AreEqual(Tier.COMMON, item.Tier);
     }
