@@ -602,7 +602,7 @@ namespace Coflnet.Sky.Commands.Shared
             }
         }
 
-        public static int DelayTimeFor(int queueSize, double minutes = 3, int max = 10000)
+        public static int DelayTimeFor(int queueSize, double minutes = 0.66, int max = 10000)
         {
             return (int)Math.Min((TimeSpan.FromMinutes(minutes) / (Math.Max(queueSize, 1))).TotalMilliseconds, max);
         }
