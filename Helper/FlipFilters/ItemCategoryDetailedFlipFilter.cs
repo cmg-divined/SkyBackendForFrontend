@@ -17,7 +17,7 @@ namespace Coflnet.Sky.Commands.Shared
 
         public FilterType FilterType => FilterType.Equal;
 
-        private static readonly ConcurrentDictionary<ItemCategory, HashSet<string>> categoryToTags = new ();
+        private static readonly ConcurrentDictionary<ItemCategory, HashSet<string>> categoryToTags = new();
         private static DateTime lastUpdate = DateTime.MinValue;
 
         public Expression<Func<FlipInstance, bool>> GetExpression(Dictionary<string, string> filters, string val)
