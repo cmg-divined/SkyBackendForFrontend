@@ -508,7 +508,9 @@ namespace Coflnet.Sky.Commands.Shared
 
             static bool IsBidFlip(LowPricedAuction flip)
             {
-                return flip.Auction.End < DateTime.UtcNow && flip.Auction.End > DateTime.UtcNow - TimeSpan.FromMinutes(6);
+                if(!flip.Auction.Bin)
+                    Console.WriteLine($"received bin auction ending at {flip.Auction.End}");
+                return flip.Auction.End < DateTime.UtcNow + TimeSpan.FromMinutes(6) && flip.Auction.End > DateTime.UtcNow;
             }
 
             static bool IsBinFlip(LowPricedAuction flip)
