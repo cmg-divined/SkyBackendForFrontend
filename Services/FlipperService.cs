@@ -501,11 +501,21 @@ namespace Coflnet.Sky.Commands.Shared
             {
                 var time = (DateTime.UtcNow - flips.First().Auction.FindTime).TotalSeconds;
                 runtroughTime.Observe(time);
-                QueueLowPriced(flips.Where(flip => !(flip.Auction.Start.ToUniversalTime() < DateTime.UtcNow.ToUniversalTime() - TimeSpan.FromMinutes(4)
-                    && flip.Auction.Bin || flip.Auction.End < DateTime.UtcNow)).ToList());
+                QueueLowPriced(flips.Where(flip => IsBinFlip(flip) || IsBidFlip(flip)).ToList());
 
                 return Task.CompletedTask;
             }, token, consumerConf.GroupId + Random.Shared.Next(), 50, AutoOffsetReset.Latest).ConfigureAwait(false);
+
+            static bool IsBidFlip(LowPricedAuction flip)
+            {
+                return flip.Auction.End < DateTime.UtcNow && flip.Auction.End > DateTime.UtcNow - TimeSpan.FromMinutes(6);
+            }
+
+            static bool IsBinFlip(LowPricedAuction flip)
+            {
+                return flip.Auction.Start.ToUniversalTime() > DateTime.UtcNow.ToUniversalTime() - TimeSpan.FromMinutes(4)
+                                    && flip.Auction.Bin;
+            }
         }
 
         public async Task ConsumeNewAuctions(CancellationToken token)
