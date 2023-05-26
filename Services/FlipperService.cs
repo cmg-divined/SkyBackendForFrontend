@@ -501,6 +501,19 @@ namespace Coflnet.Sky.Commands.Shared
             {
                 var time = (DateTime.UtcNow - flips.First().Auction.FindTime).TotalSeconds;
                 runtroughTime.Observe(time);
+                foreach (var flip in flips)
+                {
+                    try
+                    {
+
+                        if (!flip.Auction.Bin)
+                            Console.WriteLine($"received bid auction ending at {flip.Auction.End}");
+                    }
+                    catch (System.Exception e)
+                    {
+                        Console.WriteLine($"Error: failed to bid check auction {e.Message} {e.StackTrace}");
+                    }
+                }
                 QueueLowPriced(flips.Where(flip => IsBinFlip(flip) || IsBidFlip(flip)).ToList());
 
                 return Task.CompletedTask;
@@ -508,8 +521,6 @@ namespace Coflnet.Sky.Commands.Shared
 
             static bool IsBidFlip(LowPricedAuction flip)
             {
-                if(!flip.Auction.Bin)
-                    Console.WriteLine($"received bid auction ending at {flip.Auction.End}");
                 return flip.Auction.End.ToUniversalTime() < DateTime.UtcNow + TimeSpan.FromMinutes(6) && flip.Auction.End.ToUniversalTime() > DateTime.UtcNow;
             }
 
