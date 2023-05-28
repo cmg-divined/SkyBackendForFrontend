@@ -7,7 +7,7 @@ using Coflnet.Sky.Filter;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace Coflnet.Sky.Commands.Shared;
-public class IntroductionAgeDaysFlipFilter : DetailedFlipFilter
+public class IntroductionAgeDaysDetailedFlipFilter : DetailedFlipFilter
 {
     public FilterType FilterType => FilterType.RANGE | FilterType.Equal;
 

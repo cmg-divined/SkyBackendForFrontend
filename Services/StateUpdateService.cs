@@ -22,14 +22,14 @@ namespace Coflnet.Sky.Commands.Shared
         {
             this.logger = logger;
             this.config = config;
-            producer = kafkaCreator.BuildProducer<string, UpdateMessage>(true, b=>b.SetDefaultPartitioner((topic, pcount, key, isNull) =>
+            producer = kafkaCreator.BuildProducer<string, UpdateMessage>(true, b => b.SetDefaultPartitioner((topic, pcount, key, isNull) =>
             {
                 if (isNull)
                     return Random.Shared.Next() % pcount;
                 int partition = Math.Abs((int)key[0] << 8 | key[1] ^ key[2]) % pcount;
                 return partition;
             }));
-            
+
             _ = kafkaCreator.CreateTopicIfNotExist(config["TOPICS:STATE_UPDATE"]);
         }
 
