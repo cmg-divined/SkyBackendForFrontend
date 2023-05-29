@@ -61,6 +61,10 @@ public enum DescriptionField
     /// Enchant Cost Summary
     /// </summary>
     EnchantCost,
+    /// <summary>
+    /// Sum of gemstone value
+    /// </summary>
+    GemValue,
     // anything over 9000 gets hidden
     BAZAAR_COST = 9001
 }
