@@ -82,6 +82,8 @@ namespace Coflnet.Sky.Commands.Shared
 
         [SettingsDoc("Stop receiving any flips (just use other features) also stops the timer")]
         public bool DisableFlips;
+        [SettingsDoc("Outputs more information to help with debugging issues")]
+        public bool DebugMode;
 
         [DataMember(Name = "lastChange")]
         [SettingsDoc("", true)]
