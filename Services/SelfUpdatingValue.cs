@@ -10,6 +10,7 @@ namespace Coflnet.Sky.Commands.Shared
         public T Value { get; private set; }
         public event Action<T> OnChange;
         public event Action<T> AfterChange;
+        public Func<T, bool> ShouldPreventUpdate;
         private string UserId;
         private string Key;
         private bool IsDisposed = false;
@@ -28,6 +29,8 @@ namespace Coflnet.Sky.Commands.Shared
             SettingsService settings = GetService();
             instance.subTask = await settings.GetAndSubscribe<T>(userId, key, v =>
             {
+                if(instance.ShouldPreventUpdate?.Invoke(v) ?? false)
+                    return;
                 instance.OnChange?.Invoke(v);
                 instance.Value = v;
                 instance.AfterChange?.Invoke(v);
