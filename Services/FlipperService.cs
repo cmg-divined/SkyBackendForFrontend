@@ -352,6 +352,8 @@ namespace Coflnet.Sky.Commands.Shared
                 dev.Logger.Instance.Error(e, "Error in PreApiLowPriceHandler");
                 await Task.Delay(30000);
             }
+            if(flip.Finder != LowPricedAuction.FinderType.FLIPPER_AND_SNIPERS)
+                minAccountTier = AccountTier.PREMIUM_PLUS; // upgrade required tier for new finders
             if (flip.Auction.Context != null)
                 flip.Auction.Context["csh"] = (DateTime.UtcNow - flip.Auction.FindTime).ToString();
             foreach (var item in SuperSubs)
