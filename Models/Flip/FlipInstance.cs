@@ -44,7 +44,7 @@ namespace Coflnet.Sky.Commands.Shared
         {
             get
             {
-                var targetPrice = (Finder == LowPricedAuction.FinderType.SNIPER ? LowestBin : MedianPrice);
+                var targetPrice = Target;
                 var reduction = 2f;
                 if (targetPrice > 10_000_000)
                     reduction = 3;

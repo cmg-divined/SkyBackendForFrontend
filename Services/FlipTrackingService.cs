@@ -28,7 +28,6 @@ namespace Coflnet.Sky.Commands
 
         private static string ProduceTopic;
         private static ProducerConfig producerConfig;
-        private GemPriceService gemPriceService;
         private UpgradePriceService priceService;
         private ActivitySource tracer;
         private IConnectApi connectApi;
@@ -44,7 +43,6 @@ namespace Coflnet.Sky.Commands
         }
 
         public FlipTrackingService(
-            GemPriceService gemPriceService,
             UpgradePriceService priceService,
             ActivitySource tracer,
             IConfiguration config,
@@ -57,7 +55,6 @@ namespace Coflnet.Sky.Commands
             var url = config["FLIPTRACKER_BASE_URL"] ?? "http://" + config["FLIPTRACKER_HOST"];
             flipTracking = new TrackerApi(url);
             flipAnalyse = new AnalyseApi(url);
-            this.gemPriceService = gemPriceService;
             this.priceService = priceService;
             this.tracer = tracer;
             this.connectApi = connectApi;
@@ -303,9 +300,7 @@ namespace Coflnet.Sky.Commands
                     if (buy.HighestBidAmount == 0)
                         return null;
 
-                    var profit = gemPriceService.GetGemWrthFromLookup(buy.NBTLookup)
-                                - gemPriceService.GetGemWrthFromLookup(s.NBTLookup)
-                                + s.HighestBidAmount * 98 / 100
+                    var profit = s.HighestBidAmount * 98 / 100
                                 - buy.HighestBidAmount;
 
 
@@ -468,15 +463,6 @@ namespace Coflnet.Sky.Commands
             if (b.Tag == sell.Tag
                 && !enchantsBad)
             {
-                var gemSumaryBuy = gemPriceService.LookupToGems(b.Nbt);
-                var gemSumarySell = gemPriceService.LookupToGems(sell.NBTLookup);
-
-                changeSumary.AddRange(gemSumaryBuy);
-                changeSumary.AddRange(gemSumarySell.Select(g => new PropertyChange()
-                {
-                    Description = $"Selling with {g.Description}",
-                    Effect = -g.Effect
-                }));
                 try
                 {
                     changeSumary.AddRange(GetChanges(b, sell));

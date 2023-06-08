@@ -50,7 +50,6 @@ namespace Coflnet.Sky.Commands.Shared
             });
             services.AddSingleton<SettingsService>();
             services.AddSingleton<GemPriceService>();
-            services.AddHostedService<GemPriceService>(di => di.GetRequiredService<GemPriceService>());
             services.AddSingleton<UpgradePriceService>();
             services.AddHostedService<UpgradePriceService>(di => di.GetRequiredService<UpgradePriceService>());
             services.AddSingleton<FlipTrackingService>();
