@@ -456,7 +456,7 @@ namespace Coflnet.Sky.Commands.Shared
         private static string ReplaceStart(string lower, string start)
         {
             if (lower.StartsWith(start))
-                lower = lower.Replace(start, "", true, CultureInfo.InvariantCulture).TrimStart(' ', ':');
+                lower = lower.Replace(start + ":", "", true, CultureInfo.InvariantCulture).Replace(start + " ", "", true, CultureInfo.InvariantCulture);
             return lower;
         }
 
