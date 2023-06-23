@@ -172,11 +172,10 @@ namespace Coflnet.Sky.Commands.Shared
                 return (false, "minVolume");
             if (MaxCost != 0 && flip.LastKnownCost > MaxCost)
                 return (false, "maxCost");
-            GetPrice(flip, out long targetPrice, out long profit);
-            if (profit < MinProfit)
+            if (flip.Profit < MinProfit)
                 return (false, "minProfit");
             if (flip.LastKnownCost > 0 && (flip.ProfitPercentage < MinProfitPercent
-                || BasedOnLBin && (profit * 100 / flip.LastKnownCost < MinProfitPercent)))
+                || BasedOnLBin && (flip.ProfitPercentage < MinProfitPercent)))
             {
                 return (false, "profit Percentage");
             }
