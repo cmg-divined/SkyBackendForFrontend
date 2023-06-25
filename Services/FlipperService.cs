@@ -33,7 +33,7 @@ namespace Coflnet.Sky.Commands.Shared
         /// <summary>
         /// Special hook
         /// </summary>
-        public Func<FlipperService, LowPricedAuction, Task> PreApiLowPriceHandler { get; set; } = (s, auction) => Task.Delay(34_000);
+        public Func<FlipperService, LowPricedAuction, Task> PreApiLowPriceHandler { get; set; } = (s, auction) => Task.Delay(30_000);
 
         /// <summary>
         /// Wherether or not a given <see cref="SaveAuction.UId"/> was a flip or not
@@ -339,20 +339,20 @@ namespace Coflnet.Sky.Commands.Shared
 
             if (flip.Auction.Context != null)
                 flip.Auction.Context["csh"] = (DateTime.UtcNow - flip.Auction.FindTime).ToString();
-            try
+            if (flip.Auction.Context?.TryGetValue("pre-api", out var preApi) ?? true)
             {
-                if (flip.Auction.Context?.TryGetValue("pre-api", out var preApi) ?? true)
+                try
                 {
                     await PreApiLowPriceHandler(this, flip);
                     minAccountTier = AccountTier.PREMIUM_PLUS;
                 }
+                catch (System.Exception e)
+                {
+                    dev.Logger.Instance.Error(e, "Error in PreApiLowPriceHandler");
+                    await Task.Delay(30000);
+                }
             }
-            catch (System.Exception e)
-            {
-                dev.Logger.Instance.Error(e, "Error in PreApiLowPriceHandler");
-                await Task.Delay(30000);
-            }
-            if(flip.Finder != LowPricedAuction.FinderType.FLIPPER_AND_SNIPERS)
+            if (flip.Finder != LowPricedAuction.FinderType.FLIPPER_AND_SNIPERS)
                 minAccountTier = AccountTier.PREMIUM_PLUS; // upgrade required tier for new finders
             if (flip.Auction.Context != null)
                 flip.Auction.Context["csh"] = (DateTime.UtcNow - flip.Auction.FindTime).ToString();
@@ -361,6 +361,12 @@ namespace Coflnet.Sky.Commands.Shared
                 item.Value.AddLowPriced(flip);
             }
 
+            if (flip.Auction.Context?.TryGetValue("pre-api", out preApi) ?? true)
+            {
+                var waitTime = flip.Auction.Start - DateTime.UtcNow + TimeSpan.FromSeconds(20);
+                if(waitTime > TimeSpan.Zero)
+                    await Task.Delay(waitTime).ConfigureAwait(false);
+            }
             if (minAccountTier >= AccountTier.PREMIUM_PLUS)
                 await Task.Delay(1000).ConfigureAwait(false);
 
