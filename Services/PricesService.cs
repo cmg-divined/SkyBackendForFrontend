@@ -210,8 +210,6 @@ namespace Coflnet.Sky.Commands.Shared
                 var filter = new Dictionary<string, string>();
                 var lowestBins = await context.Auctions
                         .Where(a => a.ItemId == id && a.End > DateTime.Now && a.HighestBidAmount == 0 && a.Bin)
-                        .Include(a => a.Enchantments)
-                        .Include(a => a.NbtData)
                         .OrderBy(a => a.StartingBid)
                         .Take(count <= 1 ? 1 : count)
                         .AsNoTracking()

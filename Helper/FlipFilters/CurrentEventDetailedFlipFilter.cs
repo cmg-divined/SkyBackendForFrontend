@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq.Expressions;
 using System.Linq;
 using Coflnet.Sky.Filter;
+using Coflnet.Sky.Core;
 
 namespace Coflnet.Sky.Commands.Shared;
 
@@ -58,6 +59,6 @@ public class CurrentEventDetailedFlipFilter : DetailedFlipFilter
 
     private int GetCurrentDay()
     {
-        return (int)((Now - new DateTime(2019, 6, 11, 17, 55, 0, DateTimeKind.Utc)).TotalDays / (TimeSpan.FromDays(5) + TimeSpan.FromHours(4)).TotalDays * 31 * 12) % (31 * 12);
+        return (int)(Constants.SkyblockYear(Now) * 31 * 12) % (31 * 12);
     }
 }
