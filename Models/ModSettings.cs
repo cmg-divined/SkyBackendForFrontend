@@ -23,6 +23,9 @@ namespace Coflnet.Sky.Commands.Shared
         [DataMember(Name = "shortNumbers")]
         [SettingsDoc("Use M and k to shorten numbers", "sn")]
         public bool ShortNumbers;
+        [DataMember(Name = "shortNames")]
+        [SettingsDoc("Remove reforges etc from item names")]
+        public bool ShortNames;
         /// <summary>
         /// Block "flips in 10 seconds" from appearing
         /// </summary>
