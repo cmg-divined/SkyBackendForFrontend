@@ -326,14 +326,15 @@ namespace Coflnet.Sky.Commands
             }
 
         }
-        public async Task<FlipSumary> GetPlayerFlips(string uuid, System.TimeSpan timeSpan)
+        public async Task<FlipSumary> GetPlayerFlips(string uuid, System.TimeSpan timeSpan, DateTime startTime = default)
         {
-            return await GetPlayerFlips(new string[] { uuid }, timeSpan);
+            return await GetPlayerFlips(new string[] { uuid }, timeSpan, startTime);
         }
 
-        public async Task<FlipSumary> GetPlayerFlips(IEnumerable<string> uuids, System.TimeSpan timeSpan)
+        public async Task<FlipSumary> GetPlayerFlips(IEnumerable<string> uuids, System.TimeSpan timeSpan, DateTime startTime = default)
         {
-            var startTime = DateTime.UtcNow - timeSpan;
+            if (startTime == default)
+                startTime = DateTime.UtcNow - timeSpan;
             var playerGuids = uuids.Select(u => Guid.Parse(u)).ToHashSet();
             // use flipTracking.FlipsPlayerIdGetAsync(uuid)
             var allSoldFlips = await Task.WhenAll(uuids.Select(async uuid =>
