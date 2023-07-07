@@ -2,6 +2,8 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using System.Reflection;
+using Coflnet.Sky.Commands.MC;
 using Coflnet.Sky.Core;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
@@ -188,13 +190,18 @@ public class InventoryParser
             {
                 enchantments.Add(enchantment.Name, (int)enchantment.Value.value);
             }
-
+        string name = item.nbt.value?.display?.value?.Name?.value ?? item.displayName;
+        if (name.StartsWith("{"))
+        {
+            var lines = JsonConvert.DeserializeObject<TextLine>(name);
+            name = lines.To1_08();
+        }
         auction = new SaveAuction
         {
             Tag = ExtraAttributes.id.value,
             Enchantments = enchantments.Select(e => new Enchantment() { Type = Enum.Parse<Enchantment.EnchantmentType>(e.Key), Level = (byte)e.Value }).ToList(),
             Count = item.count,
-            ItemName = item.nbt.value?.display?.value?.Name?.value ?? item.displayName,
+            ItemName = name,
             Uuid = ExtraAttributes?.uuid?.value ?? Random.Shared.Next().ToString(),
         };
         var description = item.nbt.value?.display?.value?.Lore?.value?.value?.ToObject<string[]>() as string[];
@@ -203,6 +210,32 @@ public class InventoryParser
         {
             auction.Reforge = Enum.Parse<ItemReferences.Reforge>(attributesWithoutEnchantments["modifier"].ToString(), true);
             attributesWithoutEnchantments.Remove("modifier");
+        }
+    }
+
+    public class TextElement
+    {
+        public string Text { get; set; }
+        public bool Bold { get; set; }
+        public bool Italic { get; set; }
+        public string Color { get; set; }
+    }
+    public class TextLine
+    {
+        private static Dictionary<string, string> colorList;
+        static TextLine()
+        {
+            colorList = typeof(McColorCodes)
+              .GetFields(BindingFlags.Public | BindingFlags.Static)
+              .Where(f => f.FieldType == typeof(string))
+              .ToDictionary(f => f.Name.ToLower(),
+                            f => (string)f.GetValue(null));
+        }
+        public List<TextElement> Extra { get; set; }
+
+        public string To1_08()
+        {
+            return string.Join("", Extra.Select(e => $"{(e.Bold ? McColorCodes.BOLD : String.Empty)}{(e.Italic ? McColorCodes.ITALIC : String.Empty)}{(colorList.TryGetValue(e.Color, out var c) ? c : String.Empty)}{e.Text}"));
         }
     }
 

@@ -286,4 +286,116 @@ private string jsonSampleCT = """
         Assert.AreEqual(Tier.SPECIAL, item.Tier);
     }
 
+    [Test]
+    public void Parse117Strings()
+    {
+        var parser = new InventoryParser();
+        var data = parser.Parse("""
+        {
+        "_events": {},
+        "_eventsCount": 0,
+        "id": 0,
+        "type": "minecraft:inventory",
+        "title": "Inventory",
+        "slots": [
+            {
+            "type": 746,
+            "count": 1,
+            "metadata": 0,
+            "nbt": {
+                "type": "compound",
+                "name": "",
+                "value": {
+                    "Unbreakable": {
+                        "type": "byte",
+                        "value": 1
+                    },
+                    "HideFlags": {
+                        "type": "int",
+                        "value": 255
+                    },
+                    "display": {
+                        "type": "compound",
+                        "value": {
+                            "Lore": {
+                                "type": "list",
+                                "value": {
+                                    "type": "string",
+                                    "value": [
+                                        "{\"italic\":false,\"extra\":[{\"color\":\"gray\",\"text\":\"Defense: \"},{\"color\":\"green\",\"text\":\"+10\"}],\"text\":\"\"}",
+                                        "{\"italic\":false,\"text\":\"\"}",
+                                        "{\"italic\":false,\"extra\":[{\"color\":\"gray\",\"text\":\"Growth I\"}],\"text\":\"\"}",
+                                        "{\"italic\":false,\"extra\":[{\"color\":\"gray\",\"text\":\"Grants \"},{\"color\":\"green\",\"text\":\"+15 \"},{\"color\":\"red\",\"text\":\"❤ Health\"},{\"color\":\"gray\",\"text\":\".\"}],\"text\":\"\"}",
+                                        "{\"italic\":false,\"text\":\"\"}",
+                                        "{\"italic\":false,\"extra\":[{\"color\":\"gray\",\"text\":\"\"},{\"color\":\"red\",\"text\":\"You do not have a high enough\"}],\"text\":\"\"}",
+                                        "{\"italic\":false,\"extra\":[{\"color\":\"red\",\"text\":\"Enchanting level to use some of\"}],\"text\":\"\"}",
+                                        "{\"italic\":false,\"extra\":[{\"color\":\"red\",\"text\":\"the enchantments on this item!\"}],\"text\":\"\"}",
+                                        "{\"italic\":false,\"text\":\"\"}",
+                                        "{\"italic\":false,\"extra\":[{\"color\":\"gray\",\"text\":\"\"},{\"color\":\"dark_gray\",\"text\":\"This item can be reforged!\"}],\"text\":\"\"}",
+                                        "{\"italic\":false,\"extra\":[{\"bold\":true,\"color\":\"white\",\"text\":\"COMMON HELMET\"}],\"text\":\"\"}"
+                                    ]
+                                }
+                            },
+                            "Name": {
+                                "type": "string",
+                                "value": "{\"italic\":false,\"extra\":[{\"color\":\"white\",\"text\":\"Iron Helmet\"}],\"text\":\"\"}"
+                            }
+                        }
+                    },
+                    "Enchantments": {
+                        "type": "list",
+                        "value": {
+                            "type": "compound",
+                            "value": [
+                                {
+                                    "lvl": {
+                                        "type": "short",
+                                        "value": 0
+                                    },
+                                    "id": {
+                                        "type": "string",
+                                        "value": "minecraft:protection"
+                                    }
+                                }
+                            ]
+                        }
+                    },
+                    "ExtraAttributes": {
+                        "type": "compound",
+                        "value": {
+                            "id": {
+                                "type": "string",
+                                "value": "IRON_HELMET"
+                            },
+                            "enchantments": {
+                                "type": "compound",
+                                "value": {
+                                    "growth": {
+                                        "type": "int",
+                                        "value": 1
+                                    }
+                                }
+                            },
+                            "uuid": {
+                                "type": "string",
+                                "value": "0cf52647-c130-43ec-9c46-e2dc162d4894"
+                            },
+                            "timestamp": {
+                                "type": "string",
+                                "value": "2/18/23 4:27 AM"
+                            }
+                        }
+                    }
+                }
+            },
+            "name": "iron_helmet",
+            "displayName": "Iron Helmet",
+            "stackSize": 1,
+            "slot": 5
+            },
+        ]}
+        """);
+
+        Assert.AreEqual("§fIron Helmet", data.First().ItemName);
+    }
 }
