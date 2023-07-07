@@ -49,6 +49,7 @@ namespace Coflnet.Sky.Commands.Shared
             AdditionalFilters.Add<UtcHourOfDayDetailedFlipFilter>();
             AdditionalFilters.Add<UtcDayOfWeekDetailedFlipFilter>();
             AdditionalFilters.Add<CurrentEventDetailedFlipFilter>();
+            AdditionalFilters.Add<PerfectArmorTierDetailedFlipFilter>();
         }
 
         public FlipFilter(Dictionary<string, string> originalf)
