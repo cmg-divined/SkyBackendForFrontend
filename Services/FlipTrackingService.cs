@@ -326,20 +326,21 @@ namespace Coflnet.Sky.Commands
             }
 
         }
-        public async Task<FlipSumary> GetPlayerFlips(string uuid, System.TimeSpan timeSpan, DateTime startTime = default)
+        public async Task<FlipSumary> GetPlayerFlips(string uuid, System.TimeSpan timeSpan, DateTime endTime = default)
         {
-            return await GetPlayerFlips(new string[] { uuid }, timeSpan, startTime);
+            return await GetPlayerFlips(new string[] { uuid }, timeSpan, endTime);
         }
 
-        public async Task<FlipSumary> GetPlayerFlips(IEnumerable<string> uuids, System.TimeSpan timeSpan, DateTime startTime = default)
+        public async Task<FlipSumary> GetPlayerFlips(IEnumerable<string> uuids, System.TimeSpan timeSpan, DateTime endTime = default)
         {
-            if (startTime == default)
-                startTime = DateTime.UtcNow - timeSpan;
+            if (endTime == default)
+                endTime = DateTime.UtcNow;
+            var startTime = endTime.Subtract(timeSpan);
             var playerGuids = uuids.Select(u => Guid.Parse(u)).ToHashSet();
             // use flipTracking.FlipsPlayerIdGetAsync(uuid)
             var allSoldFlips = await Task.WhenAll(uuids.Select(async uuid =>
             {
-                return await flipTracking.FlipsPlayerIdGetAsync(Guid.Parse(uuid), startTime, DateTime.UtcNow);
+                return await flipTracking.FlipsPlayerIdGetAsync(Guid.Parse(uuid), startTime, endTime);
             }));
 
             var relevantFlips = allSoldFlips.Where(f => f != null).SelectMany(f => f)
@@ -373,7 +374,7 @@ namespace Coflnet.Sky.Commands
             var playerIds = await context.Players.Where(p => uuids.Contains(p.UuId)).AsNoTracking().Select(p => p.Id).ToListAsync();
             var uidKey = NBT.Instance.GetKeyId("uid");
             var sellList = await context.Auctions.Where(a => playerIds.Contains(a.SellerId))
-                .Where(a => a.End > startTime && a.End < DateTime.UtcNow && a.HighestBidAmount > 0)
+                .Where(a => a.End > endTime && a.End < DateTime.UtcNow && a.HighestBidAmount > 0)
                 .Include(a => a.NBTLookup)
                 .Include(a => a.Enchantments)
                 .AsNoTracking()
@@ -387,7 +388,7 @@ namespace Coflnet.Sky.Commands
                 }).ToList();
             var SalesUidLookup = sells.Select(a => a.Key).ToHashSet();
             var sales = await context.NBTLookups.Where(b => b.KeyId == uidKey && SalesUidLookup.Contains(b.Value)).AsNoTracking().Select(n => n.AuctionId).ToListAsync();
-            var playerBids = await context.Bids.Where(b => playerIds.Contains(b.BidderId) && sales.Contains(b.Auction.Id) && b.Timestamp > startTime.Subtract(System.TimeSpan.FromDays(14)))
+            var playerBids = await context.Bids.Where(b => playerIds.Contains(b.BidderId) && sales.Contains(b.Auction.Id) && b.Timestamp > endTime.Subtract(System.TimeSpan.FromDays(14)))
                 .AsNoTracking()
                 // filtering
                 .OrderByDescending(bid => bid.Id)
