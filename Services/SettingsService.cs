@@ -11,15 +11,15 @@ namespace Coflnet.Sky.Commands.Shared
     public class SettingsService
     {
         private ConnectionMultiplexer con;
-        private SettingsApi api;
-        public SettingsService(IConfiguration config, ILogger<SettingsService> logger)
+        private ISettingsApi api;
+        public SettingsService(IConfiguration config, ILogger<SettingsService> logger, ISettingsApi api)
         {
             var redis = config["SETTINGS_REDIS_HOST"];
             if (redis == null)
                 logger.LogWarning("SETTINGS_REDIS_HOST is not set, settings updates will not be received");
             else
                 con = ConnectionMultiplexer.Connect(redis);
-            api = new SettingsApi(config["SETTINGS_BASE_URL"]);
+            this.api = api;
         }
 
         public async Task<ChannelMessageQueue> GetAndSubscribe<T>(string userId, string key, Action<T> update, Func<T> defaultGetter = null)
