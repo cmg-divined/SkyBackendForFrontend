@@ -88,5 +88,8 @@ namespace Coflnet.Sky.Commands.Shared
         [SettingsDoc("Autmatically add items to the blacklist for 8 hours if they show up more than 5 times in 2 minutes")]
         [DataMember(Name = "tempBlacklistSpam")]
         public bool TempBlacklistSpam;
+        [SettingsDoc("don't show flips only add useful data")]
+        [DataMember(Name = "dataOnlyMode")]
+        public bool AhDataOnlyMode;
     }
 }
