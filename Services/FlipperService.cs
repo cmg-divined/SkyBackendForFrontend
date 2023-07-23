@@ -364,7 +364,7 @@ namespace Coflnet.Sky.Commands.Shared
             if (flip.Auction.Context?.TryGetValue("pre-api", out preApi) ?? true)
             {
                 var waitTime = flip.Auction.Start - DateTime.UtcNow + TimeSpan.FromSeconds(20);
-                if(waitTime > TimeSpan.Zero)
+                if (waitTime > TimeSpan.Zero)
                     await Task.Delay(waitTime).ConfigureAwait(false);
             }
             if (minAccountTier >= AccountTier.PREMIUM_PLUS)
@@ -652,7 +652,7 @@ namespace Coflnet.Sky.Commands.Shared
             return result;
         }
 
-        private void UpdateFilterSumaries()
+        public void UpdateFilterSumaries()
         {
             var minProfit = long.MaxValue;
             var sumary = new ServerFilterSumary();
