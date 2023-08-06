@@ -15,13 +15,13 @@ public class UpdateMessage
     [Key(1)]
     public DateTime ReceivedAt;
     [Key(2)]
-    public ChestView Chest;
+    public ChestView? Chest;
     [Key(3)]
-    public List<string> ChatBatch;
+    public List<string>? ChatBatch;
     [Key(4)]
-    public string PlayerId;
+    public string? PlayerId;
     [Key(5)]
-    public string SessionId { get; set; }
+    public string? SessionId { get; set; }
 
     public enum UpdateKind 
     {

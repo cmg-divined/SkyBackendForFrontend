@@ -550,11 +550,11 @@ namespace Coflnet.Sky.Commands.Shared
 
         private void QueueLowPriced(IEnumerable<LowPricedAuction> flips)
         {
+            var collection = flips.ToList();
             Task.Run(async () =>
             {
                 try
                 {
-                    var collection = flips.ToList();
                     await DeliverLowPricedAuctions(collection).ConfigureAwait(false);
                     snipesReceived.Inc(collection.Count);
                 }

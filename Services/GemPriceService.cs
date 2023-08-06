@@ -140,15 +140,15 @@ namespace Coflnet.Sky.Commands.Shared
         /// </summary>
         /// <param name="auction"></param>
         /// <returns></returns>
-        public async Task<int> GetGemstoneWorth(SaveAuction auction)
+        public Task<int> GetGemstoneWorth(SaveAuction auction)
         {
             if (auction == null)
-                return 0;
+                return Task.FromResult(0);
             if (auction.NbtData == null)
             {
                 var lookup = auction.NBTLookup;
                 // from db
-                return GetGemWrthFromLookup(lookup);
+                return Task.FromResult(GetGemWrthFromLookup(lookup));
             }
             var gems = auction.FlatenedNBT.Where(n => n.Value == "PERFECT" || n.Value == "FLAWLESS");
             var additionalWorth = 0;
@@ -164,7 +164,7 @@ namespace Coflnet.Sky.Commands.Shared
                 }
             }
 
-            return additionalWorth;
+            return Task.FromResult(additionalWorth);
         }
 
         public int GetGemWrthFromLookup(List<NBTLookup> lookup)

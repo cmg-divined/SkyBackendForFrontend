@@ -24,7 +24,7 @@ namespace Coflnet.Sky.Commands.Shared
 
         [SettingsDoc("The minimum sales per 24 hours (has decimals)")]
         [DataMember(Name = "minVolume")]
-        public double MinVolume;
+        public double MinVolume = 2;
 
         [SettingsDoc("Maximium cost of flips")]
         [DataMember(Name = "maxCost")]
@@ -78,7 +78,6 @@ namespace Coflnet.Sky.Commands.Shared
         private ListMatcher ForcedBlackListMatcher;
         private ListMatcher WhiteListMatcher;
         private ListMatcher AfterMainWhiteListMatcher;
-        private Func<FlipInstance, bool> generalFilter;
 
         [SettingsDoc("Stop receiving any flips (just use other features) also stops the timer")]
         public bool DisableFlips;

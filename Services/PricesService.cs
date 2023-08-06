@@ -22,6 +22,8 @@ namespace Coflnet.Sky.Commands.Shared
         /// Creates a new 
         /// </summary>
         /// <param name="context"></param>
+        /// <param name="bazaarClient"></param>
+        /// <param name="itemClient"></param>
         public PricesService(HypixelContext context, BazaarApi bazaarClient, IItemsApi itemClient)
         {
             this.context = context;
