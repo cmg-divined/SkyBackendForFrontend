@@ -11,7 +11,6 @@ namespace Coflnet.Sky.Commands
 {
     public class McAccountService
     {
-        public static McAccountService Instance = new McAccountService();
         RestClient mcAccountClient = new RestClient(SimplerConfig.Config.Instance["MCCONNECT_BASE_URL"] ?? "http://" + SimplerConfig.Config.Instance["MCCONNECT_HOST"]);
 
 
