@@ -15,6 +15,7 @@ public class ArmorSetDetailedFlipFilter : DetailedFlipFilter
 
     public Expression<Func<FlipInstance, bool>> GetExpression(Dictionary<string, string> filters, string val)
     {
-        return flip => flip.Auction.Tag.StartsWith(val) && (flip.Auction.Tag.EndsWith("_LEGGINGS") || flip.Auction.Tag.EndsWith("_CHESTPLATE") || flip.Auction.Tag.EndsWith("_HELMET") || flip.Auction.Tag.EndsWith("_BOOTS"));
+        return flip => flip.Auction.Tag.StartsWith(val) 
+            && (flip.Auction.Tag.EndsWith("_LEGGINGS") || flip.Auction.Tag.EndsWith("_CHESTPLATE") || flip.Auction.Tag.EndsWith("_HELMET") || flip.Auction.Tag.EndsWith("_BOOTS"));
     }
 }
