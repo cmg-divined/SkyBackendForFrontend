@@ -48,7 +48,7 @@ namespace Coflnet.Sky.Commands.Shared
                 var index = i;
                 _ = Task.Run(async () =>
                 {
-                    Console.Write("Started worker " + index);
+                    Console.Write("Debug: Started worker " + index);
                     while (!stoppingToken.IsCancellationRequested)
                     {
                         try
@@ -70,7 +70,7 @@ namespace Coflnet.Sky.Commands.Shared
                         }
                         catch (OperationCanceledException)
                         {
-                            Console.WriteLine($"worker {index} was canceled");
+                            Console.WriteLine($"Debug: worker {index} was canceled");
                             break;
                         }
                         catch (ChannelClosedException)

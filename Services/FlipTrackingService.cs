@@ -50,7 +50,6 @@ namespace Coflnet.Sky.Commands
         //public static FlipTrackingService Instance = new FlipTrackingService();
 
         private static string ProduceTopic;
-        private static ProducerConfig producerConfig;
         private UpgradePriceService priceService;
         private ActivitySource tracer;
         private IConnectApi connectApi;
@@ -58,12 +57,6 @@ namespace Coflnet.Sky.Commands
 
 
         IProducer<string, FlipTracker.Client.Model.FlipEvent> producer;
-
-        static FlipTrackingService()
-        {
-            producerConfig = new ProducerConfig { BootstrapServers = SimplerConfig.Config.Instance["KAFKA_HOST"], CancellationDelayMaxMs = 1000 };
-            ProduceTopic = SimplerConfig.Config.Instance["TOPICS:FLIP_EVENT"];
-        }
 
         public FlipTrackingService(
             UpgradePriceService priceService,
@@ -76,6 +69,7 @@ namespace Coflnet.Sky.Commands
             producer = kafkaCreator?.BuildProducer<string, FlipTracker.Client.Model.FlipEvent>();
 
             var url = config["FLIPTRACKER_BASE_URL"] ?? "http://" + config["FLIPTRACKER_HOST"];
+            ProduceTopic = config["TOPICS:FLIP_EVENT"];
             flipTracking = new TrackerApi(url);
             flipAnalyse = new AnalyseApi(url);
             this.priceService = priceService;
