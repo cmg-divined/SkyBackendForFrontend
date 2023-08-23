@@ -64,6 +64,7 @@ namespace Coflnet.Sky.Commands.Shared
             IsDisposed = true;
             subTask?.Unsubscribe();
             subTask = null;
+            Value = default;
         }
 
         /// <summary>

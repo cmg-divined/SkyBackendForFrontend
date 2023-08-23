@@ -83,7 +83,7 @@ namespace Coflnet.Sky.Commands.Shared
                             dev.Logger.Instance.Error(e, "seding flip to " + Connection.UserId);
                         }
                     }
-                }).ConfigureAwait(false);
+                }, stoppingToken).ConfigureAwait(false);
             }
         }
 

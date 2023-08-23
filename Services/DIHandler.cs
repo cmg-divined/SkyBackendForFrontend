@@ -50,9 +50,8 @@ namespace Coflnet.Sky.Commands.Shared
                 return new Bazaar.Client.Api.BazaarApi(url);
             });
             services.AddSingleton<SettingsService>();
-            services.AddSingleton<GemPriceService>();
             services.AddSingleton<UpgradePriceService>();
-            services.AddHostedService<UpgradePriceService>(di => di.GetRequiredService<UpgradePriceService>());
+            //services.AddHostedService<UpgradePriceService>(di => di.GetRequiredService<UpgradePriceService>());
             services.AddSingleton<FlipTrackingService>();
             services.AddPaymentSingleton<ProductsApi>(url => new ProductsApi(url));
             services.AddPaymentSingleton<UserApi>(url => new UserApi(url));
