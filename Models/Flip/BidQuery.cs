@@ -13,10 +13,10 @@ namespace Coflnet.Sky.Commands.Shared
         public DateTime End { get; }
         public string Tag { get; }
         public Tier Tier { get; }
-        public List<NBTLookup> Nbt { get; }
+        public NBTLookup[] Nbt { get; }
         public List<Enchantment> Enchants { get; }
 
-        public BidQuery(string key, long amount, long highestOwnBid, DateTime end, string tag, Tier tier, List<NBTLookup> nbt, List<Enchantment> enchants)
+        public BidQuery(string key, long amount, long highestOwnBid, DateTime end, string tag, Tier tier, NBTLookup[] nbt, List<Enchantment> enchants)
         {
             Key = key;
             Amount = amount;
@@ -37,7 +37,7 @@ namespace Coflnet.Sky.Commands.Shared
                    End == other.End &&
                    Tag == other.Tag &&
                    Tier == other.Tier &&
-                   EqualityComparer<List<NBTLookup>>.Default.Equals(Nbt, other.Nbt) &&
+                   EqualityComparer<NBTLookup[]>.Default.Equals(Nbt, other.Nbt) &&
                    EqualityComparer<List<Enchantment>>.Default.Equals(Enchants, other.Enchants);
         }
 

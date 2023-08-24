@@ -167,7 +167,7 @@ namespace Coflnet.Sky.Commands.Shared
             return Task.FromResult(additionalWorth);
         }
 
-        public int GetGemWrthFromLookup(List<NBTLookup> lookup)
+        public int GetGemWrthFromLookup(NBTLookup[] lookup)
         {
             return lookup.Sum(l =>
             {
@@ -184,7 +184,7 @@ namespace Coflnet.Sky.Commands.Shared
         }
 
 
-        public List<PropertyChange> LookupToGems(List<NBTLookup> lookup)
+        public List<PropertyChange> LookupToGems(NBTLookup[] lookup)
         {
             return lookup.Select(l =>
             {

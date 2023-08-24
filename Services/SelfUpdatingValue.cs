@@ -43,9 +43,7 @@ namespace Coflnet.Sky.Commands.Shared
 
         public static Task<SelfUpdatingValue<T>> CreateNoUpdate(Func<T> valGet)
         {
-            var instance = new SelfUpdatingValue<T>(null, null);
-            instance.Value = valGet();
-            return Task.FromResult(instance);
+            return Task.FromResult(CreateNoUpdate(valGet()));
         }
         public static SelfUpdatingValue<T> CreateNoUpdate(T value)
         {

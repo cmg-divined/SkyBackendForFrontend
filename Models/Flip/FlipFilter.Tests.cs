@@ -90,7 +90,7 @@ namespace Coflnet.Sky.Commands.Shared
         public void CandyBlacklistMatch()
         {
             NBT.Instance = new NBTMock();
-            sampleFlip.Auction.NBTLookup = new List<NBTLookup>() { new NBTLookup(1, 2) };
+            sampleFlip.Auction.NBTLookup = new NBTLookup[]{ new NBTLookup(1, 2) };
             var settings = new FlipSettings()
             {
                 BlackList = new List<ListEntry>() { new ListEntry() { filter = new Dictionary<string, string>() { { "Candy", "any" } } } }
@@ -123,7 +123,7 @@ namespace Coflnet.Sky.Commands.Shared
         public void MinProfitFilterMatch()
         {
             NBT.Instance = new NBTMock();
-            sampleFlip.Auction.NBTLookup = new List<NBTLookup>() { new NBTLookup(1, 2) };
+            sampleFlip.Auction.NBTLookup = new NBTLookup[]{ new NBTLookup(1, 2) };
             var settings = new FlipSettings()
             {
                 MinProfit = 10000,
@@ -140,7 +140,7 @@ namespace Coflnet.Sky.Commands.Shared
         public void VolumeDeciamalFilterMatch()
         {
             NBT.Instance = new NBTMock();
-            sampleFlip.Auction.NBTLookup = new List<NBTLookup>() { new NBTLookup(1, 2) };
+            sampleFlip.Auction.NBTLookup = new NBTLookup[]{ new NBTLookup(1, 2) };
             var settings = new FlipSettings()
             {
                 MinProfit = 1,
@@ -243,7 +243,7 @@ namespace Coflnet.Sky.Commands.Shared
                 {
                     Reforge = ItemReferences.Reforge.Renowned,
                     Tier = Tier.MYTHIC,
-                    NBTLookup = new List<NBTLookup>() { new NBTLookup(1, 5) }
+                    NBTLookup = new NBTLookup[]{ new NBTLookup(1, 5) }
                 }
             });
             Assert.IsTrue(result);

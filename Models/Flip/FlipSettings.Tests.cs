@@ -98,7 +98,7 @@ namespace Coflnet.Sky.Commands.Shared
 
         private static void CreateLookup(FlipInstance flip)
         {
-            flip.Auction.NBTLookup = new System.Collections.Generic.List<NBTLookup>() { new NBTLookup(1, 2) };
+            flip.Auction.NBTLookup = new [] { new NBTLookup(1, 2) };
         }
 
         [Test]
@@ -116,7 +116,7 @@ namespace Coflnet.Sky.Commands.Shared
         public void BlacklitPetLevel()
         {
             flipB.Auction.Tag = PetTag;
-            flipB.Auction.NBTLookup.Add(new NBTLookup(1, 2));
+            flipB.Auction.NBTLookup = new[] { new NBTLookup(1, 2) };
             var bRes = settings.MatchesSettings(flipB);
             Assert.IsFalse(bRes.Item1, bRes.Item2);
         }
