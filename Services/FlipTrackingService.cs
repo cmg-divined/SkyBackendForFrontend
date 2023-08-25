@@ -426,7 +426,7 @@ namespace Coflnet.Sky.Commands
                     bid.Max(b => b.End),
                     bid.First().Tag,
                     bid.First().Tier,
-                    bid.OrderByDescending(b => b.Amount).First().Nbt,
+                    bid.OrderByDescending(b => b.Amount).First().Nbt.ToArray(),
                     bid.First().Enchants
                 ))
                 //.ThenInclude (b => b.Auction)
