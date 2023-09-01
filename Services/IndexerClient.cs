@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using System.Text.Json;
 using System.Threading.Tasks;
 using Coflnet.Sky.Core;
+using Newtonsoft.Json;
 using RestSharp;
 
 namespace Coflnet.Sky.Commands.Shared
@@ -16,7 +17,12 @@ namespace Coflnet.Sky.Commands.Shared
         public static async Task<IEnumerable<KeyValuePair<string, short>>> LowSupply()
         {
             var response = await Client.ExecuteAsync(new RestRequest("supply/low", Method.Get));
-            return Newtonsoft.Json.JsonConvert.DeserializeObject<List<KeyValuePair<string, short>>>(response.Content);
+            return JsonConvert.DeserializeObject<List<KeyValuePair<string, short>>>(response.Content);
+        }
+        public static async Task<IEnumerable<AuctionResult>> RecentlyEnded()
+        {
+            var response = await Client.ExecuteAsync(new RestRequest("auctions/ended", Method.Get));
+            return JsonConvert.DeserializeObject<List<AuctionResult>>(JsonConvert.DeserializeObject<string>(response.Content));
         }
     }
 }
