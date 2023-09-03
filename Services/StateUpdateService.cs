@@ -24,7 +24,7 @@ namespace Coflnet.Sky.Commands.Shared
             this.config = config;
             producer = kafkaCreator.BuildProducer<string, UpdateMessage>(true, b => b.SetDefaultPartitioner((topic, pcount, key, isNull) =>
             {
-                if (isNull)
+                if (isNull || key.Length < 3)
                     return Random.Shared.Next() % pcount;
                 int partition = Math.Abs((int)key[0] << 8 | key[1] ^ key[2]) % pcount;
                 return partition;
