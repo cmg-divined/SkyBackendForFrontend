@@ -167,7 +167,7 @@ public class InventoryParser
                 auction?.SetFlattenedNbt(NBT.FlattenNbtData(attributesWithoutEnchantments).GroupBy(e => e.Key).Select(e => e.First()).ToList());
                 if (auction.Tag == "PET")
                 {
-                    auction.Tag += "_" + auction.FlatenedNBT.FirstOrDefault(e => e.Key == "type").Value.ToString();
+                    auction.Tag += "_" + auction.FlatenedNBT.FirstOrDefault(e => e.Key == "type").Value;
                 }
             }
             catch (System.Exception e)
@@ -205,7 +205,9 @@ public class InventoryParser
             Uuid = ExtraAttributes?.uuid?.value ?? Random.Shared.Next().ToString(),
         };
         var description = item.nbt.value?.display?.value?.Lore?.value?.value?.ToObject<string[]>() as string[];
-        NBT.GetAndAssignTier(auction, description.LastOrDefault()?.ToString());
+        if(!NBT.GetAndAssignTier(auction, description.LastOrDefault()?.ToString()))
+            // retry auction tier position
+            NBT.GetAndAssignTier(auction, description.Reverse().Skip(7).FirstOrDefault()?.ToString());
         if (attributesWithoutEnchantments.ContainsKey("modifier"))
         {
             auction.Reforge = Enum.Parse<ItemReferences.Reforge>(attributesWithoutEnchantments["modifier"].ToString(), true);

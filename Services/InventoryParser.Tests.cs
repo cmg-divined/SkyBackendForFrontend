@@ -261,6 +261,130 @@ public class InventoryParserTests
         Assert.AreEqual(ItemReferences.Reforge.Heavy, item.Reforge);
         Assert.AreEqual(Tier.COMMON, item.Tier);
     }
+
+    string petSample = """
+        {
+    "_events": {},
+    "_eventsCount": 0,
+    "id": 0,
+    "type": "minecraft:inventory",
+    "title": "Inventory",
+    "slots": [
+{
+  "type": 397,
+  "count": 1,
+  "metadata": 3,
+  "nbt": {
+    "type": "compound",
+    "name": "",
+    "value": {
+      "HideFlags": {
+        "type": "int",
+        "value": 254
+      },
+      "SkullOwner": {
+        "type": "compound",
+        "value": {
+          "Id": {
+            "type": "string",
+            "value": "3a80504c-0993-3be5-92cd-2200f94a72b6"
+          },
+          "Properties": {
+            "type": "compound",
+            "value": {
+              "textures": {
+                "type": "list",
+                "value": {
+                  "type": "compound",
+                  "value": [
+                    {
+                      "Value": {
+                        "type": "string",
+                        "value": "ewogICJ0aW1lc3RhbXAiIDogMTYwNjQyODA5NTg3NywKICAicHJvZmlsZUlkIiA6ICIzZmM3ZmRmOTM5NjM0YzQxOTExOTliYTNmN2NjM2ZlZCIsCiAgInByb2ZpbGVOYW1lIiA6ICJZZWxlaGEiLAogICJzaWduYXR1cmVSZXF1aXJlZCIgOiB0cnVlLAogICJ0ZXh0dXJlcyIgOiB7CiAgICAiU0tJTiIgOiB7CiAgICAgICJ1cmwiIDogImh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvZjVmMjlhOTc1NTI5Mjc2ZDkxNmZjNjc5OTg4MzNjMTFlZTE3OGZmMjFlNTk0MWFmZGZiMGZhNzAxMGY4Mzc0ZSIKICAgIH0KICB9Cn0"
+                      }
+                    }
+                  ]
+                }
+              }
+            }
+          }
+        }
+      },
+      "display": {
+        "type": "compound",
+        "value": {
+          "Lore": {
+            "type": "list",
+            "value": {
+              "type": "string",
+              "value": [
+                "§8Fishing Pet, Grown-up Skin",
+                "",
+                "§b§lMAX LEVEL",
+                "",
+                "§7§eRight-click to add this pet to",
+                "§eyour pet menu!",
+                "",
+                "§6§lLEGENDARY",
+                "§8§m-----------------",
+                "§7Seller: §b[MVP§e+§b] Parakkz",
+                "§7Buy it now: §6190,000,000 coins",
+                "",
+                "§7Ends in: §e23h",
+                "",
+                "§eClick to inspect!"
+              ]
+            }
+          },
+          "Name": {
+            "type": "string",
+            "value": "§f§f§7[Lvl 100] §6Baby Yeti ✦"
+          }
+        }
+      },
+      "ExtraAttributes": {
+        "type": "compound",
+        "value": {
+          "petInfo": {
+            "type": "string",
+            "value": "{\"type\":\"BABY_YETI\",\"active\":false,\"exp\":3.892246997045735E7,\"tier\":\"LEGENDARY\",\"hideInfo\":false,\"heldItem\":\"DWARF_TURTLE_SHELMET\",\"candyUsed\":10,\"skin\":\"YETI_GROWN_UP\",\"uuid\":\"28fdb3cb-1029-48cf-9591-3e7d8d67ba9a\",\"hideRightClick\":false}"
+          },
+          "id": {
+            "type": "string",
+            "value": "PET"
+          },
+          "uuid": {
+            "type": "string",
+            "value": "28fdb3cb-1029-48cf-9591-3e7d8d67ba9a"
+          },
+          "timestamp": {
+            "type": "string",
+            "value": "8/2/23 2:31 PM"
+          }
+        }
+      }
+    }
+  },
+  "stackId": null,
+  "name": "skull",
+  "displayName": "Head",
+  "stackSize": 64,
+  "slot": 11
+}
+]}
+""";
+
+    [Test]
+    public void ParsePetRarity()
+    {
+         var parser = new InventoryParser();
+        var serialized = MessagePackSerializer.Serialize(parser.Parse(petSample));
+        var item = MessagePackSerializer.Deserialize<List<SaveAuction>>(serialized).Last();
+        Assert.AreEqual(Tier.LEGENDARY, item.Tier);
+    }
+
+
+
 private string jsonSampleCT = """
 [{"id":"minecraft:tnt","Count":2,"tag":{"ench":[],"HideFlags":254,"display":{"Lore":["§7Breaks weak walls. Can be used","§7to blow up Crypts in §cThe","§cCatacombs §7and §3Crystal","§3Hollows§7.","","§9§lRARE"],
 "Name":"§9Superboom TNT"},"ExtraAttributes":{"id":"SUPERBOOM_TNT"}},"Damage":0},
