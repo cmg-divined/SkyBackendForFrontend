@@ -91,5 +91,8 @@ namespace Coflnet.Sky.Commands.Shared
         [SettingsDoc("don't show flips only add useful data")]
         [DataMember(Name = "dataOnlyMode")]
         public bool AhDataOnlyMode;
+        [SettingsDoc("Ah list time target in hours", false, "listHours")]
+        [DataMember(Name = "ahListHours")]
+        public int AhListTimeTarget;
     }
 }
