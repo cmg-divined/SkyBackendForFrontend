@@ -30,7 +30,7 @@ namespace Coflnet.Sky.Commands.Shared
                 return partition;
             }));
 
-            _ = kafkaCreator.CreateTopicIfNotExist(config["TOPICS:STATE_UPDATE"], 9);
+            _ = kafkaCreator.CreateTopicIfNotExist(config["TOPICS:STATE_UPDATE"], 16);
         }
 
         public void Produce(string playerId, UpdateMessage message)
