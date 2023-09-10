@@ -1,4 +1,6 @@
 using System;
+using System.Security.Cryptography;
+using System.Text;
 using Coflnet.Kafka;
 using Coflnet.Sky.Core;
 using Confluent.Kafka;
@@ -22,11 +24,13 @@ namespace Coflnet.Sky.Commands.Shared
         {
             this.logger = logger;
             this.config = config;
+            var sha = SHA256.Create();
             producer = kafkaCreator.BuildProducer<string, UpdateMessage>(true, b => b.SetDefaultPartitioner((topic, pcount, key, isNull) =>
             {
                 if (isNull || key.Length < 3)
                     return Random.Shared.Next() % pcount;
-                int partition = Math.Abs((int)key[0] << 8 | key[1] ^ key[2]) % pcount;
+                byte[] encoded = sha.ComputeHash(key.ToArray());
+                int partition = BitConverter.ToUInt16(encoded, 0) % pcount;
                 return partition;
             }));
 
