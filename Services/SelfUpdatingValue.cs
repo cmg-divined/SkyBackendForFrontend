@@ -29,14 +29,16 @@ namespace Coflnet.Sky.Commands.Shared
             SettingsService settings = GetService();
             instance.subTask = await settings.GetAndSubscribe<T>(userId, key, v =>
             {
-                if(instance.ShouldPreventUpdate?.Invoke(v) ?? false)
+                if (v == null) // should not be null
+                    v = defaultGetter();
+                if (instance.ShouldPreventUpdate?.Invoke(v) ?? false)
                     return;
                 instance.OnChange?.Invoke(v);
                 instance.Value = v;
                 instance.AfterChange?.Invoke(v);
             }, defaultGetter);
             // if instance is already disposed we need to unsubscribe, this may or may not be bullshit
-            if(instance.IsDisposed)
+            if (instance.IsDisposed)
                 instance.Dispose();
             return instance;
         }
@@ -72,7 +74,7 @@ namespace Coflnet.Sky.Commands.Shared
         /// <returns></returns>
         public async Task Update(T newValue)
         {
-            if(UserId == null)
+            if (UserId == null)
             {
                 Value = newValue;
                 return;
