@@ -45,7 +45,7 @@ namespace Coflnet.Sky.Commands.Shared
                 catch (Exception e)
                 {
                     if (i == 2)
-                    throw new Exception("Could not subscribe to setting ", e);
+                        throw new Exception("Could not subscribe to setting ", e);
                     await Task.Delay(150 * (i + 1));
                 }
             throw new Exception("Could not subscribe to setting (should not be reached)");

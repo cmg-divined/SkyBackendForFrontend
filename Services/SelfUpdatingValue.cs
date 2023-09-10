@@ -79,6 +79,8 @@ namespace Coflnet.Sky.Commands.Shared
                 Value = newValue;
                 return;
             }
+            if(newValue == null)
+                throw new ArgumentNullException(nameof(newValue));
             await GetService().UpdateSetting(UserId, Key, newValue);
         }
 
