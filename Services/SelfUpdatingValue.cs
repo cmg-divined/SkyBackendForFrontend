@@ -30,7 +30,7 @@ namespace Coflnet.Sky.Commands.Shared
             instance.subTask = await settings.GetAndSubscribe<T>(userId, key, v =>
             {
                 if (v == null) // should not be null
-                    v = defaultGetter();
+                    v = SettingsService.DefaultFor<T>(defaultGetter);
                 if (instance.ShouldPreventUpdate?.Invoke(v) ?? false)
                     return;
                 instance.OnChange?.Invoke(v);

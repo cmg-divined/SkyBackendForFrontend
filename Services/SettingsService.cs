@@ -77,7 +77,7 @@ namespace Coflnet.Sky.Commands.Shared
             return val;
         }
 
-        private static T DefaultFor<T>(Func<T> defaultGetter)
+        public static T DefaultFor<T>(Func<T> defaultGetter)
         {
             if (defaultGetter != null)
                 return defaultGetter();
