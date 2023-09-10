@@ -6,6 +6,7 @@ using Coflnet.Sky.Core;
 using Confluent.Kafka;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
+using System.Linq;
 
 namespace Coflnet.Sky.Commands.Shared
 {
@@ -29,7 +30,7 @@ namespace Coflnet.Sky.Commands.Shared
             {
                 if (isNull || key.Length < 3)
                     return Random.Shared.Next() % pcount;
-                byte[] encoded = sha.ComputeHash(key.ToArray());
+                byte[] encoded = sha.ComputeHash(key.ToArray().TakeWhile(c => c != '-').Select(c => (byte)c).ToArray());
                 int partition = BitConverter.ToUInt16(encoded, 0) % pcount;
                 return partition;
             }));
@@ -42,7 +43,7 @@ namespace Coflnet.Sky.Commands.Shared
             message.PlayerId = playerId;
             producer.Produce(config["TOPICS:STATE_UPDATE"], new()
             {
-                Key = string.IsNullOrEmpty(playerId) ? null : playerId.Truncate(4).PadRight(4) + message.GetHashCode(),
+                Key = string.IsNullOrEmpty(playerId) ? null : $"{playerId}-{message.GetHashCode()}",
                 Value = message,
                 Timestamp = new(DateTime.UtcNow)
             });

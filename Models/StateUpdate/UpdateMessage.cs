@@ -23,6 +23,22 @@ public class UpdateMessage
     [Key(5)]
     public string? SessionId { get; set; }
 
+    public override bool Equals(object? obj)
+    {
+        return obj is UpdateMessage message &&
+               Kind == message.Kind &&
+               ReceivedAt == message.ReceivedAt &&
+               EqualityComparer<ChestView?>.Default.Equals(Chest, message.Chest) &&
+               EqualityComparer<List<string>?>.Default.Equals(ChatBatch, message.ChatBatch) &&
+               PlayerId == message.PlayerId &&
+               SessionId == message.SessionId;
+    }
+
+    public override int GetHashCode()
+    {
+        return HashCode.Combine(Kind, ReceivedAt, Chest, ChatBatch, PlayerId, SessionId);
+    }
+
     public enum UpdateKind 
     {
         UNKOWN,
@@ -31,6 +47,8 @@ public class UpdateMessage
         API = 4,
 
     }
+
+    
 }
 
 [MessagePackObject]
