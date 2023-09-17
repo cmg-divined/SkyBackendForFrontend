@@ -9,7 +9,8 @@ using Coflnet.Sky.Filter;
 namespace Coflnet.Sky.Commands.Shared;
 public class ArmorSetDetailedFlipFilter : DetailedFlipFilter
 {
-    public object[] Options => ItemDetails.Instance.TagLookup.Where(t => t.Key.EndsWith("_LEGGINGS")).Select(t => (object)t.Key.Replace("_LEGGINGS", "")).ToArray();
+    // xy_TERROR_LEGGINGS can't be sold on ah so they are excluded
+    public object[] Options => ItemDetails.Instance.TagLookup.Where(t => t.Key.EndsWith("_LEGGINGS") && !t.Key.Contains("_TERROR_")).Select(t => (object)t.Key.Replace("_LEGGINGS", "")).ToArray();
 
     public FilterType FilterType => FilterType.Equal;
 
