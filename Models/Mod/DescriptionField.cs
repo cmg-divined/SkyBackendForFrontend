@@ -68,7 +68,7 @@ public enum DescriptionField
     /// <summary>
     /// Summary of past list attempts
     /// </summary>
-    AhListFees,
+    SpentOnAhFees,
     // anything over 9000 gets hidden
     BAZAAR_COST = 9001
 }
