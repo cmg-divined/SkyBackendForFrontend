@@ -65,6 +65,10 @@ public enum DescriptionField
     /// Sum of gemstone value
     /// </summary>
     GemValue,
+    /// <summary>
+    /// Summary of past list attempts
+    /// </summary>
+    AhListFees,
     // anything over 9000 gets hidden
     BAZAAR_COST = 9001
 }
