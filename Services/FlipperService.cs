@@ -13,6 +13,7 @@ using Coflnet.Sky.Core;
 using Microsoft.Extensions.Hosting;
 using System.Threading;
 using Microsoft.Extensions.Configuration;
+using Coflnet.Kafka;
 
 namespace Coflnet.Sky.Commands.Shared
 {
@@ -458,7 +459,6 @@ namespace Coflnet.Sky.Commands.Shared
         ConsumerConfig consumerConf = new ConsumerConfig
         {
             GroupId = System.Net.Dns.GetHostName(),
-            BootstrapServers = Program.KafkaHost,
             AutoOffsetReset = AutoOffsetReset.Latest,
             PartitionAssignmentStrategy = PartitionAssignmentStrategy.CooperativeSticky,
         };
@@ -568,56 +568,14 @@ namespace Coflnet.Sky.Commands.Shared
 
         private async Task ConsumeBatch<T>(string[] topics, Action<T> work, int batchSize = 20)
         {
-            using (var c = new ConsumerBuilder<Ignore, T>(consumerConf).SetValueDeserializer(SerializerFactory.GetDeserializer<T>()).Build())
+            await KafkaConsumer.ConsumeBatch<T>(config, topics, async x =>
             {
-                c.Subscribe(topics);
-                try
+                await Task.Yield();
+                foreach (var item in x)
                 {
-                    var batch = new List<TopicPartitionOffset>();
-                    Console.WriteLine("subscribed to " + string.Join(",", topics));
-                    while (true)
-                    {
-                        try
-                        {
-                            var cr = c.Consume(30000);
-                            if (cr == null)
-                            {
-                                await Task.Delay(10).ConfigureAwait(false);
-                                continue;
-                            }
-                            if (cr.TopicPartitionOffset.Offset % 200 == 0)
-                                Console.WriteLine($"consumed {cr.TopicPartitionOffset.Topic} {cr.TopicPartitionOffset.Offset}");
-                            work(cr.Message.Value);
-                            batch.Add(cr.TopicPartitionOffset);
-                            while (batch.Count <= batchSize)
-                            {
-                                cr = c.Consume(TimeSpan.Zero);
-                                if (cr == null)
-                                {
-                                    break;
-                                }
-                                batch.Add(cr.TopicPartitionOffset);
-                                work(cr.Message.Value);
-                            }
-                        }
-                        catch (ConsumeException e)
-                        {
-                            dev.Logger.Instance.Error(e, "flipper consume batch " + topics[0]);
-                        }
-                        if (batch.Count >= batchSize)
-                        {
-                            // tell kafka that we stored the batch
-                            c.Commit(batch);
-                            batch.Clear();
-                        }
-                    }
+                    work(item);
                 }
-                catch (OperationCanceledException)
-                {
-                    // Ensure the consumer leaves the group cleanly and final offsets are committed.
-                    c.Close();
-                }
-            }
+            }, CancellationToken.None, consumerConf.GroupId, batchSize, AutoOffsetReset.Latest);
         }
 
         public static int DelayTimeFor(int queueSize, double minutes = 0.66, int max = 10000)
