@@ -320,10 +320,18 @@ namespace Coflnet.Sky.Commands.Shared
         public async Task DeliverLowPricedAuctions(IEnumerable<LowPricedAuction> flips)
         {
             var stopAfterOneMinute = new System.Threading.CancellationTokenSource(TimeSpan.FromMinutes(1));
-            await Parallel.ForEachAsync(flips, stopAfterOneMinute.Token, async (item, s) =>
+            try
             {
-                await DeliverLowPricedAuction(item);
-            }).ConfigureAwait(false);
+                await Parallel.ForEachAsync(flips, stopAfterOneMinute.Token, async (item, s) =>
+                {
+                    await DeliverLowPricedAuction(item);
+                }).ConfigureAwait(false);
+            }
+            catch (TaskCanceledException)
+            {
+                // timed out after one minute
+                Activity.Current?.AddEvent(new ActivityEvent("timeout"));
+            }
         }
 
 
