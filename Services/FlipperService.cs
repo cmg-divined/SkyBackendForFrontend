@@ -131,6 +131,7 @@ namespace Coflnet.Sky.Commands.Shared
 
         private static void SendFlipHistory(IFlipConnection con, IEnumerable<FlipInstance> toSendFlips, int delay = 5000)
         {
+            var end = new CancellationTokenSource(TimeSpan.FromMinutes(1)).Token;
             Task.Run(async () =>
             {
                 try
@@ -139,7 +140,7 @@ namespace Coflnet.Sky.Commands.Shared
                     {
                         await con.SendFlip(item);
 
-                        await Task.Delay(delay).ConfigureAwait(false);
+                        await Task.Delay(delay, end).ConfigureAwait(false);
                     }
                 }
                 catch (Exception e)
@@ -502,7 +503,7 @@ namespace Coflnet.Sky.Commands.Shared
                     {
                         dev.Logger.Instance.Error(e, "delivering flip");
                     }
-                });
+                }, new CancellationTokenSource(TimeSpan.FromMinutes(1)).Token);
             });
             Console.WriteLine("ended listening");
         }
@@ -570,7 +571,7 @@ namespace Coflnet.Sky.Commands.Shared
                 {
                     dev.Logger.Instance.Error(e, "delivering low priced auction");
                 }
-            }).ConfigureAwait(false);
+            }, new CancellationTokenSource(TimeSpan.FromMinutes(1)).Token).ConfigureAwait(false);
         }
 
 
