@@ -175,7 +175,6 @@ namespace Coflnet.Sky.Commands.Shared
                 // return if already compiling
                 if (!filterCompileLock.Wait(0))
                     return;
-                filterCompileLock.Wait();
                 InitializeMatchers();
             }
             finally
