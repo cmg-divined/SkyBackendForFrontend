@@ -52,7 +52,6 @@ public class CurrentEventDetailedFlipFilter : DetailedFlipFilter
             (11*31+23,11*31+26, Events.SeasonOfJerry)
         };
         var currentEvent = eventList.FirstOrDefault(e => currentDay >= e.Item1 && currentDay <= e.Item2).Item3;
-        Console.WriteLine($"Current day: {currentDay % 31} {(int)currentDay / 31} Current event: {currentEvent}");
 
         return a => currentEvent == eventVal;
     }
