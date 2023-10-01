@@ -8,6 +8,7 @@ using Coflnet.Sky.Filter;
 using System.Collections.Concurrent;
 using System.Linq;
 using System.Diagnostics;
+using System.Threading;
 
 namespace Coflnet.Sky.Commands.Shared
 {
@@ -88,6 +89,16 @@ namespace Coflnet.Sky.Commands.Shared
         [SettingsDoc("", true)]
         public string LastChanged { get; set; }
 
+
+        private SemaphoreSlim filterCompileLock = new SemaphoreSlim(1, 1);
+        private CancellationTokenSource filterCompileCancel = new CancellationTokenSource();
+
+        public void CancelCompilation()
+        {
+            filterCompileCancel.Cancel();
+            filterCompileCancel = new CancellationTokenSource();
+        }
+
         /// <summary>
         /// Determines if a flip matches a the <see cref="Filters"/>> of this instance
         /// </summary>
@@ -102,6 +113,8 @@ namespace Coflnet.Sky.Commands.Shared
                 return (false, "not bin");
 
             MakeSureMatchersAreInitialized();
+            if (BlackListMatcher == null)
+                return (false, "filters currently compiling");
 
             try
             {
@@ -155,13 +168,32 @@ namespace Coflnet.Sky.Commands.Shared
 
         private void MakeSureMatchersAreInitialized()
         {
+            if (BlackListMatcher != null)
+                return;
+            try
+            {
+                // return if already compiling
+                if (!filterCompileLock.Wait(0))
+                    return;
+                filterCompileLock.Wait();
+                InitializeMatchers();
+            }
+            finally
+            {
+                filterCompileLock.Release();
+            }
+        }
+
+        private void InitializeMatchers()
+        {
+            var token = filterCompileCancel.Token;
             if (ForcedBlackListMatcher == null)
                 ForcedBlackListMatcher = new ListMatcher(GetForceBlacklist());
-            if (WhiteListMatcher == null)
+            if (WhiteListMatcher == null && !token.IsCancellationRequested)
                 WhiteListMatcher = new ListMatcher(WhiteList?.Except(GetAfterMainWhitelist()).ToList());
-            if (AfterMainWhiteListMatcher == null)
+            if (AfterMainWhiteListMatcher == null && !token.IsCancellationRequested)
                 AfterMainWhiteListMatcher = new ListMatcher(GetAfterMainWhitelist());
-            if (BlackListMatcher == null)
+            if (BlackListMatcher == null && !token.IsCancellationRequested)
                 BlackListMatcher = new ListMatcher(BlackList?.Except(GetForceBlacklist()).ToList());
         }
 
@@ -223,7 +255,7 @@ namespace Coflnet.Sky.Commands.Shared
         public bool IsFinderBlocked(LowPricedAuction.FinderType finder)
         {
             return finder == LowPricedAuction.FinderType.UNKOWN ||
-                    AllowedFinders == LowPricedAuction.FinderType.UNKOWN && 
+                    AllowedFinders == LowPricedAuction.FinderType.UNKOWN &&
                         !(LowPricedAuction.FinderType.SNIPERS).HasFlag(finder)
                                                 || AllowedFinders != LowPricedAuction.FinderType.UNKOWN && !AllowedFinders.HasFlag(finder)
                                                 && (int)finder != 3;
