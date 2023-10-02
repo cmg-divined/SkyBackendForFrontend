@@ -493,7 +493,7 @@ namespace Coflnet.Sky.Commands.Shared
             {
                 if (flip.MedianPrice - flip.LastKnownCost < 50_000)
                     return;
-                Task.Run(async () =>
+                _ = Task.Run(async () =>
                 {
                     try
                     {
@@ -577,13 +577,13 @@ namespace Coflnet.Sky.Commands.Shared
 
         private async Task ConsumeBatch<T>(string[] topics, Action<T> work, int batchSize = 20)
         {
-            await KafkaConsumer.ConsumeBatch<T>(config, topics, async x =>
+            await KafkaConsumer.ConsumeBatch<T>(config, topics, x =>
             {
-                await Task.Yield();
                 foreach (var item in x)
                 {
                     work(item);
                 }
+                return Task.CompletedTask;
             }, CancellationToken.None, consumerConf.GroupId, batchSize, AutoOffsetReset.Latest);
         }
 
