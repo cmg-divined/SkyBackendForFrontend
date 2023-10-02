@@ -14,6 +14,8 @@ public class CurrentMayorDetailedFlipFilter : DetailedFlipFilter
     public object[] Options => new object[] {
             "Aatrox", "Cole", "Diana", "Diaz", "Foxy", "Finnegan", "Marina", "Paul", "Derpy", "Jerry", "Scorpius", "Dante", "Barry"
             };
+    
+    private (string val, DateTime lastUpdate) lastUpdate;
 
     public Expression<Func<FlipInstance, bool>> GetExpression(Dictionary<string, string> filters, string val)
     {
@@ -21,8 +23,13 @@ public class CurrentMayorDetailedFlipFilter : DetailedFlipFilter
         val = Options.FirstOrDefault(t => t.ToString().ToLower() == val.ToLower())?.ToString();
         if (val == null)
             throw new CoflnetException("invalid_mayor", "The specified mayor does not exist");
-        var current = TargetMayor();
-        if (current == null || current == null)
+        if(DateTime.Now - lastUpdate.lastUpdate > TimeSpan.FromHours(1))
+        {
+            // update as too old
+            lastUpdate = (TargetMayor(), DateTime.Now);
+        }
+        var current = lastUpdate.val;
+        if (current == null)
             throw new CoflnetException("no_mayor", "Current mayor could not be retrieved");
         return (f) => val == current;
     }
