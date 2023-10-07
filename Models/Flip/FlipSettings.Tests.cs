@@ -2,6 +2,7 @@ using NUnit.Framework;
 using Coflnet.Sky.Core;
 using System.Diagnostics;
 using Coflnet.Sky.Commands.Tests;
+using System.Threading.Tasks;
 
 namespace Coflnet.Sky.Commands.Shared
 {
@@ -104,7 +105,6 @@ namespace Coflnet.Sky.Commands.Shared
         [Test]
         public void MatchesSettings1()
         {
-
             Assert.IsTrue(settings.MatchesSettings(flipA).Item1);
             var bRes = settings.MatchesSettings(flipB);
             Assert.IsFalse(bRes.Item1, bRes.Item2);
@@ -121,6 +121,20 @@ namespace Coflnet.Sky.Commands.Shared
             Assert.IsFalse(bRes.Item1, bRes.Item2);
         }
 
+        [Test]
+        public async Task ConcurrentTest()
+        {
+            settings.ClearListMatchers();
+            var tasks = new Task[10];
+            for (int i = 0; i < tasks.Length; i++)
+            {
+                tasks[i] = Task.Run(() =>
+                {
+                    settings.MatchesSettings(flipA);
+                });
+            }
+            await Task.WhenAll(tasks);
+        }
 
         [Test]
         public void MatchesSpeed()

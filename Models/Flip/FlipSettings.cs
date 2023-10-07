@@ -170,11 +170,13 @@ namespace Coflnet.Sky.Commands.Shared
         {
             if (BlackListMatcher != null)
                 return;
+            // return if already compiling
+            if (!filterCompileLock.Wait(0))
+            {
+                return;
+            }
             try
             {
-                // return if already compiling
-                if (!filterCompileLock.Wait(0))
-                    return;
                 InitializeMatchers();
             }
             finally
