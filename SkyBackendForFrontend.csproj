@@ -33,6 +33,7 @@
     <PackageReference Include="Google.Apis.Auth" Version="1.50.0" />
     <PackageReference Include="Coflnet.Sky.EventBroker.Client" Version="0.1.0" />
     <PackageReference Include="Coflnet.Sky.Api.Client" Version="0.3.0" />
+    <PackageReference Include="System.IdentityModel.Tokens.Jwt" Version="7.0.2" />
 
   </ItemGroup>
 

@@ -108,8 +108,8 @@ namespace Coflnet.Sky.Commands.Shared
             if (!sendHistory)
                 return;
             SendFlipHistory(connection, LoadBurst, 0);
-            if (SlowSubs.Count % 10 == 0)
-                Console.WriteLine("Added new con " + SlowSubs.Count);
+            if (Random.Shared.Next() % 30 == 0)
+                Console.WriteLine("Added new con, now there are " + SlowSubs.Count);
             UpdateFilterSumaries();
         }
 
