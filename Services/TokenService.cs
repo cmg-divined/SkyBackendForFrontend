@@ -36,7 +36,7 @@ public class TokenService
             issuer: config["JWT_ISSUER"],
             audience: config["JWT_AUDIENCE"],
             claims: new[] { new Claim("email", email), new Claim("tokenId", randomTokenId) },
-            expires: DateTime.Now.AddDays(30),
+            expires: DateTime.Now.AddDays(7),
             signingCredentials: creds);
 
         return new JwtSecurityTokenHandler().WriteToken(token);
