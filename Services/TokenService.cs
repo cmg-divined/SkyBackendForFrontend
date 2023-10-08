@@ -1,7 +1,9 @@
 using System;
 using System.IdentityModel.Tokens.Jwt;
+using System.Linq;
 using System.Security.Claims;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Logging;
 using Microsoft.IdentityModel.Tokens;
 
 namespace Coflnet.Sky.Commands.Shared;
@@ -12,10 +14,12 @@ namespace Coflnet.Sky.Commands.Shared;
 public class TokenService
 {
     private IConfiguration config;
+    private ILogger<TokenService> logger;
 
-    public TokenService(IConfiguration config)
+    public TokenService(IConfiguration config, ILogger<TokenService> logger)
     {
         this.config = config;
+        this.logger = logger;
     }
 
     /// <summary>
@@ -25,8 +29,7 @@ public class TokenService
     /// <returns>The token</returns>
     public string CreateToken(string email)
     {
-        var key = new SymmetricSecurityKey(System.Text.Encoding.UTF8.GetBytes(config["JWT_KEY"]));
-        var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
+        SigningCredentials creds = GetCreds();
         var randomTokenId = Guid.NewGuid().ToString();
 
         var token = new JwtSecurityToken(
@@ -39,6 +42,15 @@ public class TokenService
         return new JwtSecurityTokenHandler().WriteToken(token);
     }
 
+    private SigningCredentials GetCreds()
+    {
+        var seed = System.Text.Encoding.UTF8.GetBytes(config["JWT_KEY"] ?? throw new Exception("JWT_KEY environment variable not set"));
+        var hmac = new System.Security.Cryptography.HMACSHA256(seed);
+        var key = new SymmetricSecurityKey(hmac.ComputeHash(seed));
+        var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
+        return creds;
+    }
+
     /// <summary>
     /// Validates the given token
     /// </summary>
@@ -47,8 +59,7 @@ public class TokenService
     /// <exception cref="SecurityTokenException">Thrown if the token is invalid</exception>
     public ClaimsPrincipal ValidateToken(string token)
     {
-        var key = new SymmetricSecurityKey(System.Text.Encoding.UTF8.GetBytes(config["JWT_KEY"]));
-        var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
+        var creds = GetCreds();
 
         var validationParameters = new TokenValidationParameters
         {
@@ -77,7 +88,7 @@ public class TokenService
     public string GetEmailFromToken(string token)
     {
         var principal = ValidateToken(token);
-        return principal.FindFirst("email").Value;
+        return principal.FindFirst(c=>c.Type == "email" || c.Type == "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/emailaddress").Value;
     }
 
     /// <summary>
@@ -94,8 +105,15 @@ public class TokenService
             email = GetEmailFromToken(token);
             return true;
         }
-        catch (SecurityTokenException)
+        catch(Microsoft.IdentityModel.Tokens.SecurityTokenMalformedException e)
         {
+            logger.LogError(e, "Token format of token {token} is invalid", token);
+            email = null;
+            return false;
+        }
+        catch (SecurityTokenException e)
+        {
+            logger.LogError(e, "Invalid token");
             email = null;
             return false;
         }
