@@ -45,8 +45,6 @@ public class TokenService
     /// <param name="token">The token to validate</param>
     /// <returns>The claims of the token</returns>
     /// <exception cref="SecurityTokenException">Thrown if the token is invalid</exception>
-    /// <exception cref="ArgumentException">Thrown if the token is invalid</exception>
-    /// <exception cref="ArgumentNullException">Thrown if the token is invalid</exception>
     public ClaimsPrincipal ValidateToken(string token)
     {
         var key = new SymmetricSecurityKey(System.Text.Encoding.UTF8.GetBytes(config["JWT_KEY"]));
@@ -76,11 +74,30 @@ public class TokenService
     /// <param name="token">The token to get the email from</param>
     /// <returns>The email of the user</returns>
     /// <exception cref="SecurityTokenException">Thrown if the token is invalid</exception>
-    /// <exception cref="ArgumentException">Thrown if the token is invalid</exception>
-    /// <exception cref="ArgumentNullException">Thrown if the token is invalid</exception>
     public string GetEmailFromToken(string token)
     {
         var principal = ValidateToken(token);
         return principal.FindFirst("email").Value;
+    }
+
+    /// <summary>
+    /// Tries to get the email from a token string
+    /// </summary>
+    /// <param name="token">The token to get the email from</param>
+    /// <param name="email">The email of the user</param>
+    /// <returns>True if the token is valid, false otherwise</returns>
+    /// <exception cref="ArgumentException">Thrown if the token is invalid</exception>
+    public bool TryGetEmailFromToken(string token, out string email)
+    {
+        try
+        {
+            email = GetEmailFromToken(token);
+            return true;
+        }
+        catch (SecurityTokenException)
+        {
+            email = null;
+            return false;
+        }
     }
 }
