@@ -44,7 +44,7 @@ public class TokenService
 
     private SigningCredentials GetCreds()
     {
-        var seed = System.Text.Encoding.UTF8.GetBytes(config["JWT_KEY"] ?? throw new Exception("JWT_KEY environment variable not set"));
+        var seed = System.Text.Encoding.UTF8.GetBytes(config["JWT_SECRET"] ?? throw new Exception("JWT_SECRET environment variable not set"));
         var hmac = new System.Security.Cryptography.HMACSHA256(seed);
         var key = new SymmetricSecurityKey(hmac.ComputeHash(seed));
         var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
