@@ -69,6 +69,10 @@ public enum DescriptionField
     /// Summary of past list attempts
     /// </summary>
     SpentOnAhFees,
+    /// <summary>
+    /// how much kat takes in coins and materials to upgrade
+    /// </summary>
+    KatUpgradeCost,
     // anything over 9000 gets hidden
     BAZAAR_COST = 9001
 }
