@@ -201,7 +201,7 @@ namespace Coflnet.Sky.Commands.Shared
                 Volume = flip.DailyVolume,
                 Rarity = flip.Auction.Tier,
                 Finder = flip.Finder,
-                LowestBin = flip.Finder == LowPricedAuction.FinderType.SNIPER ? flip.TargetPrice : 0,
+                LowestBin = (flip.Finder == LowPricedAuction.FinderType.SNIPER || flip.Finder == LowPricedAuction.FinderType.USER)? flip.TargetPrice : 0,
                 Context = context
             };
             return flipIntance;
