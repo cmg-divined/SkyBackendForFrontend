@@ -268,7 +268,7 @@ namespace Coflnet.Sky.Commands.Shared
             }
             else if (search.Length == 12 || search.Length == 36)
             {
-                var key = NBT.GetLookupKey("uid");
+                var key = NBT.Instance.GetKeyId("uid");
                 var val = NBT.UidToLong(search);
                 using (var context = new HypixelContext())
                 {
@@ -298,7 +298,7 @@ namespace Coflnet.Sky.Commands.Shared
                 IconUrl = "https://sky.coflnet.com/static/icon/" + auction.Tag,
                 Id = auction.Uuid
             });
-            var key = NBT.GetLookupKey("uid");
+            var key = NBT.Instance.GetKeyId("uid");
             var filter = new Dictionary<string, string>();
             filter["UId"] = auction.NBTLookup.Where(l => l.KeyId == key).FirstOrDefault().Value.ToString("X");
             AddFilterResult(Results, filter, auction.ItemName + " (Sells)", auction.Tag, 100_000);
