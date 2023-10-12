@@ -12,6 +12,8 @@ namespace Coflnet.Sky.Commands.Shared
         public static RestClient Client = new RestClient(SimplerConfig.SConfig.Instance["INDEXER_BASE_URL"] ?? "http://" + SimplerConfig.SConfig.Instance["INDEXER_HOST"]);
         public static Task<RestSharp.RestResponse<Player>> TriggerNameUpdate(string uuid)
         {
+            if(uuid.Length != 32)
+                throw new System.ArgumentException("uuid must be 32 characters long", nameof(uuid));
             return Client.ExecuteAsync<Player>(new RestRequest("player/{uuid}", Method.Patch).AddUrlSegment("uuid", uuid));
         }
         public static async Task<IEnumerable<KeyValuePair<string, short>>> LowSupply()
