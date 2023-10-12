@@ -205,9 +205,12 @@ public class InventoryParser
             Uuid = ExtraAttributes?.uuid?.value ?? Random.Shared.Next().ToString(),
         };
         var description = item.nbt.value?.display?.value?.Lore?.value?.value?.ToObject<string[]>() as string[];
-        if(!NBT.GetAndAssignTier(auction, description.LastOrDefault()?.ToString()))
+        if (!NBT.GetAndAssignTier(auction, description.LastOrDefault()?.ToString()))
             // retry auction tier position
             NBT.GetAndAssignTier(auction, description.Reverse().Skip(7).FirstOrDefault()?.ToString());
+        if (auction.Context == null)
+            auction.Context = new();
+        auction.Context.Add("lore", string.Join("\n", description));
         if (attributesWithoutEnchantments.ContainsKey("modifier"))
         {
             auction.Reforge = Enum.Parse<ItemReferences.Reforge>(attributesWithoutEnchantments["modifier"].ToString(), true);

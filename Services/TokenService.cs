@@ -111,9 +111,8 @@ public class TokenService
             email = null;
             return false;
         }
-        catch (SecurityTokenException e)
+        catch (SecurityTokenException)
         {
-            logger.LogError(e, "Invalid token");
             email = null;
             return false;
         }

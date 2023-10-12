@@ -31,13 +31,13 @@ namespace Coflnet.Sky.PlayerName
                 {
                     try
                     {
-                        playerUuid = (await Coflnet.Sky.Core.PlayerSearch.Instance.GetMcProfile(name)).Id;
+                        playerUuid = (await Coflnet.Sky.Core.PlayerSearch.Instance.GetMcProfile(name))?.Id;
                         await IndexerClient.TriggerNameUpdate(playerUuid);
                         break;
                     }
                     catch (System.Exception e)
                     {
-                        logger.LogError(e, "Failed to get uuid for name");
+                        logger.LogError(e, $"Failed to get uuid for name {name} {playerUuid}");
                     }
                 }
             }
