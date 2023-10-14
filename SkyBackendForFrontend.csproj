@@ -19,7 +19,7 @@
   <ItemGroup>
     <PackageReference Include="Coflnet.Leaderboard.Client" Version="0.1.0" />
     <PackageReference Include="Coflnet.Sky.Mayor.Client" Version="0.3.0" />
-    <PackageReference Include="Coflnet.Payments.Client" Version="0.11.2" />
+    <PackageReference Include="Coflnet.Payments.Client" Version="0.12.0" />
     <PackageReference Include="Coflnet.Sky.McConnect" Version="0.1.0" />
     <PackageReference Include="Coflnet.Sky.PlayerName.Client" Version="0.2.0" />
     <PackageReference Include="Coflnet.Sky.PlayerState.Client" Version="0.1.0" />
