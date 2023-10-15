@@ -521,5 +521,6 @@ private string jsonSampleCT = """
         """);
 
         Assert.AreEqual("§fIron Helmet", data.First().ItemName);
+        Assert.IsTrue(data.First().Context["lore"].StartsWith("§7Defense: §a+10\n\n§7Growth I\n§7Grants §a+15 §c❤ Health"));
     }
 }

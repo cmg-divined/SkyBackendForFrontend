@@ -205,6 +205,10 @@ public class InventoryParser
             Uuid = ExtraAttributes?.uuid?.value ?? Random.Shared.Next().ToString(),
         };
         var description = item.nbt.value?.display?.value?.Lore?.value?.value?.ToObject<string[]>() as string[];
+        if(description != null && description.FirstOrDefault()?.StartsWith("{") == true)
+        {
+            description = description.Select(e => JsonConvert.DeserializeObject<TextLine>(e).To1_08()).ToArray();
+        }
         if (!NBT.GetAndAssignTier(auction, description.LastOrDefault()?.ToString()))
             // retry auction tier position
             NBT.GetAndAssignTier(auction, description.Reverse().Skip(7).FirstOrDefault()?.ToString());
@@ -240,6 +244,8 @@ public class InventoryParser
 
         public string To1_08()
         {
+            if(Extra == null)
+                return string.Empty;
             return string.Join("", Extra.Select(e => $"{(e.Bold ? McColorCodes.BOLD : String.Empty)}{(e.Italic ? McColorCodes.ITALIC : String.Empty)}{(colorList.TryGetValue(e.Color, out var c) ? c : String.Empty)}{e.Text}"));
         }
     }
