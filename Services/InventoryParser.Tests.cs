@@ -446,7 +446,7 @@ private string jsonSampleCT = """
                                 "value": {
                                     "type": "string",
                                     "value": [
-                                        "{\"italic\":false,\"extra\":[{\"color\":\"gray\",\"text\":\"Defense: \"},{\"color\":\"green\",\"text\":\"+10\"}],\"text\":\"\"}",
+                                        "{\"italic\":false,\"extra\":[{\"color\":\"gray\",\"text\":\"Defense: \"},{\"text\":\" \"},{\"color\":\"green\",\"text\":\"+10\"}],\"text\":\"\"}",
                                         "{\"italic\":false,\"text\":\"\"}",
                                         "{\"italic\":false,\"extra\":[{\"color\":\"gray\",\"text\":\"Growth I\"}],\"text\":\"\"}",
                                         "{\"italic\":false,\"extra\":[{\"color\":\"gray\",\"text\":\"Grants \"},{\"color\":\"green\",\"text\":\"+15 \"},{\"color\":\"red\",\"text\":\"❤ Health\"},{\"color\":\"gray\",\"text\":\".\"}],\"text\":\"\"}",
@@ -521,6 +521,6 @@ private string jsonSampleCT = """
         """);
 
         Assert.AreEqual("§fIron Helmet", data.First().ItemName);
-        Assert.IsTrue(data.First().Context["lore"].StartsWith("§7Defense: §a+10\n\n§7Growth I\n§7Grants §a+15 §c❤ Health"));
+        Assert.IsTrue(data.First().Context["lore"].StartsWith("§7Defense:  §a+10\n\n§7Growth I\n§7Grants §a+15 §c❤ Health"));
     }
 }

@@ -205,7 +205,7 @@ public class InventoryParser
             Uuid = ExtraAttributes?.uuid?.value ?? Random.Shared.Next().ToString(),
         };
         var description = item.nbt.value?.display?.value?.Lore?.value?.value?.ToObject<string[]>() as string[];
-        if(description != null && description.FirstOrDefault()?.StartsWith("{") == true)
+        if (description != null && description.FirstOrDefault()?.StartsWith("{") == true)
         {
             description = description.Select(e => JsonConvert.DeserializeObject<TextLine>(e).To1_08()).ToArray();
         }
@@ -244,9 +244,9 @@ public class InventoryParser
 
         public string To1_08()
         {
-            if(Extra == null)
+            if (Extra == null)
                 return string.Empty;
-            return string.Join("", Extra.Select(e => $"{(e.Bold ? McColorCodes.BOLD : String.Empty)}{(e.Italic ? McColorCodes.ITALIC : String.Empty)}{(colorList.TryGetValue(e.Color, out var c) ? c : String.Empty)}{e.Text}"));
+            return string.Join("", Extra.Select(e => $"{(e.Bold ? McColorCodes.BOLD : String.Empty)}{(e.Italic ? McColorCodes.ITALIC : String.Empty)}{(e.Color != null && colorList.TryGetValue(e.Color, out var c) ? c : String.Empty)}{e.Text}"));
         }
     }
 
