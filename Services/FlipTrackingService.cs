@@ -16,6 +16,9 @@ using Coflnet.Sky.McConnect.Api;
 using Coflnet.Payments.Client.Api;
 using System.Collections.Concurrent;
 using Coflnet.Kafka;
+using Coflnet.Leaderboard.Client.Api;
+using Coflnet.Leaderboard.Client.Model;
+using Microsoft.Extensions.Logging;
 
 namespace Coflnet.Sky.Commands
 {
@@ -54,6 +57,8 @@ namespace Coflnet.Sky.Commands
         private ActivitySource tracer;
         private IConnectApi connectApi;
         private IProductsApi productApi;
+        private IScoresApi scoresApi;
+        private ILogger<FlipTrackingService> logger;
 
 
         IProducer<string, FlipTracker.Client.Model.FlipEvent> producer;
@@ -64,7 +69,9 @@ namespace Coflnet.Sky.Commands
             IConfiguration config,
             IConnectApi connectApi,
             IProductsApi productApi,
-            KafkaCreator kafkaCreator)
+            KafkaCreator kafkaCreator,
+            IScoresApi scoresApi,
+            ILogger<FlipTrackingService> logger)
         {
             producer = kafkaCreator?.BuildProducer<string, FlipTracker.Client.Model.FlipEvent>();
 
@@ -77,6 +84,8 @@ namespace Coflnet.Sky.Commands
             this.connectApi = connectApi;
             this.productApi = productApi;
             _ = kafkaCreator?.CreateTopicIfNotExist(ProduceTopic, 6);
+            this.scoresApi = scoresApi;
+            this.logger = logger;
         }
 
 
@@ -345,7 +354,25 @@ namespace Coflnet.Sky.Commands
         }
         public async Task<FlipSumary> GetPlayerFlips(string uuid, System.TimeSpan timeSpan, DateTime endTime = default)
         {
-            return await GetPlayerFlips(new string[] { uuid }, timeSpan, endTime);
+            var summary = await GetPlayerFlips(new string[] { uuid }, timeSpan, endTime);
+
+            _ = Task.Run(async () =>
+            {
+                try
+                {
+                    // postfix week
+                    var weekStartDate = DateTime.UtcNow.RoundDown(TimeSpan.FromDays(7)).ToString("yyyy-MM-dd");
+                    var boardSlug = $"sky-flippers-{weekStartDate}";
+                    var looserBoard = $"sky-flippers-loosers-{weekStartDate}";
+                    await scoresApi.ScoresLeaderboardSlugPostAsync(boardSlug, new ScoreCreate(uuid, summary.TotalProfit, 100));
+                    await scoresApi.ScoresLeaderboardSlugPostAsync(looserBoard, new ScoreCreate(uuid, -summary.TotalProfit, 100));
+                }
+                catch (Exception e)
+                {
+                    logger.LogError(e, "Failed to post flip score");
+                }
+            });
+            return summary;
         }
 
         public async Task<FlipSumary> GetPlayerFlips(IEnumerable<string> uuids, System.TimeSpan timeSpan, DateTime endTime = default)
