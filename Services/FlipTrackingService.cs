@@ -354,25 +354,7 @@ namespace Coflnet.Sky.Commands
         }
         public async Task<FlipSumary> GetPlayerFlips(string uuid, System.TimeSpan timeSpan, DateTime endTime = default)
         {
-            var summary = await GetPlayerFlips(new string[] { uuid }, timeSpan, endTime);
-
-            _ = Task.Run(async () =>
-            {
-                try
-                {
-                    // postfix week
-                    var weekStartDate = DateTime.UtcNow.RoundDown(TimeSpan.FromDays(7)).ToString("yyyy-MM-dd");
-                    var boardSlug = $"sky-flippers-{weekStartDate}";
-                    var looserBoard = $"sky-flippers-loosers-{weekStartDate}";
-                    await scoresApi.ScoresLeaderboardSlugPostAsync(boardSlug, new ScoreCreate(uuid, summary.TotalProfit, 100));
-                    await scoresApi.ScoresLeaderboardSlugPostAsync(looserBoard, new ScoreCreate(uuid, -summary.TotalProfit, 100));
-                }
-                catch (Exception e)
-                {
-                    logger.LogError(e, "Failed to post flip score");
-                }
-            });
-            return summary;
+            return await GetPlayerFlips(new string[] { uuid }, timeSpan, endTime);
         }
 
         public async Task<FlipSumary> GetPlayerFlips(IEnumerable<string> uuids, System.TimeSpan timeSpan, DateTime endTime = default)
@@ -407,6 +389,8 @@ namespace Coflnet.Sky.Commands
                 PropertyChanges = f.ProfitChanges.Select(c => new PropertyChange(c.Label, c.Amount)).ToList(),
                 Profit = f.Profit
             }).ToArray();
+            if (uuids.Count() == 1)
+                SaveProfitToLeaderboard(uuids.First(), newFlips.Sum(f => f.Profit));
 
             return new FlipSumary()
             {
@@ -475,6 +459,26 @@ namespace Coflnet.Sky.Commands
                 TotalProfit = flips.Sum(r => r.Profit)
             };
 
+        }
+
+        private void SaveProfitToLeaderboard(string uuid, long totalProfit)
+        {
+            _ = Task.Run(async () =>
+            {
+                try
+                {
+                    // postfix week
+                    var weekStartDate = DateTime.UtcNow.RoundDown(TimeSpan.FromDays(7)).ToString("yyyy-MM-dd");
+                    var boardSlug = $"sky-flippers-{weekStartDate}";
+                    var looserBoard = $"sky-flippers-loosers-{weekStartDate}";
+                    await scoresApi.ScoresLeaderboardSlugPostAsync(boardSlug, new ScoreCreate(uuid, totalProfit, 100));
+                    await scoresApi.ScoresLeaderboardSlugPostAsync(looserBoard, new ScoreCreate(uuid, -totalProfit, 100));
+                }
+                catch (Exception e)
+                {
+                    logger.LogError(e, "Failed to post flip score");
+                }
+            });
         }
 
         private FlipDetails ToFlipDetails(BidQuery b, short uidKey, List<IGrouping<long, SaveAuction>> sells, Dictionary<long, IEnumerable<Flip>> flipStats)
