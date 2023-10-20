@@ -17,6 +17,7 @@ using Coflnet.Sky.FlipTracker.Client.Api;
 using Coflnet.Sky.Mayor.Client.Api;
 using Coflnet.Leaderboard.Client.Api;
 using Coflnet.Sky.Settings.Client.Api;
+using Coflnet.Sky.Filter;
 
 namespace Coflnet.Sky.Commands.Shared
 {
@@ -133,6 +134,7 @@ namespace Coflnet.Sky.Commands.Shared
                 var config = context.GetRequiredService<IConfiguration>();
                 return new SettingsApi(config["SETTINGS_BASE_URL"]);
             });
+            services.AddSingleton<FilterEngine>();
             services.AddSingleton<IConnectApi, ConnectApi>(
                 sp => new ConnectApi(sp.GetRequiredService<IConfiguration>()["MCCONNECT_BASE_URL"]));
             services.AddSingleton<PlayerState.Client.Api.IPlayerStateApi, PlayerState.Client.Api.PlayerStateApi>(
