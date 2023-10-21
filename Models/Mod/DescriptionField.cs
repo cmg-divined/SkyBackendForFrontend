@@ -73,6 +73,10 @@ public enum DescriptionField
     /// how much kat takes in coins and materials to upgrade
     /// </summary>
     KatUpgradeCost,
+    /// <summary>
+    /// Estimated price the item instasells for
+    /// </summary>
+    InstaSellPrice,
     // anything over 9000 gets hidden
     BAZAAR_COST = 9001
 }
