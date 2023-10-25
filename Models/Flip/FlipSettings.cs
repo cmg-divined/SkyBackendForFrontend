@@ -162,8 +162,8 @@ namespace Coflnet.Sky.Commands.Shared
         private static void LogError(FlipInstance flip, string title, ListMatcher matcher, Exception e)
         {
             Activity.Current?.AddTag("flip", JSON.Stringify(flip));
-            Activity.Current?.AddTag("filter", JSON.Stringify(matcher.FullList.Select(x => new { x.ItemTag, x.filter })));
-            throw new Exception("Error while matching " + title + " " + e.Message, e);
+            Activity.Current?.AddTag("filter", JSON.Stringify(matcher?.FullList?.Where(x=>x!=null).Select(x => new { x.ItemTag, x.filter })));
+            throw new Exception("Error while matching " + title + " " + e?.Message, e);
         }
 
         private void MakeSureMatchersAreInitialized()

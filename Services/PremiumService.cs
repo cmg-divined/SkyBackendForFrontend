@@ -32,12 +32,6 @@ namespace Coflnet.Sky.Commands.Shared
             }
         }
 
-        public GoogleUser GetUserWithToken(string token)
-        {
-
-            return UserService.Instance.GetOrCreateUser(ValidateToken(token).Subject);
-        }
-
         public GoogleJsonWebSignature.Payload ValidateToken(string token)
         {
             try
