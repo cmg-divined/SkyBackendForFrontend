@@ -37,7 +37,7 @@ namespace Coflnet.Sky.Commands.Shared
         private static IServiceCollection _servics;
         public static void AddCoflService(this IServiceCollection services)
         {
-            services.AddSingleton<PlayerName.Client.Api.PlayerNameApi>(context =>
+            services.AddSingleton<PlayerName.Client.Api.IPlayerNameApi>(context =>
             {
                 var config = context.GetRequiredService<IConfiguration>();
                 return new PlayerName.Client.Api.PlayerNameApi(config["PLAYERNAME_BASE_URL"] ?? "http://" + config["PLAYERNAME_HOST"]);
