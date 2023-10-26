@@ -41,10 +41,11 @@ namespace Coflnet.Sky.Commands.Shared
         {
             int id = GetItemId(itemTag);
 
+            var days = 2;
             var bazaarItems = await itemClient.ItemsBazaarTagsGetAsync();
             if (bazaarItems?.Contains(itemTag) ?? false)
             {
-                var val = await bazaarClient.ApiBazaarItemIdHistoryGetAsync(itemTag, DateTime.UtcNow - TimeSpan.FromDays(3), DateTime.UtcNow);
+                var val = await bazaarClient.ApiBazaarItemIdHistoryGetAsync(itemTag, DateTime.UtcNow - TimeSpan.FromDays(days), DateTime.UtcNow);
                 if (val == null)
                     return null;
                 if (val.Count() == 0)
@@ -56,10 +57,9 @@ namespace Coflnet.Sky.Commands.Shared
                     Min = (long)val.Min(p => p.MinSell),
                     Mean = (long)val.Average(p => p.Buy),
                     Mode = (long)val.GroupBy(p => p.Buy).OrderByDescending(p => p.Count()).FirstOrDefault().Key,
-                    Volume = (long)val.Sum(p => p.SellVolume)
+                    Volume = (long)val.Select(p => p.SellVolume + p.BuyVolume).First() / 7 * days
                 };
             }
-            var days = 2;
             var minTime = DateTime.Now.Subtract(TimeSpan.FromDays(days));
             var mainSelect = context.Auctions.Where(a => a.ItemId == id && a.End < DateTime.Now && a.End > minTime && a.HighestBidAmount > 0);
             filter["ItemId"] = id.ToString();
