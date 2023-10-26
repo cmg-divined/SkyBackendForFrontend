@@ -57,7 +57,7 @@ namespace Coflnet.Sky.Commands.Shared
                     Min = (long)val.Min(p => p.MinSell),
                     Mean = (long)val.Average(p => p.Buy),
                     Mode = (long)val.GroupBy(p => p.Buy).OrderByDescending(p => p.Count()).FirstOrDefault().Key,
-                    Volume = (long)val.Select(p => p.SellVolume + p.BuyVolume).First() / 7 * days
+                    Volume = (long)val.Select(p => p.SellVolume + p.BuyVolume).First() / 7
                 };
             }
             var minTime = DateTime.Now.Subtract(TimeSpan.FromDays(days));
