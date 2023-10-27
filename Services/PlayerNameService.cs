@@ -9,10 +9,10 @@ namespace Coflnet.Sky.PlayerName
 {
     public class PlayerNameService
     {
-        PlayerName.Client.Api.PlayerNameApi client;
+        IPlayerNameApi client;
         ILogger<PlayerNameService> logger;
 
-        public PlayerNameService(PlayerNameApi client, ILogger<PlayerNameService> logger)
+        public PlayerNameService(IPlayerNameApi client, ILogger<PlayerNameService> logger)
         {
             this.client = client;
             this.logger = logger;

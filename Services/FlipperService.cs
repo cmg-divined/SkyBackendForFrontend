@@ -211,12 +211,12 @@ namespace Coflnet.Sky.Commands.Shared
         {
             if (settings == null || settings.Visibility == null)
                 return;
-            var timeOut = new System.Threading.CancellationTokenSource(5000);
+            var timeOut = new CancellationTokenSource(5000);
             if (settings.Visibility.Seller && flip.SellerName == null)
             {
                 try
                 {
-                    flip.SellerName = (await DiHandler.ServiceProvider.GetRequiredService<Coflnet.Sky.PlayerName.Client.Api.PlayerNameApi>()
+                    flip.SellerName = (await DiHandler.ServiceProvider.GetRequiredService<PlayerName.Client.Api.IPlayerNameApi>()
                                     .PlayerNameNameUuidGetAsync(flip.Auction.AuctioneerId, 0, timeOut.Token).ConfigureAwait(false))?.Trim('"');
                 }
                 catch (TaskCanceledException)
@@ -238,13 +238,13 @@ namespace Coflnet.Sky.Commands.Shared
         public static async Task<List<ItemPrices.AuctionPreview>> GetLowestBin(SaveAuction auction)
         {
             var filters = new Dictionary<string, string>();
-            var ulti = auction.Enchantments.Where(e => Coflnet.Sky.Core.Constants.RelevantEnchants.Where(rel => rel.Type == e.Type && rel.Level <= e.Level).Any()).FirstOrDefault();
+            var ulti = auction.Enchantments.Where(e => Constants.RelevantEnchants.Any(rel => rel.Type == e.Type && rel.Level <= e.Level)).FirstOrDefault();
             if (ulti != null)
             {
                 filters["Enchantment"] = ulti.Type.ToString();
                 filters["EnchantLvl"] = ulti.Level.ToString();
             }
-            if (Coflnet.Sky.Core.Constants.RelevantReforges.Contains(auction.Reforge))
+            if (Constants.RelevantReforges.Contains(auction.Reforge))
             {
                 filters["Reforge"] = auction.Reforge.ToString();
             }
