@@ -169,6 +169,14 @@ namespace Coflnet.Sky.Commands.Shared
             }
         }
 
+        public static void OverrideService<T, TImpl>(TImpl service) where T : class where TImpl : T
+        {
+            if(_servics == null)
+                _servics = new ServiceCollection();
+            _servics.AddSingleton<T>(service);
+            _serviceProvider = null;
+        }
+
         public static void AddPaymentSingleton<T>(this IServiceCollection services, Func<string, T> creator) where T : class, IApiAccessor
         {
             services.AddSingleton<T>(context =>

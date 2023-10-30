@@ -141,9 +141,9 @@ namespace Coflnet.Sky.Commands.Shared
             if (!main.Item1)
                 return main;
 
-            var awmatch = AfterMainWhiteListMatcher.IsMatch(flip);
-            if (awmatch.Item1)
-                return (true, "whitelist am " + awmatch.Item2);
+            var awmatch = AfterMainWhiteListMatcher?.IsMatch(flip);
+            if (awmatch.HasValue && awmatch.Value.Item1)
+                return (true, "whitelist am " + awmatch.Value.Item2);
 
             try
             {
