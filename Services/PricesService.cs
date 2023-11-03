@@ -8,6 +8,7 @@ using Coflnet.Sky.Core;
 using Microsoft.EntityFrameworkCore;
 using Coflnet.Sky.Bazaar.Client.Api;
 using Coflnet.Sky.Items.Client.Api;
+using System.Threading;
 
 namespace Coflnet.Sky.Commands.Shared
 {
@@ -140,6 +141,7 @@ namespace Coflnet.Sky.Commands.Shared
                 filters["ItemId"] = itemId.ToString();
                 select = FilterEngine.AddFilters(select, filters);
             }
+            var timeout = new CancellationTokenSource(TimeSpan.FromSeconds(20)).Token;
 
             var groupedSelect = select.GroupBy(item => new { item.End.Date, Hour = 0 });
             if (end - start < TimeSpan.FromDays(7.001))
@@ -150,11 +152,11 @@ namespace Coflnet.Sky.Commands.Shared
                     new
                     {
                         End = item.Key,
-                        Avg = item.Average(a => (a.HighestBidAmount) / a.Count),
-                        Max = item.Max(a => (a.HighestBidAmount) / a.Count),
-                        Min = item.Min(a => (a.HighestBidAmount) / a.Count),
+                        Avg = item.Average(a => a.HighestBidAmount / a.Count),
+                        Max = item.Max(a => a.HighestBidAmount / a.Count),
+                        Min = item.Min(a => a.HighestBidAmount / a.Count),
                         Count = item.Sum(a => a.Count)
-                    }).AsNoTracking().ToListAsync();
+                    }).AsNoTracking().ToListAsync(timeout);
 
             if (dbResult.Count == 0)
             {
