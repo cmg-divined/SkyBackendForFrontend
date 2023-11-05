@@ -72,6 +72,8 @@ namespace Coflnet.Sky.Commands.Helper
                 properties.Add(new Property($"Kills: {ItemDetails.TagToName(data["zombie_kills"])}", 15));
             if (data.ContainsKey("unlocked_slots"))
                 properties.Add(new Property($"Unlocked: {(data["unlocked_slots"].Sum(c => c == ',' ? 1 : 0) + 1)}", 15));
+            if(data.ContainsKey("ethermerge"))
+                properties.Add(new Property($"Ethermerge", 13));
 
             properties.AddRange(data.Where(p => p.Value == "PERFECT" || p.Value == "FLAWLESS")
                 // Jasper0 slot can't be accessed on starred (Fragged) items
