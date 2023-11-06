@@ -5,6 +5,7 @@ using System.Linq;
 using System.Linq.Expressions;
 using Coflnet.Sky.Filter;
 using Coflnet.Sky.Core;
+using System.Diagnostics;
 
 namespace Coflnet.Sky.Commands.Shared
 {
@@ -76,8 +77,10 @@ namespace Coflnet.Sky.Commands.Shared
                     }
                     catch (Exception e)
                     {
-                        Console.WriteLine(e);
-                        throw new CoflnetException("filter_parsing", $"Error in filter {item} with value {match.Value} : {e.Message}");
+                        using var errorAct = DiHandler.GetService<ActivitySource>().StartActivity("error");
+                        errorAct?.SetTag("error", "filter_parsing");
+                        Console.WriteLine($"{errorAct.Id} {e}");
+                        throw new CoflnetException("filter_parsing", $"Error in filter {item} with value {match.Value} : {e.Message.Truncate(24)} id:{errorAct.Id}");
                     }
                 }
             }
