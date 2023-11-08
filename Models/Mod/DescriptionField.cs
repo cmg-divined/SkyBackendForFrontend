@@ -1,7 +1,19 @@
+using System;
+using System.Runtime.Serialization;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
 
 namespace Coflnet.Sky.Api.Models.Mod;
+
+public class FieldDescription : Attribute
+{
+    public string[] Text { get; set; }
+
+    public FieldDescription(params string[] text)
+    {
+        Text = text;
+    }
+}
 
 /// <summary>
 /// List of available fields
@@ -12,70 +24,87 @@ public enum DescriptionField
     /// <summary>
     /// Display nothing (global)
     /// </summary>
+    [FieldDescription("Placeholder for emtpy line")]
     NONE,
     /// <summary>
     /// Display the lowest bin
     /// </summary>
+    [FieldDescription("Best matching lowest bin")]
     LBIN,
     /// <summary>
     /// Display the key used to get the lowest bin
     /// </summary>
+    [FieldDescription("List of modifiers used to get the lowest bin")]
     LBIN_KEY,
     /// <summary>
     /// Display the median price
     /// </summary>
+    [FieldDescription("Median price of items with all modifiers in MEDIAN_KEY")]
     MEDIAN,
     /// <summary>
     /// Display the key used to get the median price
     /// </summary>
+    [FieldDescription("List of modifiers used to get the median price")]
     MEDIAN_KEY,
     /// <summary>
     /// Display the volume
     /// </summary>
+    [FieldDescription("Sales per day of items with all modifiers in MEDIAN_KEY")]
     VOLUME,
     /// <summary>
     /// Display the item tag
     /// </summary>
+    [FieldDescription("The hypixel internal item id")]
     TAG,
     /// <summary>
     /// Display the craft cost
     /// </summary>
+    [FieldDescription("Craft cost of clean item")]
     CRAFT_COST,
     /// <summary>
     /// Display the bazaar buy cost
     /// </summary>
+    [FieldDescription("The price you can buy an item on bazaar", "Gets hidden if not on bazaar")]
     BazaarBuy,
     /// <summary>
     /// Display the bazaar sell profit
     /// </summary>
+    [FieldDescription("The price you can sell an item on bazaar", "Gets hidden if not sellable on bazaar")]
     BazaarSell,
     /// <summary>
     /// Display price paid
     /// </summary>
+    [FieldDescription("The last price this item sold for", "any sell counts not just your own")]
     PRICE_PAID,
     /// <summary>
     /// Breakdown of relevant price modifying stats
     /// </summary>
+    [FieldDescription("List of valuable attributes used to estimate value")]
     ITEM_KEY,
     /// <summary>
     /// Enchant Cost Summary
     /// </summary>
+    [FieldDescription("Sum of all Enchantment Cost")]
     EnchantCost,
     /// <summary>
     /// Sum of gemstone value
     /// </summary>
+    [FieldDescription("Sum of gemstone value")]
     GemValue,
     /// <summary>
     /// Summary of past list attempts
     /// </summary>
+    [FieldDescription("Summary of past list attempts")]
     SpentOnAhFees,
     /// <summary>
     /// how much kat takes in coins and materials to upgrade
     /// </summary>
+    [FieldDescription("how much kat takes in coins and materials to upgrade")]
     KatUpgradeCost,
     /// <summary>
     /// Estimated price the item instasells for
     /// </summary>
+    [FieldDescription("Estimated price the item instasells for")]
     InstaSellPrice,
     // anything over 9000 gets hidden
     BAZAAR_COST = 9001
