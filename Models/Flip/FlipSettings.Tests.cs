@@ -139,6 +139,9 @@ namespace Coflnet.Sky.Commands.Shared
         [Test]
         public void MatchesSpeed()
         {
+            var hostName = System.Net.Dns.GetHostName();
+            if(hostName.Contains("-build"))
+                Assert.Ignore("Running on build server");
             var matchCount = 0;
             var iterations = 2000;
             settings.MatchesSettings(flipB); // compile
