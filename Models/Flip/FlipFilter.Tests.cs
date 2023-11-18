@@ -1,10 +1,12 @@
 
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using Coflnet.Sky.Commands.Tests;
 using Coflnet.Sky.Core;
+using Coflnet.Sky.Filter;
 using Newtonsoft.Json;
 using NUnit.Framework;
 
@@ -90,13 +92,17 @@ namespace Coflnet.Sky.Commands.Shared
         public void CandyBlacklistMatch()
         {
             NBT.Instance = new NBTMock();
-            sampleFlip.Auction.NBTLookup = new NBTLookup[]{ new NBTLookup(1, 2) };
+            sampleFlip.Auction.FlatenedNBT["candyUsed"] = "1";
             var settings = new FlipSettings()
             {
                 BlackList = new List<ListEntry>() { new ListEntry() { filter = new Dictionary<string, string>() { { "Candy", "any" } } } }
             };
             var matches = settings.MatchesSettings(sampleFlip);
-            Assert.IsFalse(matches.Item1, "flip should not match");
+            Console.WriteLine(new FilterEngine().GetMatchExpression(settings.BlackList[0].filter).ToString());
+            Assert.IsFalse(matches.Item1, "flip should not match " + matches.Item2);
+            sampleFlip.Auction.FlatenedNBT["candyUsed"] = "0";
+            matches = settings.MatchesSettings(sampleFlip);
+            Assert.IsTrue(matches.Item1, "flip should match " + matches.Item2);
         }
 
         [Test]
