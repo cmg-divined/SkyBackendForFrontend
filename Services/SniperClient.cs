@@ -13,16 +13,19 @@ namespace Coflnet.Sky.Commands.Shared;
 public interface ISniperClient
 {
     Task<List<Sniper.Client.Model.PriceEstimate>> GetPrices(IEnumerable<SaveAuction> auctionRepresent);
+    Task<Dictionary<string, long>> GetCleanPrices();
 }
 
 public class SniperClient : ISniperClient
 {
     private RestSharp.RestClient sniperClient;
     private readonly ILogger<SniperClient> logger;
+    private readonly ISniperApi sniperApi;
 
     public SniperClient(ISniperApi sniperApi, ILogger<SniperClient> logger)
     {
         sniperClient = new(sniperApi.GetBasePath());
+        this.sniperApi = sniperApi;
         this.logger = logger;
     }
     public async Task<List<Sniper.Client.Model.PriceEstimate>> GetPrices(IEnumerable<SaveAuction> auctionRepresent)
@@ -45,5 +48,10 @@ public class SniperClient : ISniperClient
             logger.LogError("responded with " + respone.StatusCode + respone.Content);
             throw;
         }
+    }
+
+    public async Task<Dictionary<string, long>> GetCleanPrices()
+    {
+        return await sniperApi.ApiSniperPricesCleanGetAsync();
     }
 }

@@ -106,6 +106,12 @@ public enum DescriptionField
     /// </summary>
     [FieldDescription("Estimated price the item instasells for")]
     InstaSellPrice,
+    [FieldDescription("Summary of the cost of all modifiers applied", "May be screwed by manipulated bazaar prices")]
+    ModifierCost,
+    [FieldDescription("Full craft cost including modifiers")]
+    FullCraftCost,
+    [FieldDescription("Modifiers included in cost", "lets you see what was summed up in the cost")]
+    ModifierCostList,
     // anything over 9000 gets hidden
     BAZAAR_COST = 9001
 }
