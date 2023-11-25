@@ -45,13 +45,19 @@ namespace Coflnet.Sky.Commands.Shared
             get
             {
                 var targetPrice = Target;
-                var reduction = 2f;
-                if (targetPrice > 10_000_000)
-                    reduction = 3;
-                if (targetPrice > 100_000_000)
-                    reduction = 3.5f;
-                return (long)(targetPrice * (100 - reduction) / 100 - LastKnownCost);
+                var cost = LastKnownCost;
+                return ProfitAfterFees(targetPrice, cost);
             }
+        }
+
+        public static long ProfitAfterFees(long targetPrice, long cost)
+        {
+            var reduction = 2f;
+            if (targetPrice > 10_000_000)
+                reduction = 3;
+            if (targetPrice > 100_000_000)
+                reduction = 3.5f;
+            return (long)(targetPrice * (100 - reduction) / 100 - cost);
         }
 
         [IgnoreDataMember]
