@@ -28,6 +28,7 @@ namespace Coflnet.Sky.Commands.Shared
         /// A list of changes that were applied to the item
         /// </summary>
         public List<PropertyChange> PropertyChanges;
+        public FlipTracker.Client.Model.FlipFlags? Flags;
     }
 
     public class PropertyChange

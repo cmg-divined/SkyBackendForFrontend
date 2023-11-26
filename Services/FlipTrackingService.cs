@@ -387,7 +387,8 @@ namespace Coflnet.Sky.Commands
                 Tier = f.ItemTier.ToString(),
                 uId = f.Uid,
                 PropertyChanges = f.ProfitChanges.Select(c => new PropertyChange(c.Label, c.Amount)).ToList(),
-                Profit = f.Profit
+                Profit = f.Profit,
+                Flags = f.Flags
             }).ToArray();
             if (uuids.Count() == 1 && timeSpan >= TimeSpan.FromDays(7) && endTime > DateTime.UtcNow - TimeSpan.FromSeconds(1))
                 SaveProfitToLeaderboard(uuids.First(), newFlips.Where(f=>f.SellTime > DateTime.UtcNow - TimeSpan.FromDays(7)).Sum(f => f.Profit));
