@@ -1,10 +1,12 @@
 using System;
 using System.Collections.Generic;
 using Coflnet.Sky.Core;
+using Newtonsoft.Json.Converters;
 
 namespace Coflnet.Sky.Commands.Shared
 {
     [Flags]
+    [Newtonsoft.Json.JsonConverter(typeof(StringEnumConverter))] 
     public enum FlipFlags
     {
         None = 0,
