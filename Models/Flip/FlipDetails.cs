@@ -4,6 +4,17 @@ using Coflnet.Sky.Core;
 
 namespace Coflnet.Sky.Commands.Shared
 {
+    [Flags]
+    public enum FlipFlags
+    {
+        None = 0,
+        DifferentBuyer = 1,
+        ViaTrade = 2,
+        /// <summary>
+        /// More than one item was traded, not exact price
+        /// </summary>
+        MultiItemTrade = 4,
+    }
     /// <summary>
     /// Details about a single flip
     /// </summary>
@@ -28,7 +39,7 @@ namespace Coflnet.Sky.Commands.Shared
         /// A list of changes that were applied to the item
         /// </summary>
         public List<PropertyChange> PropertyChanges;
-        public FlipTracker.Client.Model.FlipFlags? Flags;
+        public FlipFlags Flags;
     }
 
     public class PropertyChange
@@ -46,6 +57,6 @@ namespace Coflnet.Sky.Commands.Shared
             Effect = effect;
         }
 
-        
+
     }
 }
