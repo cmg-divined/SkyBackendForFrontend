@@ -35,6 +35,9 @@ namespace Coflnet.Sky.Commands.Shared
         [DataMember(Name = "format")]
         [SettingsDoc("Custom flip message format")]
         public string Format;
+        [DataMember(Name = "blockedFormat")]
+        [SettingsDoc("Custom flip message format for blocked flips")]
+        public string BlockedFormat;
         [DataMember(Name = "chat")]
         [SettingsDoc("Is the chat enabled")]
         public bool Chat;
