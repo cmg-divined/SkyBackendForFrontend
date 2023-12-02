@@ -6,6 +6,7 @@ using System.Linq;
 using System.Runtime.Serialization;
 using Coflnet.Sky.Core;
 using System.Reflection;
+using Coflnet.Sky.Api.Models.Mod;
 
 namespace Coflnet.Sky.Commands.Shared
 {
@@ -33,6 +34,7 @@ namespace Coflnet.Sky.Commands.Shared
             AddSettings(typeof(ModSettings).GetFields(), "mod");
             AddSettings(typeof(VisibilitySettings).GetFields(), "show");
             AddSettings(typeof(PrivacySettings).GetFields(), "privacy");
+            AddSettings(typeof(DescriptionSetting).GetFields(), "lore");
         }
 
         private void AddSettings(System.Reflection.FieldInfo[] fields, string prefix = "")
@@ -115,9 +117,20 @@ namespace Coflnet.Sky.Commands.Shared
             else if (doc.Prefix == "privacy")
             {
                 var settingsService = DiHandler.GetService<SettingsService>();
-                var current = await settingsService.GetCurrentValue<PrivacySettings>(con.UserId.ToString(), "privacySettings", () => PrivacySettings.Default);
+                var current = await settingsService.GetCurrentValue(con.UserId.ToString(), "privacySettings", () => PrivacySettings.Default);
                 var newVal = UpdateValueOnObject(value, doc.RealName, current);
                 await settingsService.UpdateSetting(con.UserId.ToString(), "privacySettings", current);
+                return newVal;
+            }
+            else if (doc.Prefix == "lore")
+            {
+                var settingsService = DiHandler.GetService<SettingsService>();
+                var current = await settingsService.GetCurrentValue(con.UserId.ToString(), "description", () =>
+                {
+                    return DescriptionSetting.Default;
+                });
+                var newVal = UpdateValueOnObject(value, doc.RealName, current);
+                await settingsService.UpdateSetting(con.UserId.ToString(), "description", current);
                 return newVal;
             }
             else
@@ -155,7 +168,16 @@ namespace Coflnet.Sky.Commands.Shared
             else if (doc.Prefix == "privacy")
             {
                 var settingsService = DiHandler.GetService<SettingsService>();
-                var current = await settingsService.GetCurrentValue<PrivacySettings>(con.UserId.ToString(), "privacySettings", () => PrivacySettings.Default);
+                var current = await settingsService.GetCurrentValue(con.UserId.ToString(), "privacySettings", () => PrivacySettings.Default);
+                return GetValueOnObject(doc.RealName, current);
+            }
+            else if(doc.Prefix == "lore")
+            {
+                var settingsService = DiHandler.GetService<SettingsService>();
+                var current = await settingsService.GetCurrentValue(con.UserId.ToString(), "description", () =>
+                {
+                    return DescriptionSetting.Default;
+                });
                 return GetValueOnObject(doc.RealName, current);
             }
             else

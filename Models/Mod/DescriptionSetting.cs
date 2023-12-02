@@ -1,6 +1,8 @@
 
 
+using System;
 using System.Collections.Generic;
+using Coflnet.Sky.Commands.Shared;
 
 namespace Coflnet.Sky.Api.Models.Mod;
 
@@ -13,6 +15,11 @@ public class DescriptionSetting
     /// Lines and which elements to put into these lines
     /// </summary>
     public List<List<DescriptionField>> Fields { get; set; }
+    /// <summary>
+    /// If black and whitelist matches should be highlighted
+    /// </summary>
+    [SettingsDoc("Highlight items in ah and trade windows when matching black or whitelist filter")]
+    public bool HighlightFilterMatch;
 
     public static DescriptionSetting Default => new DescriptionSetting()
     {
