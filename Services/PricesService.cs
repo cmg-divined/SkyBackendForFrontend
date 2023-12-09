@@ -17,7 +17,7 @@ namespace Coflnet.Sky.Commands.Shared
         private HypixelContext context;
         private BazaarApi bazaarClient;
         private IItemsApi itemClient;
-        static private FilterEngine FilterEngine = new FilterEngine();
+        private FilterEngine FilterEngine;
 
         /// <summary>
         /// Creates a new 
@@ -25,11 +25,13 @@ namespace Coflnet.Sky.Commands.Shared
         /// <param name="context"></param>
         /// <param name="bazaarClient"></param>
         /// <param name="itemClient"></param>
-        public PricesService(HypixelContext context, BazaarApi bazaarClient, IItemsApi itemClient)
+        /// <param name="filterEngine"></param>
+        public PricesService(HypixelContext context, BazaarApi bazaarClient, IItemsApi itemClient, FilterEngine filterEngine)
         {
             this.context = context;
             this.bazaarClient = bazaarClient;
             this.itemClient = itemClient;
+            FilterEngine = filterEngine;
         }
 
         /// <summary>

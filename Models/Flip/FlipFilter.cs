@@ -11,7 +11,7 @@ namespace Coflnet.Sky.Commands.Shared
 {
     public class FlipFilter
     {
-        public static FilterEngine FilterEngine { get; } = new FilterEngine();
+        public static FilterEngine FilterEngine => DiHandler.GetService<FilterEngine>();
 
         private Func<SaveAuction, bool> Filters;
         private Func<FlipInstance, bool> FlipFilters = null;

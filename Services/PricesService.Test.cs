@@ -20,7 +20,7 @@ namespace Coflnet.Sky.Commands.Shared.Test
                 new BuyOrder(){Amount = 5,PricePerUnit = 100},
             };
             var count = 8;
-            double totalCost = new PricesService(null, null, null).GetBazaarCostForCount(orders, count);
+            double totalCost = new PricesService(null, null, null, null).GetBazaarCostForCount(orders, count);
             Assert.AreEqual(116, totalCost);
         }
 
@@ -32,7 +32,7 @@ namespace Coflnet.Sky.Commands.Shared.Test
                 new BuyOrder(){Amount = 4,PricePerUnit = 1}
             };
             var count = 3;
-            double totalCost = new PricesService(null, null, null).GetBazaarCostForCount(orders, count);
+            double totalCost = new PricesService(null, null, null, null).GetBazaarCostForCount(orders, count);
             Assert.AreEqual(12, totalCost);
         }
     }

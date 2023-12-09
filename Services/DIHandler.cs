@@ -153,6 +153,8 @@ namespace Coflnet.Sky.Commands.Shared
             services.AddSingleton<IStateUpdateService, StateUpdateService>();
             services.AddSingleton<McAccountService>();
             services.AddHostedService<ServicePorter>();
+            services.AddHostedService<FilterLoader>();
+            services.AddTransient<HypixelContext>(s=>new HypixelContext());
 
             _servics = services;
         }
