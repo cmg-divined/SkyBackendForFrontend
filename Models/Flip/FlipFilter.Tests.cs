@@ -19,6 +19,7 @@ namespace Coflnet.Sky.Commands.Shared
         [SetUp]
         public void Setup()
         {
+            DiHandler.OverrideService<FilterEngine,FilterEngine>(new FilterEngine());
             sampleFlip = new FlipInstance()
             {
                 MedianPrice = 10,

@@ -3,6 +3,7 @@ using Coflnet.Sky.Core;
 using System.Diagnostics;
 using Coflnet.Sky.Commands.Tests;
 using System.Threading.Tasks;
+using Coflnet.Sky.Filter;
 
 namespace Coflnet.Sky.Commands.Shared
 {
@@ -18,6 +19,7 @@ namespace Coflnet.Sky.Commands.Shared
         [SetUp]
         public void Setup()
         {
+            DiHandler.OverrideService<FilterEngine,FilterEngine>(new FilterEngine());
             flipA = new FlipInstance()
             {
                 Auction = new SaveAuction()
