@@ -220,6 +220,29 @@ public class InventoryParser
             auction.Reforge = Enum.Parse<ItemReferences.Reforge>(attributesWithoutEnchantments["modifier"].ToString(), true);
             attributesWithoutEnchantments.Remove("modifier");
         }
+        if(attributesWithoutEnchantments.ContainsKey("timestamp"))
+        {
+            try
+            {
+                AssignCreationTime(attributesWithoutEnchantments, auction);
+            }
+            catch (System.Exception e)
+            {
+                Activity.Current?.AddEvent(new ActivityEvent("Log", default, new(new Dictionary<string, object>() { {
+                    "message", "Error while parsing timestamp" }, { "error", e }, {"item", JsonConvert.SerializeObject(item)} })));
+                dev.Logger.Instance.Error(e, "Error while parsing timestamp");
+            }
+        }
+    }
+
+    private static void AssignCreationTime(Dictionary<string, object> attributesWithoutEnchantments, SaveAuction auction)
+    {
+        // format for 2/18/23 4:27 AM
+        var format = "M/d/yy h:mm tt";
+        var stringDate = attributesWithoutEnchantments["timestamp"].ToString();
+        var parsedDate = DateTime.ParseExact(stringDate, format, System.Globalization.CultureInfo.InvariantCulture);
+        auction.ItemCreatedAt = parsedDate;
+        attributesWithoutEnchantments.Remove("timestamp");
     }
 
     public class TextElement
