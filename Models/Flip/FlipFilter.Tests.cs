@@ -28,7 +28,7 @@ namespace Coflnet.Sky.Commands.Shared
                 {
                     Bin = false,
                     Enchantments = new List<Enchantment>(){
-                    new Enchantment(Enchantment.EnchantmentType.critical,4)
+                    new(Enchantment.EnchantmentType.critical,4)
                 },
                     FlatenedNBT = new Dictionary<string, string>() { { "candy", "3" } }
                 },
@@ -57,7 +57,7 @@ namespace Coflnet.Sky.Commands.Shared
         {
             var settings = new FlipSettings()
             {
-                BlackList = new List<ListEntry>() { new ListEntry() { filter = new Dictionary<string, string>() { { "Bin", "true" } } } }
+                BlackList = new List<ListEntry>() { new() { filter = new Dictionary<string, string>() { { "Bin", "true" } } } }
             };
             var matches = settings.MatchesSettings(sampleFlip);
             Assert.IsTrue(matches.Item1, "flip should match");
@@ -71,7 +71,7 @@ namespace Coflnet.Sky.Commands.Shared
         {
             var settings = new FlipSettings()
             {
-                BlackList = new List<ListEntry>() { new ListEntry() { filter = new Dictionary<string, string>() { { "Enchantment", "aiming" }, { "EnchantLvl", "1" } } } }
+                BlackList = new List<ListEntry>() { new() { filter = new Dictionary<string, string>() { { "Enchantment", "aiming" }, { "EnchantLvl", "1" } } } }
             };
             var matches = settings.MatchesSettings(sampleFlip);
             Assert.IsTrue(matches.Item1, "flip should match");
@@ -83,7 +83,7 @@ namespace Coflnet.Sky.Commands.Shared
         {
             var settings = new FlipSettings()
             {
-                BlackList = new List<ListEntry>() { new ListEntry() { filter = new Dictionary<string, string>() { { "Enchantment", "critical" }, { "EnchantLvl", "4" } } } }
+                BlackList = new List<ListEntry>() { new() { filter = new Dictionary<string, string>() { { "Enchantment", "critical" }, { "EnchantLvl", "4" } } } }
             };
             var matches = settings.MatchesSettings(sampleFlip);
             Assert.IsFalse(matches.Item1, "flip should not match");
@@ -96,7 +96,7 @@ namespace Coflnet.Sky.Commands.Shared
             sampleFlip.Auction.FlatenedNBT["candyUsed"] = "1";
             var settings = new FlipSettings()
             {
-                BlackList = new List<ListEntry>() { new ListEntry() { filter = new Dictionary<string, string>() { { "Candy", "any" } } } }
+                BlackList = new List<ListEntry>() { new() { filter = new Dictionary<string, string>() { { "Candy", "any" } } } }
             };
             var matches = settings.MatchesSettings(sampleFlip);
             Console.WriteLine(new FilterEngine().GetMatchExpression(settings.BlackList[0].filter).ToString());
@@ -116,8 +116,8 @@ namespace Coflnet.Sky.Commands.Shared
             var oneForAllFilter = new Dictionary<string, string>() { { "Enchantment", "ultimate_one_for_all" }, { "EnchantLvl", "1" } };
             var settings = new FlipSettings()
             {
-                BlackList = new List<ListEntry>() { new ListEntry() { ItemTag = "REAPER", filter = oneForAllFilter } },
-                WhiteList = new List<ListEntry>() { new ListEntry() { ItemTag = "ENCHANTED_BOOK", filter = oneForAllFilter } }
+                BlackList = new List<ListEntry>() { new() { ItemTag = "REAPER", filter = oneForAllFilter } },
+                WhiteList = new List<ListEntry>() { new() { ItemTag = "ENCHANTED_BOOK", filter = oneForAllFilter } }
             };
             var matches = settings.MatchesSettings(bookOfa);
             var shouldNotBatch = settings.MatchesSettings(reaperOfa);
@@ -130,11 +130,11 @@ namespace Coflnet.Sky.Commands.Shared
         public void MinProfitFilterMatch()
         {
             NBT.Instance = new NBTMock();
-            sampleFlip.Auction.NBTLookup = new NBTLookup[]{ new NBTLookup(1, 2) };
+            sampleFlip.Auction.NBTLookup = new NBTLookup[]{ new(1, 2) };
             var settings = new FlipSettings()
             {
                 MinProfit = 10000,
-                WhiteList = new List<ListEntry>() { new ListEntry() { filter = new Dictionary<string, string>() { { "MinProfit", "5" } } } }
+                WhiteList = new List<ListEntry>() { new() { filter = new Dictionary<string, string>() { { "MinProfit", "5" } } } }
             };
             var matches = settings.MatchesSettings(sampleFlip);
             System.Console.WriteLine(sampleFlip.Profit);
@@ -147,7 +147,7 @@ namespace Coflnet.Sky.Commands.Shared
         public void VolumeDeciamalFilterMatch()
         {
             NBT.Instance = new NBTMock();
-            sampleFlip.Auction.NBTLookup = new NBTLookup[]{ new NBTLookup(1, 2) };
+            sampleFlip.Auction.NBTLookup = new NBTLookup[]{ new(1, 2) };
             var settings = new FlipSettings()
             {
                 MinProfit = 1,
@@ -170,7 +170,7 @@ namespace Coflnet.Sky.Commands.Shared
                 MinProfit = 1,
                 MinVolume = 50,
             };
-            settings.WhiteList = new List<ListEntry>() { new ListEntry() { filter = new Dictionary<string, string>() { { "Volume", "<0.5" } } } };
+            settings.WhiteList = new List<ListEntry>() { new() { filter = new Dictionary<string, string>() { { "Volume", "<0.5" } } } };
             sampleFlip.Volume = 0.1f;
             var matches3 = settings.MatchesSettings(sampleFlip);
             Assert.IsTrue(matches3.Item1, matches3.Item2);
@@ -195,11 +195,11 @@ namespace Coflnet.Sky.Commands.Shared
         [TestCase("2", false)]
         public void ReferenceAgeFilterMatch(string val, bool result)
         {
-            var settings = new FlipSettings()
+            var settings = new FlipSettings
             {
                 MinProfit = 100,
+                WhiteList = new List<ListEntry>() { new() { filter = new Dictionary<string, string>() { { "ReferenceAge", "<2" } } } }
             };
-            settings.WhiteList = new List<ListEntry>() { new ListEntry() { filter = new Dictionary<string, string>() { { "ReferenceAge", "<2" } } } };
             sampleFlip.Context["refAge"] = val;
             var matches3 = settings.MatchesSettings(sampleFlip);
             Assert.AreEqual(result, matches3.Item1, matches3.Item2);
@@ -213,7 +213,7 @@ namespace Coflnet.Sky.Commands.Shared
             var settings = new FlipSettings()
             {
                 MinProfit = 10000,
-                WhiteList = new List<ListEntry>() { new ListEntry() { filter = new Dictionary<string, string>() {
+                WhiteList = new List<ListEntry>() { new() { filter = new Dictionary<string, string>() {
                     { "MinProfit", "5" },{"FlipFinder", "SNIPER_MEDIAN"},{"Bin","false"} } } }
             };
             sampleFlip.Auction.StartingBid = 10;
@@ -229,7 +229,7 @@ namespace Coflnet.Sky.Commands.Shared
             var settings = new FlipSettings()
             {
                 MinProfit = 10000,
-                WhiteList = new List<ListEntry>() { new ListEntry() { filter = new Dictionary<string, string>() {
+                WhiteList = new List<ListEntry>() { new() { filter = new Dictionary<string, string>() {
                     { "MinProfit", "5" } } } }
             };
             sampleFlip.Auction.StartingBid = 10;
@@ -250,7 +250,7 @@ namespace Coflnet.Sky.Commands.Shared
                 {
                     Reforge = ItemReferences.Reforge.Renowned,
                     Tier = Tier.MYTHIC,
-                    NBTLookup = new NBTLookup[]{ new NBTLookup(1, 5) }
+                    NBTLookup = new NBTLookup[]{ new(1, 5) }
                 }
             });
             Assert.IsTrue(result);
@@ -261,7 +261,7 @@ namespace Coflnet.Sky.Commands.Shared
         {
             var settings = new FlipSettings()
             {
-                WhiteList = new List<ListEntry>() { new ListEntry() { filter = new Dictionary<string, string>() { { "Reforge", "Sharp" }, { "AfterMainFilter", "true" } } } },
+                WhiteList = new List<ListEntry>() { new() { filter = new () { { "Reforge", "Sharp" }, { "AfterMainFilter", "true" } } } },
                 MinProfit = 1000
             };
             sampleFlip.Auction.Reforge = ItemReferences.Reforge.Sharp;
@@ -278,13 +278,13 @@ namespace Coflnet.Sky.Commands.Shared
         [Test]
         public void ForceBlacklistOverwritesWhitelist()
         {
-            var settings = new FlipSettings()
+            var settings = new FlipSettings
             {
                 MinProfit = 0,
                 MinVolume = 0,
+                WhiteList = new List<ListEntry>() { new() { filter = new () { { "Volume", "<0.5" } } } },
+                BlackList = new List<ListEntry>() { new() { filter = new () { { "Volume", "<0.5" }, { "ForceBlacklist", "" } } } }
             };
-            settings.WhiteList = new List<ListEntry>() { new ListEntry() { filter = new Dictionary<string, string>() { { "Volume", "<0.5" } } } };
-            settings.BlackList = new List<ListEntry>() { new ListEntry() { filter = new Dictionary<string, string>() { { "Volume", "<0.5" }, { "ForceBlacklist", "" } } } };
             sampleFlip.Volume = 0.1f;
             var result = settings.MatchesSettings(sampleFlip);
 
@@ -295,13 +295,13 @@ namespace Coflnet.Sky.Commands.Shared
         [Test]
         public void JujuHighProfit()
         {
-            var settings = new FlipSettings()
+            var settings = new FlipSettings
             {
                 MinProfit = 0,
                 MinVolume = 0,
+                WhiteList = new List<ListEntry>() { new() { filter = new() { { "FlipFinder", "SNIPER_MEDIAN" }, { "MinProfitPercentage", "40" } }, ItemTag = "JUJU_SHORTBOW" } },
+                BlackList = new List<ListEntry>() { new() { filter = new() { { "FlipFinder", "SNIPER_MEDIAN" } } } }
             };
-            settings.WhiteList = new List<ListEntry>() { new ListEntry() { filter = new() { { "FlipFinder", "SNIPER_MEDIAN" }, { "MinProfitPercentage", "40" } }, ItemTag = "JUJU_SHORTBOW" } };
-            settings.BlackList = new List<ListEntry>() { new ListEntry() { filter = new() { { "FlipFinder", "SNIPER_MEDIAN" } } } };
             sampleFlip.Volume = 0.1f;
             sampleFlip.Auction.Tag = "JUJU_SHORTBOW";
             sampleFlip.MedianPrice = 35800000;
@@ -319,7 +319,7 @@ namespace Coflnet.Sky.Commands.Shared
             var settings = new FlipSettings()
             {
                 MinProfit = 100,
-                BlackList = new List<ListEntry>() { new ListEntry() { filter = new Dictionary<string, string>() {
+                BlackList = new List<ListEntry>() { new() { filter = new Dictionary<string, string>() {
                     { "FlipFinder", "FLIPPER" } } } }
             };
             sampleFlip.Auction.StartingBid = 10;
@@ -333,7 +333,7 @@ namespace Coflnet.Sky.Commands.Shared
             var settings = new FlipSettings()
             {
                 MinProfit = 10000,
-                WhiteList = new List<ListEntry>() { new ListEntry() { filter = new Dictionary<string, string>() {
+                WhiteList = new List<ListEntry>() { new() { filter = new Dictionary<string, string>() {
                     { "ProfitPercentage", ">5" } }
                 } }
             };
@@ -347,13 +347,13 @@ namespace Coflnet.Sky.Commands.Shared
             var settings = new FlipSettings()
             {
                 MinProfit = 10000,
-                WhiteList = new List<ListEntry>() { new ListEntry() { filter = new Dictionary<string, string>() {
+                WhiteList = new List<ListEntry>() { new() { filter = new Dictionary<string, string>() {
                     { "ProfitPercentage", "1-10" } }
                 } }
             };
             sampleFlip.Auction.StartingBid = 50;
             sampleFlip.MedianPrice = 55;
-            System.Console.WriteLine(sampleFlip.ProfitPercentage);
+            Console.WriteLine(sampleFlip.ProfitPercentage);
             Matches(settings, sampleFlip);
         }
 
@@ -363,12 +363,12 @@ namespace Coflnet.Sky.Commands.Shared
             var settings = new FlipSettings()
             {
                 MinProfit = 35000000,
-                WhiteList = new List<ListEntry>() { new ListEntry() { ItemTag = "PET_ENDER_DRAGON",
+                WhiteList = new List<ListEntry>() { new() { ItemTag = "PET_ENDER_DRAGON",
                 filter = new Dictionary<string, string>() {
                     { "FlipFinder", "FLIPPER_AND_SNIPERS" },
                     { "MinProfitPercentage", "5" }
                 } } },
-                BlackList = new List<ListEntry>() { new ListEntry() { ItemTag = "PET_ENDER_DRAGON" } }
+                BlackList = new List<ListEntry>() { new() { ItemTag = "PET_ENDER_DRAGON" } }
             };
             sampleFlip.Auction.Tag = "PET_ENDER_DRAGON";
             sampleFlip.Auction.StartingBid = 250000000;
@@ -403,7 +403,7 @@ namespace Coflnet.Sky.Commands.Shared
                 {
                     Tag = tag,
                     Enchantments = new List<Enchantment>(){
-                        new Enchantment(Enchantment.EnchantmentType.ultimate_one_for_all,1)
+                        new(Enchantment.EnchantmentType.ultimate_one_for_all,1)
                     }
                 },
                 Finder = LowPricedAuction.FinderType.SNIPER
