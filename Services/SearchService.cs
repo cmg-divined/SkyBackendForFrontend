@@ -406,7 +406,7 @@ namespace Coflnet.Sky.Commands.Shared
 
         private static void AddFilterResult(Channel<SearchResultItem> Results, Dictionary<string, string> filter, string resultText, string itemTag, int hitCount = 10)
         {
-            Console.WriteLine($"Adding {resultText} {hitCount}");
+            Console.WriteLine($"Adding search {resultText} {hitCount}");
             Results.Writer.TryWrite(new SearchResultItem
             {
                 HitCount = hitCount, // account for "Enchantment" suffix
