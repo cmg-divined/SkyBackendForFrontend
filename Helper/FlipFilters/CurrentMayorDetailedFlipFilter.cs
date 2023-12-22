@@ -23,7 +23,13 @@ public class CurrentMayorDetailedFlipFilter : DetailedFlipFilter
         val = Options.FirstOrDefault(t => t.ToString().ToLower() == val.ToLower())?.ToString();
         if (val == null)
             throw new CoflnetException("invalid_mayor", "The specified mayor does not exist");
-        if(DateTime.Now - lastUpdate.lastUpdate > TimeSpan.FromHours(1))
+        string current = CurrentMayor();
+        return (f) => val == current;
+    }
+
+    public string CurrentMayor()
+    {
+        if (DateTime.Now - lastUpdate.lastUpdate > TimeSpan.FromMinutes(2))
         {
             // update as too old
             lastUpdate = (TargetMayor(), DateTime.Now);
@@ -31,7 +37,7 @@ public class CurrentMayorDetailedFlipFilter : DetailedFlipFilter
         var current = lastUpdate.val;
         if (current == null)
             throw new CoflnetException("no_mayor", "Current mayor could not be retrieved");
-        return (f) => val == current;
+        return current;
     }
 
     protected virtual string TargetMayor()
