@@ -54,5 +54,8 @@ namespace Coflnet.Sky.Commands.Shared
         [DataMember(Name = "hideSold")]
         [SettingsDoc("Prevents sold auctions from showing", "hideSold")]
         public bool HideSoldAuction;
+        [DataMember(Name = "hideManipulated")]
+        [SettingsDoc("Prevents manipulated bazaar items from showing up", "hideManipulated")]
+        public bool HideManipulated;
     }
 }
