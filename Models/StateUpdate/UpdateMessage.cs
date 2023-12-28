@@ -21,7 +21,7 @@ public class UpdateMessage
     [Key(4)]
     public string? PlayerId;
     [Key(5)]
-    public string? SessionId { get; set; }
+    public string? UserId { get; set; }
 
     public override bool Equals(object? obj)
     {
@@ -31,12 +31,12 @@ public class UpdateMessage
                EqualityComparer<ChestView?>.Default.Equals(Chest, message.Chest) &&
                EqualityComparer<List<string>?>.Default.Equals(ChatBatch, message.ChatBatch) &&
                PlayerId == message.PlayerId &&
-               SessionId == message.SessionId;
+               UserId == message.UserId;
     }
 
     public override int GetHashCode()
     {
-        return HashCode.Combine(Kind, ReceivedAt, Chest, ChatBatch, PlayerId, SessionId);
+        return HashCode.Combine(Kind, ReceivedAt, Chest, ChatBatch, PlayerId, UserId);
     }
 
     public enum UpdateKind 

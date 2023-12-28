@@ -29,7 +29,15 @@ namespace Coflnet.Sky.Commands.Shared
             get
             {
                 if (_serviceProvider == null)
-                    _serviceProvider = _servics.BuildServiceProvider();
+                    try
+                    {
+                        _serviceProvider = _servics.BuildServiceProvider();
+                    }
+                    catch (System.Exception)
+                    {
+                        Console.WriteLine("Failed to build service provider\nCheck that you called AddCoflService on the service collection in Startup.cs");
+                        throw;
+                    }
                 return _serviceProvider;
             }
         }
@@ -154,7 +162,7 @@ namespace Coflnet.Sky.Commands.Shared
             services.AddSingleton<McAccountService>();
             services.AddHostedService<ServicePorter>();
             services.AddHostedService<FilterLoader>();
-            services.AddTransient<HypixelContext>(s=>new HypixelContext());
+            services.AddTransient<HypixelContext>(s => new HypixelContext());
 
             _servics = services;
         }
@@ -173,7 +181,7 @@ namespace Coflnet.Sky.Commands.Shared
 
         public static void OverrideService<T, TImpl>(TImpl service) where T : class where TImpl : T
         {
-            if(_servics == null)
+            if (_servics == null)
                 _servics = new ServiceCollection();
             _servics.AddSingleton<T>(service);
             _serviceProvider = null;
