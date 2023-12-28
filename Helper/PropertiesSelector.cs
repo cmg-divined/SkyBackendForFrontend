@@ -74,6 +74,8 @@ namespace Coflnet.Sky.Commands.Helper
                 properties.Add(new Property($"Unlocked: {(data["unlocked_slots"].Sum(c => c == ',' ? 1 : 0) + 1)}", 15));
             if(data.ContainsKey("ethermerge"))
                 properties.Add(new Property($"Ethermerge", 13));
+            if (data.ContainsKey("color"))
+                properties.Add(new Property($"Color: {ToHex(data["color"])}", 5));
 
             properties.AddRange(data.Where(p => p.Value == "PERFECT" || p.Value == "FLAWLESS")
                 // Jasper0 slot can't be accessed on starred (Fragged) items
@@ -98,6 +100,13 @@ namespace Coflnet.Sky.Commands.Helper
                 properties.Add(new Property($"Module: {ItemDetails.TagToName(module)}", 15));
 
             return properties;
+        }
+
+        private static object ToHex(string separated)
+        {
+            // 0:0:0 to hex
+            var parts = separated.Split(':');
+            return string.Join("", parts.Select(p => int.Parse(p).ToString("X2")));
         }
     }
 }
