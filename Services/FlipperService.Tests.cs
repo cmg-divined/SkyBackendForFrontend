@@ -19,7 +19,7 @@ namespace Coflnet.Sky.Commands.Tests
         // test disabled because it fails in kaniko [Test]
         public async Task ReceiveAndDistribute()
         {
-            var service = new FlipperService(null);
+            var service = new FlipperService(null, null);
             var con = new MockConnection();
             service.AddConnection(con);
             //for (int i = 0; i < 1; i++)

@@ -220,7 +220,13 @@ public class InventoryParser
             auction.Reforge = Enum.Parse<ItemReferences.Reforge>(attributesWithoutEnchantments["modifier"].ToString(), true);
             attributesWithoutEnchantments.Remove("modifier");
         }
-        if(attributesWithoutEnchantments.ContainsKey("timestamp"))
+        if (attributesWithoutEnchantments.TryGetValue("unlocked_slots", out var unlockedObj) && unlockedObj is List<object> unlockedList)
+        {
+            // override format with comma, the default chooses spaces but for some reason this didn't go through to db
+            // haven't found where it is so this is an uggly workaround
+            attributesWithoutEnchantments["unlocked_slots"] = string.Join(",", unlockedList.OrderBy(a=>a).Select(e => e.ToString()));
+        }
+        if (attributesWithoutEnchantments.ContainsKey("timestamp"))
         {
             try
             {

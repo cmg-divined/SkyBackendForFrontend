@@ -60,6 +60,12 @@ public class InventoryParserTests
             "stackSize": 64,
             "slot": 16
         },
+        {"type":315,"count":1,"metadata":0,"nbt":{"type":"compound","name":"","value":{"ench":{"type":"list","value":{"type":"end","value":[]}},"Unbreakable":{"type":"byte","value":1},"HideFlags":{"type":"int","value":254},
+            "display":{"type":"compound","value":{"Lore":{"type":"list","value":{"type":"string","value":["§7Health: §a+200","§7Defense: §a+150","§7Mining Speed: §a+230 §9(+60) §d(+90)"]}},"Name":{"type":"string","value":"§f§f§dJaded Chestplate of Divan"}}},
+            "ExtraAttributes":{"type":"compound","value":{"rarity_upgrades":{"type":"int","value":1},"gems":{"type":"compound","value":{"JADE_1":{"type":"string","value":"FINE"},"JADE_0":{"type":"string","value":"FINE"},
+                "unlocked_slots":{"type":"list","value":{"type":"string","value":["JADE_0","JADE_1","TOPAZ_0","AMBER_0","AMBER_1"]}},"AMBER_0":{"type":"string","value":"FINE"},"AMBER_1":{"type":"string","value":"FINE"},"TOPAZ_0":{"type":"string","value":"FINE"}}},"modifier":{"type":"string","value":"jaded"},"id":{"type":"string","value":"DIVAN_CHESTPLATE"},
+                "enchantments":{"type":"compound","value":{"ultimate_wisdom":{"type":"int","value":1},"growth":{"type":"int","value":5},"protection":{"type":"int","value":5}}},"uuid":{"type":"string","value":"ea533251-6328-4a3c-8477-649cfb93ff45"},"timestamp":{"type":"string","value":"7/24/23 2:42 AM"}}}}},
+                "stackId":null,"name":"golden_chestplate","displayName":"Golden Chestplate","stackSize":1,"maxDurability":112,"slot":32},
         {
             "type": 306,
             "count": 1,
@@ -243,7 +249,8 @@ public class InventoryParserTests
     {
         var parser = new InventoryParser();
         var serialized = MessagePackSerializer.Serialize(parser.Parse(jsonSample));
-        var item = MessagePackSerializer.Deserialize<List<SaveAuction>>(serialized)
+        var deserialized = MessagePackSerializer.Deserialize<List<SaveAuction>>(serialized);
+        var item = deserialized
                         .Where(i => i != null).Last();
         Console.WriteLine(JsonConvert.SerializeObject(item, Formatting.Indented));
         Assert.AreEqual("PET_ELEPHANT", item.Tag);
@@ -260,6 +267,10 @@ public class InventoryParserTests
         Assert.AreEqual("6", item.FlatenedNBT["MASTER_CRYPT_TANK_ZOMBIE_70"]);
         Assert.AreEqual(ItemReferences.Reforge.Heavy, item.Reforge);
         Assert.AreEqual(Tier.COMMON, item.Tier);
+
+        var divan = deserialized.Where(i => i != null).Skip(1).First();
+        Assert.AreEqual(new DateTime(2023, 7, 24), divan.ItemCreatedAt.Date);
+        Assert.AreEqual("AMBER_0,AMBER_1,JADE_0,JADE_1,TOPAZ_0", divan.FlatenedNBT["unlocked_slots"]);
     }
 
     string petSample = """
@@ -377,15 +388,15 @@ public class InventoryParserTests
     [Test]
     public void ParsePetRarity()
     {
-         var parser = new InventoryParser();
+        var parser = new InventoryParser();
         var serialized = MessagePackSerializer.Serialize(parser.Parse(petSample));
-        var item = MessagePackSerializer.Deserialize<List<SaveAuction>>(serialized).Last();
+        var item = MessagePackSerializer.Deserialize<List<SaveAuction>>(serialized).First();
         Assert.AreEqual(Tier.LEGENDARY, item.Tier);
     }
 
 
 
-private string jsonSampleCT = """
+    private string jsonSampleCT = """
 [{"id":"minecraft:tnt","Count":2,"tag":{"ench":[],"HideFlags":254,"display":{"Lore":["§7Breaks weak walls. Can be used","§7to blow up Crypts in §cThe","§cCatacombs §7and §3Crystal","§3Hollows§7.","","§9§lRARE"],
 "Name":"§9Superboom TNT"},"ExtraAttributes":{"id":"SUPERBOOM_TNT"}},"Damage":0},
 {"id":"minecraft:stained_glass","Count":1,"tag":{"HideFlags":254,"display":{"Lore":["§7§oA rare space helmet forged","§7§ofrom shards of moon glass.","","§7§8This item can be reforged!","§c§lSPECIAL HELMET"],
