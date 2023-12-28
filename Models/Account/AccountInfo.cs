@@ -29,8 +29,10 @@ namespace Coflnet.Sky.Commands.Shared
         public DateTime LastCaptchaSolve { get; set; }
         [DataMember(Name = "locale")]
         public string Locale { get; set; }
-        [DataMember(Name = "timeZoneString")]
-        public string timeZone { get; set; }
+        [DataMember(Name = "timeZoneOffset")]
+        public int TimeZoneOffset { get; set; }
+        [DataMember(Name = "region")]
+        public string Region { get; set; }
         [DataMember(Name = "captchaType")]
         public string CaptchaType { get; set; }
     }
