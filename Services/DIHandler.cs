@@ -18,6 +18,7 @@ using Coflnet.Sky.Mayor.Client.Api;
 using Coflnet.Leaderboard.Client.Api;
 using Coflnet.Sky.Settings.Client.Api;
 using Coflnet.Sky.Filter;
+using Coflnet.Sky.EventBroker.Client.Api;
 
 namespace Coflnet.Sky.Commands.Shared
 {
@@ -153,6 +154,21 @@ namespace Coflnet.Sky.Commands.Shared
             services.AddSingleton<PremiumService>();
             services.AddSingleton<ISniperClient, SniperClient>();
             services.AddSingleton<EventBrokerClient>();
+            services.AddSingleton<ISubscriptionsApi>(context =>
+            {
+                var config = context.GetRequiredService<IConfiguration>();
+                return new SubscriptionsApi(config["EVENTS_BASE_URL"]);
+            });
+            services.AddSingleton<ISubscriptionsApi>(context =>
+            {
+                var config = context.GetRequiredService<IConfiguration>();
+                return new SubscriptionsApi(config["EVENTS_BASE_URL"]);
+            });
+            services.AddSingleton<ITargetsApi>(context =>
+            {
+                var config = context.GetRequiredService<IConfiguration>();
+                return new TargetsApi(config["EVENTS_BASE_URL"]);
+            });
             services.AddSingleton<PlayerName.PlayerNameService>();
             services.AddSingleton<IdConverter>();
             services.AddSingleton<AuctionService>();
