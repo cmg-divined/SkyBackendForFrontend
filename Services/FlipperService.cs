@@ -14,6 +14,7 @@ using Microsoft.Extensions.Hosting;
 using System.Threading;
 using Microsoft.Extensions.Configuration;
 using Coflnet.Kafka;
+using Microsoft.Extensions.Logging;
 
 namespace Coflnet.Sky.Commands.Shared
 {
@@ -62,10 +63,12 @@ namespace Coflnet.Sky.Commands.Shared
         private ConcurrentDictionary<long, DateTime> SoldAuctions = new ConcurrentDictionary<long, DateTime>();
         static RestClient SkyFlipperHost = new RestClient(SimplerConfig.Config.Instance["SKYFLIPPER_BASE_URL"] ?? "http://" + SimplerConfig.Config.Instance["SKYFLIPPER_HOST"]);
         IConfiguration config;
+        private ILogger<FlipperService> logger;
 
-        public FlipperService(IConfiguration config)
+        public FlipperService(IConfiguration config, ILogger<FlipperService> logger)
         {
             this.config = config;
+            this.logger = logger;
         }
 
         public void AddConnectionPlus(IFlipConnection connection, bool sendHistory = true)
@@ -109,7 +112,7 @@ namespace Coflnet.Sky.Commands.Shared
                 return;
             SendFlipHistory(connection, LoadBurst, 0);
             if (Random.Shared.Next() % 30 == 0)
-                Console.WriteLine("Added new con, now there are " + SlowSubs.Count);
+                logger.LogInformation("Added new con, now there are " + SlowSubs.Count);
             UpdateFilterSumaries();
         }
 
@@ -201,7 +204,7 @@ namespace Coflnet.Sky.Commands.Shared
                 Volume = flip.DailyVolume,
                 Rarity = flip.Auction.Tier,
                 Finder = flip.Finder,
-                LowestBin = (flip.Finder == LowPricedAuction.FinderType.SNIPER || flip.Finder == LowPricedAuction.FinderType.USER)? flip.TargetPrice : 0,
+                LowestBin = (flip.Finder == LowPricedAuction.FinderType.SNIPER || flip.Finder == LowPricedAuction.FinderType.USER) ? flip.TargetPrice : 0,
                 Context = context
             };
             return flipIntance;
@@ -441,7 +444,7 @@ namespace Coflnet.Sky.Commands.Shared
                         }
                         catch (Exception e)
                         {
-                            Console.WriteLine($"Failed to send slow flip {e.Message} {e.StackTrace}");
+                            logger.LogError(e, $"Failed to send slow flip");
                         }
                     }, new CancellationTokenSource(30_000).Token);
                 }
@@ -625,12 +628,19 @@ namespace Coflnet.Sky.Commands.Shared
             var sumary = new ServerFilterSumary();
             foreach (var item in Connections)
             {
-                var settings = item.Connection.Settings;
-                if (settings == null)
-                    continue;
-                if (settings.AllowedFinders.HasFlag(LowPricedAuction.FinderType.USER))
-                    sumary.UserFinderEnabledCount++;
-                minProfit = Math.Min(minProfit, settings.MinProfit);
+                try
+                {
+                    var settings = item.Connection.Settings;
+                    if (settings == null)
+                        continue;
+                    if (settings.AllowedFinders.HasFlag(LowPricedAuction.FinderType.USER))
+                        sumary.UserFinderEnabledCount++;
+                    minProfit = Math.Min(minProfit, settings.MinProfit);
+                }
+                catch (Exception e)
+                {
+                    logger.LogError(e, "Error in UpdateFilterSumaries");
+                }
             }
             sumary.LowestMinProfit = minProfit;
 
