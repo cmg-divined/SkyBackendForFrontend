@@ -30,5 +30,16 @@ namespace Coflnet.Sky.Commands.Helper
             var prop = PropertiesSelector.GetProperties(auction).Select(p => p.Value).First();
             Assert.AreEqual("Bed: 9s", prop);
         }
+        [Test]
+        public void FormatHex()
+        {
+            var auction = new SaveAuction()
+            {
+                FlatenedNBT = new System.Collections.Generic.Dictionary<string, string>()
+                { { "color", "0:0:255" } }
+            };
+            var prop = PropertiesSelector.GetProperties(auction).Select(p => p.Value).First();
+            Assert.AreEqual("Color: §10000FF§f", prop);
+        }
     }
 }

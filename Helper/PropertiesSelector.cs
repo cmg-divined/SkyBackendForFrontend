@@ -75,7 +75,7 @@ namespace Coflnet.Sky.Commands.Helper
             if (data.ContainsKey("ethermerge"))
                 properties.Add(new Property($"Ethermerge", 13));
             if (data.TryGetValue("color", out string color))
-                properties.Add(new Property($"Color: {ToHex(color)}", 5));
+                properties.Add(new Property($"Color: {FormatHex(color)}", 5));
 
             properties.AddRange(data.Where(p => p.Value == "PERFECT" || p.Value == "FLAWLESS")
                 // Jasper0 slot can't be accessed on starred (Fragged) items
@@ -123,14 +123,17 @@ namespace Coflnet.Sky.Commands.Helper
             {"000000","§0"},
         };
 
-        private static object ToHex(string separated)
+        private static Dictionary<int, string> ColorCodeToHexLookup = HexToColorCodeLookup
+            .ToDictionary(k => int.Parse(k.Key.ToString(), System.Globalization.NumberStyles.HexNumber), v => v.Value);
+
+        private static object FormatHex(string separated)
         {
             // 0:0:0 to hex
             var parts = separated.Split(':');
             var hex = string.Join("", parts.Select(p => int.Parse(p).ToString("X2")));
-            var compare = new Fastenshtein.Levenshtein(hex);
-            var closest = HexToColorCodeLookup.Keys.OrderBy(k => compare.DistanceFrom(k)).First();
-            return HexToColorCodeLookup[closest] + hex + "§f";
+            var numeric = int.Parse(hex, System.Globalization.NumberStyles.HexNumber);
+            var closest = ColorCodeToHexLookup.Keys.OrderBy(k => Math.Abs(numeric - k)).First();
+            return ColorCodeToHexLookup[closest] + hex + "§f";
         }
     }
 }
