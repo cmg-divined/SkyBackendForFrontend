@@ -123,16 +123,22 @@ namespace Coflnet.Sky.Commands.Helper
             {"000000","§0"},
         };
 
-        private static Dictionary<int, string> ColorCodeToHexLookup = HexToColorCodeLookup
-            .ToDictionary(k => int.Parse(k.Key.ToString(), System.Globalization.NumberStyles.HexNumber), v => v.Value);
+        private static Dictionary<(int, int, int), string> ColorCodeToHexLookup = HexToColorCodeLookup
+            .ToDictionary(k => (ParsePart(k.Key.Substring(0, 2)), ParsePart(k.Key.Substring(2, 2)), ParsePart(k.Key.Substring(4, 2))),
+                v => v.Value);
+
+        private static int ParsePart(string hex)
+        {
+            return int.Parse(hex, System.Globalization.NumberStyles.HexNumber);
+        }
 
         private static object FormatHex(string separated)
         {
             // 0:0:0 to hex
-            var parts = separated.Split(':');
-            var hex = string.Join("", parts.Select(p => int.Parse(p).ToString("X2")));
+            var parts = separated.Split(':').Select(p => int.Parse(p)).ToArray();
+            var hex = string.Join("", parts.Select(p => p.ToString("X2")));
             var numeric = int.Parse(hex, System.Globalization.NumberStyles.HexNumber);
-            var closest = ColorCodeToHexLookup.Keys.OrderBy(k => Math.Abs(numeric - k)).First();
+            var closest = ColorCodeToHexLookup.Keys.OrderBy(k => Math.Abs(parts[0] - k.Item1) + Math.Abs(parts[1] - k.Item2) + Math.Abs(parts[2] - k.Item3)).First();
             return ColorCodeToHexLookup[closest] + hex + "§f";
         }
     }
