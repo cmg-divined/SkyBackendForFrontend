@@ -48,34 +48,34 @@ namespace Coflnet.Sky.Commands.Helper
             {
                 properties.Add(new Property($"Bed: {((int)bedEstimate)}s", 20));
             }
-            if (data.ContainsKey("winning_bid"))
+            if (data.TryGetValue("winning_bid", out string winning_bid))
             {
-                properties.Add(new Property("Top Bid: " + string.Format("{0:n0}", long.Parse(data["winning_bid"])), 20));
+                properties.Add(new Property("Top Bid: " + string.Format("{0:n0}", long.Parse(winning_bid)), 20));
             }
-            if (data.ContainsKey("hpc"))
-                properties.Add(new Property("HPB: " + data["hpc"], 12));
+            if (data.TryGetValue("hpc", out string hpcvalue))
+                properties.Add(new Property("HPB: " + hpcvalue, 12));
             if (data.ContainsKey("rarity_upgrades"))
                 properties.Add(new Property("Recombobulated ", 12));
             if (auction.Count > 1)
                 properties.Add(new Property($"Count x{auction.Count}", 12));
-            if (data.ContainsKey("heldItem"))
-                properties.Add(new Property($"Holds {ItemDetails.TagToName(data["heldItem"])}", 12));
-            if (data.ContainsKey("candyUsed"))
-                properties.Add(new Property($"Candy Used {data["candyUsed"]}", 11));
-            if (data.ContainsKey("farming_for_dummies_count"))
-                properties.Add(new Property($"Farming for dummies {data["farming_for_dummies_count"]}", 11));
-            if (data.ContainsKey("skin"))
-                properties.Add(new Property($"Skin: {ItemDetails.TagToName(data["skin"])}", 15));
-            if (data.ContainsKey("spider_kills"))
-                properties.Add(new Property($"Kills: {ItemDetails.TagToName(data["spider_kills"])}", 15));
-            if (data.ContainsKey("zombie_kills"))
-                properties.Add(new Property($"Kills: {ItemDetails.TagToName(data["zombie_kills"])}", 15));
-            if (data.ContainsKey("unlocked_slots"))
-                properties.Add(new Property($"Unlocked: {(data["unlocked_slots"].Sum(c => c == ',' ? 1 : 0) + 1)}", 15));
-            if(data.ContainsKey("ethermerge"))
+            if (data.TryGetValue("heldItem", out string heldItem))
+                properties.Add(new Property($"Holds {ItemDetails.TagToName(heldItem)}", 12));
+            if (data.TryGetValue("candyUsed", out string candyUsed))
+                properties.Add(new Property($"Candy Used {candyUsed}", 11));
+            if (data.TryGetValue("farming_for_dummies_count", out string farmingForDummies))
+                properties.Add(new Property($"Farming for dummies {farmingForDummies}", 11));
+            if (data.TryGetValue("skin", out string skin))
+                properties.Add(new Property($"Skin: {ItemDetails.TagToName(skin)}", 15));
+            if (data.TryGetValue("spider_kills", out string spider_kills))
+                properties.Add(new Property($"Kills: {ItemDetails.TagToName(spider_kills)}", 15));
+            if (data.TryGetValue("zombie_kills", out string zombie_kills))
+                properties.Add(new Property($"Kills: {ItemDetails.TagToName(zombie_kills)}", 15));
+            if (data.TryGetValue("unlocked_slots", out string unlocked_slots))
+                properties.Add(new Property($"Unlocked: {(unlocked_slots.Sum(c => c == ',' ? 1 : 0) + 1)}", 15));
+            if (data.ContainsKey("ethermerge"))
                 properties.Add(new Property($"Ethermerge", 13));
-            if (data.ContainsKey("color"))
-                properties.Add(new Property($"Color: {ToHex(data["color"])}", 5));
+            if (data.TryGetValue("color", out string color))
+                properties.Add(new Property($"Color: {ToHex(color)}", 5));
 
             properties.AddRange(data.Where(p => p.Value == "PERFECT" || p.Value == "FLAWLESS")
                 // Jasper0 slot can't be accessed on starred (Fragged) items
@@ -102,11 +102,35 @@ namespace Coflnet.Sky.Commands.Helper
             return properties;
         }
 
+        // minecraft java hex color codes to chat code
+        private static Dictionary<string, string> HexToColorCodeLookup = new()
+        {
+            {"AA0000","§4"},
+            {"FF5555","§c"},
+            {"FFAA00","§6"},
+            {"FFFF55","§e"},
+            {"00AA00","§2"},
+            {"55FF55","§a"},
+            {"55FFFF","§b"},
+            {"00AAAA","§3"},
+            {"0000AA","§1"},
+            {"5555FF","§9"},
+            {"FF55FF","§d"},
+            {"AA00AA","§5"},
+            {"FFFFFF","§f"},
+            {"AAAAAA","§7"},
+            {"555555","§8"},
+            {"000000","§0"},
+        };
+
         private static object ToHex(string separated)
         {
             // 0:0:0 to hex
             var parts = separated.Split(':');
-            return string.Join("", parts.Select(p => int.Parse(p).ToString("X2")));
+            var hex = string.Join("", parts.Select(p => int.Parse(p).ToString("X2")));
+            var compare = new Fastenshtein.Levenshtein(hex);
+            var closest = HexToColorCodeLookup.Keys.OrderBy(k => compare.DistanceFrom(k)).First();
+            return HexToColorCodeLookup[closest] + hex + "§f";
         }
     }
 }
