@@ -61,7 +61,7 @@ namespace Coflnet.Sky.Commands
         private ILogger<FlipTrackingService> logger;
 
 
-        IProducer<string, FlipTracker.Client.Model.FlipEvent> producer;
+        IProducer<string, FlipEvent> producer;
 
         public FlipTrackingService(
             UpgradePriceService priceService,
@@ -73,7 +73,7 @@ namespace Coflnet.Sky.Commands
             IScoresApi scoresApi,
             ILogger<FlipTrackingService> logger)
         {
-            producer = kafkaCreator?.BuildProducer<string, FlipTracker.Client.Model.FlipEvent>();
+            producer = kafkaCreator?.BuildProducer<string, FlipEvent>();
 
             var url = config["FLIPTRACKER_BASE_URL"] ?? "http://" + config["FLIPTRACKER_HOST"];
             ProduceTopic = config["TOPICS:FLIP_EVENT"];
@@ -95,7 +95,7 @@ namespace Coflnet.Sky.Commands
             {
                 await SendEvent(auctionId, playerId, FlipTracker.Client.Model.FlipEventType.FLIPRECEIVE, when);
             }
-            catch (System.Exception e)
+            catch (Exception e)
             {
                 System.Console.WriteLine(e.Message);
                 System.Console.WriteLine(e.StackTrace);
@@ -127,9 +127,9 @@ namespace Coflnet.Sky.Commands
             await SendEvent(auctionId, playerId, FlipTracker.Client.Model.FlipEventType.DOWNVOTE);
         }
 
-        private Task SendEvent(string auctionId, string playerId, FlipTracker.Client.Model.FlipEventType type, DateTime when = default)
+        private Task SendEvent(string auctionId, string playerId, FlipEventType type, DateTime when = default)
         {
-            var flipEvent = new FlipTracker.Client.Model.FlipEvent()
+            var flipEvent = new FlipEvent()
             {
                 Type = type,
                 PlayerId = AuctionService.Instance.GetId(playerId),
@@ -137,15 +137,15 @@ namespace Coflnet.Sky.Commands
                 Timestamp = when == default ? System.DateTime.UtcNow : when
             };
 
-            producer.Produce(ProduceTopic, new Message<string, FlipTracker.Client.Model.FlipEvent>() { Value = flipEvent });
+            producer.Produce(ProduceTopic, new Message<string, FlipEvent>() { Value = flipEvent, Key = flipEvent.AuctionId.ToString() });
             return Task.CompletedTask;
         }
 
         public async Task NewFlip(LowPricedAuction flip, DateTime foundAt = default)
         {
-            var res = await flipTracking.TrackerFlipAuctionIdPostAsync(flip.Auction.Uuid, new FlipTracker.Client.Model.Flip()
+            var res = await flipTracking.TrackerFlipAuctionIdPostAsync(flip.Auction.Uuid, new Flip()
             {
-                FinderType = (FlipTracker.Client.Model.FinderType?)flip.Finder,
+                FinderType = (FinderType?)flip.Finder,
                 TargetPrice = (int)flip.TargetPrice,
                 Timestamp = foundAt,
                 AuctionId = flip.UId
@@ -157,7 +157,7 @@ namespace Coflnet.Sky.Commands
         /// </summary>
         /// <param name="playerIds">The uuid of the player to test</param>
         /// <returns></returns>
-        public async Task<(System.TimeSpan, int)> GetRecommendedPenalty(IEnumerable<string> playerIds)
+        public async Task<(TimeSpan, int)> GetRecommendedPenalty(IEnumerable<string> playerIds)
         {
             var breakdown = await GetSpeedComp(playerIds);
             var hourCount = breakdown?.Times?.Where(t => t.TotalSeconds > 1).GroupBy(t => System.TimeSpan.Parse(t.Age).Hours).Count() ?? 0;
@@ -192,7 +192,7 @@ namespace Coflnet.Sky.Commands
                 {
                     return await flipTracking.FlipsPlayerIdGetAsync(Guid.Parse(a.AccountUuid), DateTime.UtcNow - TimeSpan.FromDays(1), DateTime.UtcNow);
                 }
-                catch (System.Exception)
+                catch (Exception)
                 {
                     return null;
                 }
@@ -352,12 +352,12 @@ namespace Coflnet.Sky.Commands
             }
 
         }
-        public async Task<FlipSumary> GetPlayerFlips(string uuid, System.TimeSpan timeSpan, DateTime endTime = default)
+        public async Task<FlipSumary> GetPlayerFlips(string uuid, TimeSpan timeSpan, DateTime endTime = default)
         {
             return await GetPlayerFlips(new string[] { uuid }, timeSpan, endTime);
         }
 
-        public async Task<FlipSumary> GetPlayerFlips(IEnumerable<string> uuids, System.TimeSpan timeSpan, DateTime endTime = default)
+        public async Task<FlipSumary> GetPlayerFlips(IEnumerable<string> uuids, TimeSpan timeSpan, DateTime endTime = default)
         {
             if (endTime == default)
                 endTime = DateTime.UtcNow;
@@ -485,7 +485,7 @@ namespace Coflnet.Sky.Commands
 
         private FlipDetails ToFlipDetails(BidQuery b, short uidKey, List<IGrouping<long, SaveAuction>> sells, Dictionary<long, IEnumerable<Flip>> flipStats)
         {
-            FlipTracker.Client.Model.Flip first = flipStats?.GetValueOrDefault(AuctionService.Instance.GetId(b.Key))?.OrderBy(b => b.Timestamp).FirstOrDefault();
+            Flip first = flipStats?.GetValueOrDefault(AuctionService.Instance.GetId(b.Key))?.OrderBy(b => b.Timestamp).FirstOrDefault();
             var uId = b.Nbt.Where(b => b.KeyId == uidKey).FirstOrDefault().Value;
             var sell = sells.Where(s => s.Key == uId)?
                     .FirstOrDefault()
