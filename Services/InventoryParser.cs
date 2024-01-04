@@ -165,19 +165,8 @@ public class InventoryParser
             {
                 CreateAuction(item, ExtraAttributes, out attributesWithoutEnchantments, out auction);
                 auction?.SetFlattenedNbt(NBT.FlattenNbtData(attributesWithoutEnchantments).GroupBy(e => e.Key).Select(e => e.First()).ToList());
-                if (auction.Tag == "PET")
-                {
-                    auction.Tag += "_" + auction.FlatenedNBT.FirstOrDefault(e => e.Key == "type").Value;
-                }
-                else if (auction.Tag == "POTION")
-                {
-                    auction.Tag += "_" + auction.FlatenedNBT.FirstOrDefault(e => e.Key == "potion").Value;
-                }
-                else if (auction.Tag == "ABICASE")
-                {
-                    auction.Tag += "_" + auction.FlatenedNBT.FirstOrDefault(e => e.Key == "model").Value;
-                }
-                else if (auction.Tag?.EndsWith("RUNE") ?? false)
+                FixItemTag(auction);
+                if (auction.Tag?.EndsWith("RUNE") ?? false)
                 {
                     var rune = ExtraAttributes.runes.value as JObject;
                     var type = rune?.Properties().FirstOrDefault()?.Name;
@@ -191,6 +180,22 @@ public class InventoryParser
                 dev.Logger.Instance.Error(e, "Error while parsing inventory");
             }
             yield return auction;
+        }
+    }
+
+    private static void FixItemTag(SaveAuction auction)
+    {
+        if (auction.Tag == "PET")
+        {
+            auction.Tag += "_" + auction.FlatenedNBT.FirstOrDefault(e => e.Key == "type").Value;
+        }
+        else if (auction.Tag == "POTION")
+        {
+            auction.Tag += "_" + auction.FlatenedNBT.FirstOrDefault(e => e.Key == "potion").Value;
+        }
+        else if (auction.Tag == "ABICASE")
+        {
+            auction.Tag += "_" + auction.FlatenedNBT.FirstOrDefault(e => e.Key == "model").Value;
         }
     }
 
@@ -328,6 +333,13 @@ public class InventoryParser
             };
             NBT.GetAndAssignTier(auction, item["tag"]["display"]["Lore"]?.LastOrDefault()?.ToString());
             auction.SetFlattenedNbt(flatNbt);
+            FixItemTag(auction);
+            if (auction.Tag?.EndsWith("RUNE") ?? false)
+            {
+                var rune = extraAttributes["runes"] as JObject;
+                var type = rune?.Properties().FirstOrDefault()?.Name;
+                auction.Tag += $"_{type}";
+            }
 
             yield return auction;
         }
