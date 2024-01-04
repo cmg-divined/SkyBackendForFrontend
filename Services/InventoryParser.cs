@@ -163,11 +163,25 @@ public class InventoryParser
             SaveAuction auction = null;
             try
             {
-                NewMethod(item, ExtraAttributes, out attributesWithoutEnchantments, out auction);
+                CreateAuction(item, ExtraAttributes, out attributesWithoutEnchantments, out auction);
                 auction?.SetFlattenedNbt(NBT.FlattenNbtData(attributesWithoutEnchantments).GroupBy(e => e.Key).Select(e => e.First()).ToList());
                 if (auction.Tag == "PET")
                 {
                     auction.Tag += "_" + auction.FlatenedNBT.FirstOrDefault(e => e.Key == "type").Value;
+                }
+                else if (auction.Tag == "POTION")
+                {
+                    auction.Tag += "_" + auction.FlatenedNBT.FirstOrDefault(e => e.Key == "potion").Value;
+                }
+                else if (auction.Tag == "ABICASE")
+                {
+                    auction.Tag += "_" + auction.FlatenedNBT.FirstOrDefault(e => e.Key == "model").Value;
+                }
+                else if (auction.Tag?.EndsWith("RUNE") ?? false)
+                {
+                    var rune = ExtraAttributes.runes.value as JObject;
+                    var type = rune?.Properties().FirstOrDefault()?.Name;
+                    auction.Tag += $"_{type}";
                 }
             }
             catch (System.Exception e)
@@ -180,7 +194,7 @@ public class InventoryParser
         }
     }
 
-    private void NewMethod(dynamic item, dynamic ExtraAttributes, out Dictionary<string, object> attributesWithoutEnchantments, out SaveAuction auction)
+    private void CreateAuction(dynamic item, dynamic ExtraAttributes, out Dictionary<string, object> attributesWithoutEnchantments, out SaveAuction auction)
     {
         attributesWithoutEnchantments = new Dictionary<string, object>();
         Denest(ExtraAttributes, attributesWithoutEnchantments);
@@ -191,7 +205,7 @@ public class InventoryParser
                 enchantments.Add(enchantment.Name, (int)enchantment.Value.value);
             }
         string name = item.nbt.value?.display?.value?.Name?.value ?? item.displayName;
-        if (name.StartsWith("{"))
+        if (name?.StartsWith("{") ?? false)
         {
             var lines = JsonConvert.DeserializeObject<TextLine>(name);
             name = lines.To1_08();
@@ -209,12 +223,15 @@ public class InventoryParser
         {
             description = description.Select(e => JsonConvert.DeserializeObject<TextLine>(e).To1_08()).ToArray();
         }
-        if (!NBT.GetAndAssignTier(auction, description.LastOrDefault()?.ToString()))
-            // retry auction tier position
-            NBT.GetAndAssignTier(auction, description.Reverse().Skip(7).FirstOrDefault()?.ToString());
-        if (auction.Context == null)
-            auction.Context = new();
-        auction.Context.Add("lore", string.Join("\n", description));
+        if (description != null)
+        {
+            if (!NBT.GetAndAssignTier(auction, description?.LastOrDefault()?.ToString()))
+                // retry auction tier position
+                NBT.GetAndAssignTier(auction, description?.Reverse().Skip(7).FirstOrDefault()?.ToString());
+            if (auction.Context == null)
+                auction.Context = new();
+            auction.Context.Add("lore", string.Join("\n", description));
+        }
         if (attributesWithoutEnchantments.ContainsKey("modifier"))
         {
             auction.Reforge = Enum.Parse<ItemReferences.Reforge>(attributesWithoutEnchantments["modifier"].ToString(), true);
@@ -224,7 +241,7 @@ public class InventoryParser
         {
             // override format with comma, the default chooses spaces but for some reason this didn't go through to db
             // haven't found where it is so this is an uggly workaround
-            attributesWithoutEnchantments["unlocked_slots"] = string.Join(",", unlockedList.OrderBy(a=>a).Select(e => e.ToString()));
+            attributesWithoutEnchantments["unlocked_slots"] = string.Join(",", unlockedList.OrderBy(a => a).Select(e => e.ToString()));
         }
         if (attributesWithoutEnchantments.ContainsKey("timestamp"))
         {

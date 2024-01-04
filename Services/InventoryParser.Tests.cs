@@ -421,6 +421,81 @@ public class InventoryParserTests
         Assert.AreEqual(Tier.SPECIAL, item.Tier);
     }
 
+    /// <summary>
+    /// Some hypixel item tags are split up in multiple virtual items
+    /// The parsing needs to reflect that
+    /// </summary>
+    [Test]
+    public void SpecialItemIdParsing()
+    {
+        var parser = new InventoryParser();
+        var data = parser.Parse("""
+        {
+        "title": "Inventory",
+        "slots": [
+            {
+            "count": 1,
+            "metadata": 0,
+            "nbt": {
+                "type": "compound",
+                "name": "",
+                "value": {
+                    "ExtraAttributes": {
+                        "type": "compound",
+                        "value": {
+                            "potion_level": {
+                                "type": "int",
+                                "value": 5
+                            },
+                            "potion": {
+                                "type": "string",
+                                "value": "harvest_harbinger"
+                            },
+                            "potion_type": {
+                                "type": "string",
+                                "value": "POTION"
+                            },
+                            "id": {
+                                "type": "string",
+                                "value": "POTION"
+                            }
+                        }
+                    }
+                }
+            }},
+            {
+            "count": 1,
+            "metadata": 0,
+            "nbt": {
+                "type": "compound",
+                "name": "",
+                "value": {
+                    "ExtraAttributes": {
+                        "type": "compound",
+                        "value": {
+                            "runes": {
+                                "type": "compound",
+                                "value": {
+                                    "ICE_SKATES": {
+                                        "type": "int",
+                                        "value": 3
+                                    }
+                                }
+                            },
+                            "id": {
+                                "type": "string",
+                                "value": "UNIQUE_RUNE"
+                            }
+                        }
+                    }
+                }
+            }}
+        ]}
+        """);
+        Assert.That(data.First().Tag, Is.EqualTo("POTION_harvest_harbinger"));
+        Assert.That(data.Last().Tag, Is.EqualTo("UNIQUE_RUNE_ICE_SKATES"));
+    }
+
     [Test]
     public void Parse117Strings()
     {
