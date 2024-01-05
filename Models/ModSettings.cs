@@ -97,5 +97,8 @@ namespace Coflnet.Sky.Commands.Shared
         [SettingsDoc("Ah list time target in hours", false, "listHours")]
         [DataMember(Name = "ahListHours")]
         public int AhListTimeTarget;
+        [SettingsDoc("Sell items as fast as possible", false, "quicksell")]
+        [DataMember(Name = "quickSell")]
+        public bool QuickSell;
     }
 }
