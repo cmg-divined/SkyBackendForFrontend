@@ -100,8 +100,8 @@ namespace Coflnet.Sky.Commands.Shared
         [SettingsDoc("Sell items as fast as possible", false, "quicksell")]
         [DataMember(Name = "quickSell")]
         public bool QuickSell;
-        [SettingsDoc("The maximum amount of flips to buy and store in inventory", "maxFlipInInventory")]
-        [DataMember(Name = "maxFlipInInventory")]
+        [SettingsDoc("The maximum amount of flips to buy and store in inventory", "maxItemsInInventory")]
+        [DataMember(Name = "maxItemsInInventory")]
         public int MaxFlipItemsInInventory;
     }
 }
