@@ -54,4 +54,18 @@ public class SniperClient : ISniperClient
     {
         return await sniperApi.ApiSniperPricesCleanGetAsync();
     }
+
+    public static double InstaSellPrice(Sniper.Client.Model.PriceEstimate pricing)
+    {
+        var deduct = 0.12;
+        if (pricing.Median < 15_000_000)
+            deduct = 0.18;
+        if (pricing.Median > 150_000_000)
+            deduct = 0.10;
+        var fromMed = pricing.Median * (1 - deduct);
+        var target = Math.Max(fromMed, Math.Min(pricing.Lbin.Price * (1 - deduct - 0.08), fromMed * 1.2));
+        if (pricing.ItemKey != pricing.LbinKey)
+            target = fromMed;
+        return target;
+    }
 }
