@@ -268,6 +268,12 @@ public class InventoryParser
         // format for 2/18/23 4:27 AM
         var format = "M/d/yy h:mm tt";
         var stringDate = attributesWithoutEnchantments["timestamp"].ToString();
+        if(long.TryParse(stringDate, out var milliseconds))
+        {
+            auction.ItemCreatedAt = DateTimeOffset.FromUnixTimeMilliseconds(milliseconds).DateTime;
+            attributesWithoutEnchantments.Remove("timestamp");
+            return;
+        }
         var parsedDate = DateTime.ParseExact(stringDate, format, System.Globalization.CultureInfo.InvariantCulture);
         auction.ItemCreatedAt = parsedDate;
         attributesWithoutEnchantments.Remove("timestamp");

@@ -369,8 +369,11 @@ public class InventoryParserTests
             "value": "28fdb3cb-1029-48cf-9591-3e7d8d67ba9a"
           },
           "timestamp": {
-            "type": "string",
-            "value": "8/2/23 2:31 PM"
+            "type": "long",
+            "value": [
+                391,
+                733787264
+            ]
           }
         }
       }
@@ -392,6 +395,7 @@ public class InventoryParserTests
         var serialized = MessagePackSerializer.Serialize(parser.Parse(petSample));
         var item = MessagePackSerializer.Deserialize<List<SaveAuction>>(serialized).First();
         Assert.AreEqual(Tier.LEGENDARY, item.Tier);
+        Assert.AreEqual(new DateTime(2023, 3, 29), item.ItemCreatedAt.Date);
     }
 
 
