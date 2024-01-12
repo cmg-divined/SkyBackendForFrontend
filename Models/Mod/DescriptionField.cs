@@ -1,5 +1,6 @@
 using System;
 using System.Runtime.Serialization;
+using Coflnet.Sky.Commands.MC;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
 
@@ -112,7 +113,12 @@ public enum DescriptionField
     FullCraftCost,
     [FieldDescription("Modifiers included in cost", "lets you see what was summed up in the cost")]
     ModifierCostList,
-    [FieldDescription("List of flip finders, which", "deemed the last purchase a flip.", "Includes their estimated value")]
+    [FieldDescription(
+        "List of flip finders, which", 
+        "deemed the last purchase a flip.", 
+        "Includes their estimated value", 
+        "§cThis can noticably down description",
+        "§cloading because of how its stored")]
     FinderEstimates,
     // anything over 9000 gets hidden
     BAZAAR_COST = 9001
