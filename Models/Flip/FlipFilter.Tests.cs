@@ -250,7 +250,7 @@ namespace Coflnet.Sky.Commands.Shared
                 {
                     Reforge = ItemReferences.Reforge.Renowned,
                     Tier = Tier.MYTHIC,
-                    NBTLookup = new NBTLookup[]{ new(1, 5) }
+                    FlatenedNBT = new Dictionary<string, string>() { { "upgrade_level", "5" } }
                 }
             });
             Assert.IsTrue(result);

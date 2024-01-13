@@ -18,6 +18,8 @@ public class FilterStateService
         public string NextMayor { get; set; }
         public string PreviousMayor { get; set; }
         public DateTime LastUpdate { get; set; }
+        public Dictionary<int, HashSet<string>> IntroductionAge { get; set; } = new();
+        public HashSet<string> ExistingTags { get; set; } = new();
     }
 
     public FilterState State { get; set; } = new FilterState();
@@ -59,5 +61,14 @@ public class FilterStateService
         {
             State.itemCategories[category].Add(item);
         }
+    }
+
+    public HashSet<string> GetIntroductionAge(int days)
+    {
+        if (!State.IntroductionAge.ContainsKey(days))
+        {
+            State.IntroductionAge[days] = new HashSet<string>(itemsApi.ItemsRecentGet(days));
+        }
+        return State.IntroductionAge[days];
     }
 }
