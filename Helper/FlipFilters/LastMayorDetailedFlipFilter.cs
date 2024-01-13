@@ -1,9 +1,11 @@
+using System;
+
 namespace Coflnet.Sky.Commands.Shared;
 
 public class LastMayorDetailedFlipFilter : CurrentMayorDetailedFlipFilter
 {
-    protected override string TargetMayor()
+    protected override Func<string> TargetMayor(FilterStateService service)
     {
-        return DiHandler.GetService<Sky.Mayor.Client.Api.IMayorApi>().MayorLastGet();
+        return ()=> service.State.PreviousMayor;
     }
 }

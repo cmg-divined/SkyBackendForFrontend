@@ -14,8 +14,9 @@ public class CurrentMayorDetailedFlipFilter : DetailedFlipFilter
     public object[] Options => new object[] {
             "Aatrox", "Cole", "Diana", "Diaz", "Foxy", "Finnegan", "Marina", "Paul", "Derpy", "Jerry", "Scorpius", "Dante", "Barry"
             };
-    
-    private (string val, DateTime lastUpdate) lastUpdate;
+
+
+    protected (Func<string> val, DateTime lastUpdate) lastUpdate;
 
     public Expression<Func<FlipInstance, bool>> GetExpression(Dictionary<string, string> filters, string val)
     {
@@ -23,16 +24,18 @@ public class CurrentMayorDetailedFlipFilter : DetailedFlipFilter
         val = Options.FirstOrDefault(t => t.ToString().ToLower() == val.ToLower())?.ToString();
         if (val == null)
             throw new CoflnetException("invalid_mayor", "The specified mayor does not exist");
-        string current = CurrentMayor();
-        return (f) => val == current;
+        var current = GetCurrentMayor();
+        return (f) => val == current();
     }
 
-    public string CurrentMayor()
+    public Func<string> GetCurrentMayor()
     {
         if (DateTime.Now - lastUpdate.lastUpdate > TimeSpan.FromMinutes(2))
         {
+            var service = DiHandler.GetService<FilterStateService>();
+            service.UpdateState().Wait();
             // update as too old
-            lastUpdate = (TargetMayor(), DateTime.Now);
+            lastUpdate = (TargetMayor(service), DateTime.Now);
         }
         var current = lastUpdate.val;
         if (current == null)
@@ -40,10 +43,9 @@ public class CurrentMayorDetailedFlipFilter : DetailedFlipFilter
         return current;
     }
 
-    protected virtual string TargetMayor()
+    protected virtual Func<string> TargetMayor(FilterStateService service)
     {
-        var response = DiHandler.GetService<Sky.Mayor.Client.Api.IMayorApi>().MayorCurrentGetWithHttpInfo();
-        return JsonConvert.DeserializeObject<ModelCandidate>(response.Data.ToString()).Name;
+        return ()=> service.State.CurrentMayor;
     }
 
     public Filter.FilterType FilterType => Filter.FilterType.Equal;

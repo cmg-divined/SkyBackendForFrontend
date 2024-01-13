@@ -179,6 +179,7 @@ namespace Coflnet.Sky.Commands.Shared
             services.AddHostedService<ServicePorter>();
             services.AddHostedService<FilterLoader>();
             services.AddTransient<HypixelContext>(s => new HypixelContext());
+            services.AddSingleton<FilterStateService>();
 
             _servics = services;
         }

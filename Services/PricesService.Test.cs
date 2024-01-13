@@ -36,5 +36,4 @@ namespace Coflnet.Sky.Commands.Shared.Test
             Assert.AreEqual(12, totalCost);
         }
     }
-
 }
