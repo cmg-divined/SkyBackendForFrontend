@@ -88,6 +88,8 @@ namespace Coflnet.Sky.Commands.Shared
         [DataMember(Name = "lastChange")]
         [SettingsDoc("", true)]
         public string LastChanged { get; set; }
+        [IgnoreDataMember]
+        public bool IsCompiled => BlackListMatcher != null && filterCompileLock.CurrentCount != 0;
 
 
         private SemaphoreSlim filterCompileLock = new SemaphoreSlim(1, 1);
