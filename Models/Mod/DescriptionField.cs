@@ -117,7 +117,7 @@ public enum DescriptionField
         "List of flip finders, which", 
         "deemed the last purchase a flip.", 
         "Includes their estimated value", 
-        "§cThis can noticably down description",
+        "§cThis can noticably slow description",
         "§cloading because of how its stored")]
     FinderEstimates,
     // anything over 9000 gets hidden
