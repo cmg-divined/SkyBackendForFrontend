@@ -1,8 +1,10 @@
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
+using Coflnet.Sky.Core;
 using Coflnet.Sky.Items.Client.Model;
 using Coflnet.Sky.Mayor.Client.Model;
 using Newtonsoft.Json;
@@ -67,7 +69,15 @@ public class FilterStateService
     {
         if (!State.IntroductionAge.ContainsKey(days))
         {
-            State.IntroductionAge[days] = new HashSet<string>(itemsApi.ItemsRecentGet(days));
+            var items = itemsApi.ItemsRecentGet(days);
+            if (items == null && days == 1)
+                return new HashSet<string>(); // handled via known tags
+            if (items == null)
+            {
+                Activity.Current?.AddTag("error", "could_not_load");
+                throw new CoflnetException("could_not_load", $"Could not load new items from {days} days");
+            }
+            State.IntroductionAge[days] = new HashSet<string>(items);
         }
         return State.IntroductionAge[days];
     }
