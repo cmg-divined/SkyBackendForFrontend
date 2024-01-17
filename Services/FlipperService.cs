@@ -347,9 +347,6 @@ namespace Coflnet.Sky.Commands.Shared
             using var activity = tracer.StartActivity("DeliverLP").SetTag("uuid", flip.Auction.Uuid);
             var time = (DateTime.UtcNow - flip.Auction.FindTime).TotalSeconds;
 
-            if (flip.Auction != null && flip.Auction.NBTLookup == null)
-                flip.Auction.NBTLookup = NBT.CreateLookup(flip.Auction);
-
             if (flip.Auction.Context != null)
                 flip.Auction.Context["csh"] = (DateTime.UtcNow - flip.Auction.FindTime).ToString();
             if (flip.Auction.Context?.TryGetValue("pre-api", out var preApi) ?? true)
@@ -404,8 +401,6 @@ namespace Coflnet.Sky.Commands.Shared
 
         private static async Task NotifyAll(FlipInstance flip, ConcurrentDictionary<long, FlipConWrapper> subscribers)
         {
-            if (flip.Auction != null && flip.Auction.NBTLookup == null)
-                flip.Auction.NBTLookup = NBT.CreateLookup(flip.Auction);
             foreach (var item in subscribers.Keys)
             {
                 try
