@@ -48,7 +48,7 @@ public class FilterStateService
             return;
         var response = await mayorApi.MayorCurrentGetWithHttpInfoAsync();
         State.CurrentMayor = JsonConvert.DeserializeObject<ModelCandidate>(response.Data.ToString()).Name;
-        State.NextMayor = mayorApi.MayorNextGet().Name;
+        State.NextMayor = mayorApi.MayorNextGet()?.Name;
         State.PreviousMayor = mayorApi.MayorLastGet();
         foreach (var item in State.itemCategories.Keys)
         {
