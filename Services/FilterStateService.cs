@@ -50,12 +50,12 @@ public class FilterStateService
         }
         else
             return;
+        var response = await mayorApi.MayorCurrentGetWithHttpInfoAsync();
+        State.CurrentMayor = JsonConvert.DeserializeObject<ModelCandidate>(response.Data.ToString()).Name;
+        State.PreviousMayor = mayorApi.MayorLastGet();
         try
         {
-            var response = await mayorApi.MayorCurrentGetWithHttpInfoAsync();
-            State.CurrentMayor = JsonConvert.DeserializeObject<ModelCandidate>(response.Data.ToString()).Name;
             State.NextMayor = (await mayorApi.MayorNextGetAsync())?.Name;
-            State.PreviousMayor = mayorApi.MayorLastGet();
         }
         catch (Exception e)
         {
@@ -63,12 +63,21 @@ public class FilterStateService
         }
         foreach (var item in State.itemCategories.Keys)
         {
-            GetItemCategory(item);
+            try
+            {
+                GetItemCategory(item);
+            }
+            catch (Exception e)
+            {
+                logger.LogError(e, "Could not load item category {0}", item);
+            }
         }
-        foreach (var item in ItemDetails.Instance.TagLookup.Keys)
+        var items = await itemsApi.ItemNamesGetAsync();
+        foreach (var item in items.Select(i => i.Tag))
         {
             State.ExistingTags.Add(item);
         }
+        logger.LogInformation("Loaded {0} item tags", State.ExistingTags.Count);
     }
 
     public void GetItemCategory(ItemCategory category)
