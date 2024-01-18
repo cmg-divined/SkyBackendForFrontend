@@ -1,6 +1,8 @@
 using System.Collections.Generic;
+using Castle.Core.Logging;
 using Coflnet.Sky.Core;
 using Coflnet.Sky.Items.Client.Api;
+using Microsoft.Extensions.Logging.Abstractions;
 using Moq;
 using NUnit.Framework;
 
@@ -14,7 +16,7 @@ public class IntroductionAgeDaysTests
         var mock = new Mock<IItemsApi>();
         DiHandler.OverrideService<IItemsApi, IItemsApi>(mock.Object);
         DiHandler.OverrideService<Mayor.Client.Api.IMayorApi, Mayor.Client.Api.IMayorApi>(new Mock<Mayor.Client.Api.IMayorApi>().Object);
-        DiHandler.OverrideService<FilterStateService, FilterStateService>(new FilterStateService());
+        DiHandler.OverrideService<FilterStateService, FilterStateService>(new FilterStateService(NullLogger<FilterStateService>.Instance));
         mock.Setup(x => x.ItemsRecentGet(1, 0)).Returns(new List<string>() { "different" });
         ItemDetails.Instance.TagLookup = new System.Collections.Concurrent.ConcurrentDictionary<string, int>(
             new Dictionary<string, int>() {

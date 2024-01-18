@@ -8,6 +8,8 @@ using System.Threading.Tasks;
 using Coflnet.Sky.Core;
 using Coflnet.Sky.Items.Client.Model;
 using Coflnet.Sky.Mayor.Client.Model;
+using dev;
+using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 
 namespace Coflnet.Sky.Commands.Shared;
@@ -31,11 +33,13 @@ public class FilterStateService
 
     private Mayor.Client.Api.IMayorApi mayorApi;
     private Items.Client.Api.IItemsApi itemsApi;
+    private ILogger<FilterStateService> logger;
 
-    public FilterStateService()
+    public FilterStateService(ILogger<FilterStateService> logger)
     {
         mayorApi = DiHandler.GetService<Mayor.Client.Api.IMayorApi>();
         itemsApi = DiHandler.GetService<Items.Client.Api.IItemsApi>();
+        this.logger = logger;
     }
 
     public async Task UpdateState()
@@ -46,10 +50,17 @@ public class FilterStateService
         }
         else
             return;
-        var response = await mayorApi.MayorCurrentGetWithHttpInfoAsync();
-        State.CurrentMayor = JsonConvert.DeserializeObject<ModelCandidate>(response.Data.ToString()).Name;
-        State.NextMayor = mayorApi.MayorNextGet()?.Name;
-        State.PreviousMayor = mayorApi.MayorLastGet();
+        try
+        {
+            var response = await mayorApi.MayorCurrentGetWithHttpInfoAsync();
+            State.CurrentMayor = JsonConvert.DeserializeObject<ModelCandidate>(response.Data.ToString()).Name;
+            State.NextMayor = (await mayorApi.MayorNextGetAsync())?.Name;
+            State.PreviousMayor = mayorApi.MayorLastGet();
+        }
+        catch (Exception e)
+        {
+            logger.LogError(e, "Could not load mayor");
+        }
         foreach (var item in State.itemCategories.Keys)
         {
             GetItemCategory(item);
