@@ -54,6 +54,10 @@ public class FilterStateService
         {
             GetItemCategory(item);
         }
+        foreach (var item in ItemDetails.Instance.TagLookup.Keys)
+        {
+            State.ExistingTags.Add(item);
+        }
     }
 
     public void GetItemCategory(ItemCategory category)
