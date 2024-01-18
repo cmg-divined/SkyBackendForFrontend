@@ -204,6 +204,11 @@ namespace Coflnet.Sky.Commands.Shared
             _serviceProvider = null;
         }
 
+        public static void ResetProvider()
+        {
+            _serviceProvider = null;
+        }
+
         public static void AddPaymentSingleton<T>(this IServiceCollection services, Func<string, T> creator) where T : class, IApiAccessor
         {
             services.AddSingleton<T>(context =>
