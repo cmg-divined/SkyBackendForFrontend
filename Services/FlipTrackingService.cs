@@ -93,38 +93,38 @@ namespace Coflnet.Sky.Commands
         {
             try
             {
-                await SendEvent(auctionId, playerId, FlipTracker.Client.Model.FlipEventType.FLIPRECEIVE, when);
+                await SendEvent(auctionId, playerId, FlipEventType.FLIPRECEIVE, when);
             }
             catch (Exception e)
             {
-                System.Console.WriteLine(e.Message);
-                System.Console.WriteLine(e.StackTrace);
-                throw e;
+                Console.WriteLine(e.Message);
+                Console.WriteLine(e.StackTrace);
+                throw;
             }
         }
         public async Task ClickFlip(string auctionId, string playerId)
         {
-            await SendEvent(auctionId, playerId, FlipTracker.Client.Model.FlipEventType.FLIPCLICK);
+            await SendEvent(auctionId, playerId, FlipEventType.FLIPCLICK);
         }
         public async Task PurchaseStart(string auctionId, string playerId)
         {
-            await SendEvent(auctionId, playerId, FlipTracker.Client.Model.FlipEventType.PURCHASESTART);
+            await SendEvent(auctionId, playerId, FlipEventType.PURCHASESTART);
         }
         public async Task PurchaseConfirm(string auctionId, string playerId)
         {
-            await SendEvent(auctionId, playerId, FlipTracker.Client.Model.FlipEventType.PURCHASECONFIRM);
+            await SendEvent(auctionId, playerId, FlipEventType.PURCHASECONFIRM);
         }
         public async Task Sold(string auctionId, string playerId)
         {
-            await SendEvent(auctionId, playerId, FlipTracker.Client.Model.FlipEventType.AUCTIONSOLD);
+            await SendEvent(auctionId, playerId, FlipEventType.AUCTIONSOLD);
         }
         public async Task UpVote(string auctionId, string playerId)
         {
-            await SendEvent(auctionId, playerId, FlipTracker.Client.Model.FlipEventType.UPVOTE);
+            await SendEvent(auctionId, playerId, FlipEventType.UPVOTE);
         }
         public async Task DownVote(string auctionId, string playerId)
         {
-            await SendEvent(auctionId, playerId, FlipTracker.Client.Model.FlipEventType.DOWNVOTE);
+            await SendEvent(auctionId, playerId, FlipEventType.DOWNVOTE);
         }
 
         private Task SendEvent(string auctionId, string playerId, FlipEventType type, DateTime when = default)
@@ -134,7 +134,7 @@ namespace Coflnet.Sky.Commands
                 Type = type,
                 PlayerId = AuctionService.Instance.GetId(playerId),
                 AuctionId = AuctionService.Instance.GetId(auctionId),
-                Timestamp = when == default ? System.DateTime.UtcNow : when
+                Timestamp = when == default ? DateTime.UtcNow : when
             };
 
             producer.Produce(ProduceTopic, new Message<string, FlipEvent>() { Value = flipEvent, Key = flipEvent.AuctionId.ToString() });
@@ -160,13 +160,13 @@ namespace Coflnet.Sky.Commands
         public async Task<(TimeSpan, int)> GetRecommendedPenalty(IEnumerable<string> playerIds)
         {
             var breakdown = await GetSpeedComp(playerIds);
-            var hourCount = breakdown?.Times?.Where(t => t.TotalSeconds > 1).GroupBy(t => System.TimeSpan.Parse(t.Age).Hours).Count() ?? 0;
-            return (System.TimeSpan.FromSeconds(breakdown?.Penalty ?? 0), hourCount);
+            var hourCount = breakdown?.Times?.Where(t => t.TotalSeconds > 1).GroupBy(t => TimeSpan.Parse(t.Age).Hours).Count() ?? 0;
+            return (TimeSpan.FromSeconds(breakdown?.Penalty ?? 0), hourCount);
         }
 
         public async Task<TierSumary> GetPreApiProfit()
         {
-            var ownedAt = await productApi.ProductsServiceServiceSlugOwnedGetAsync("pre_api", DateTime.UtcNow - System.TimeSpan.FromDays(1), DateTime.UtcNow);
+            var ownedAt = await productApi.ProductsServiceServiceSlugOwnedGetAsync("pre_api", DateTime.UtcNow - TimeSpan.FromDays(1), DateTime.UtcNow);
             var minecraftConnnectionResponse = await connectApi.ConnectUsersIdsGetAsync(ownedAt.Select(o => o.UserId).Distinct().ToList());
             var includeMap = new ConcurrentDictionary<Guid, List<(DateTime start, DateTime end)>>();
             foreach (var user in minecraftConnnectionResponse)
@@ -283,7 +283,7 @@ namespace Coflnet.Sky.Commands
                 end = start;
                 start = tmp;
             }
-            if (start < end - System.TimeSpan.FromDays(1))
+            if (start < end - TimeSpan.FromDays(1))
                 throw new CoflnetException("span_to_large", "Querying for more than a day is not supported");
 
             var idTask = flipAnalyse.AnalyseFinderFinderTypeGetAsync(Enum.Parse<FinderType>(type.ToString(), true), start, end).ConfigureAwait(false);
@@ -418,7 +418,7 @@ namespace Coflnet.Sky.Commands
                 }).ToList();
             var SalesUidLookup = sells.Select(a => a.Key).ToHashSet();
             var sales = await context.NBTLookups.Where(b => b.KeyId == uidKey && SalesUidLookup.Contains(b.Value)).AsNoTracking().Select(n => n.AuctionId).ToListAsync();
-            var playerBids = await context.Bids.Where(b => playerIds.Contains(b.BidderId) && sales.Contains(b.Auction.Id) && b.Timestamp > endTime.Subtract(System.TimeSpan.FromDays(14)))
+            var playerBids = await context.Bids.Where(b => playerIds.Contains(b.BidderId) && sales.Contains(b.Auction.Id) && b.Timestamp > endTime.Subtract(TimeSpan.FromDays(14)))
                 .AsNoTracking()
                 // filtering
                 .OrderByDescending(bid => bid.Id)
