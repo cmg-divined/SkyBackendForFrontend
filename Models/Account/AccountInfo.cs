@@ -35,5 +35,7 @@ namespace Coflnet.Sky.Commands.Shared
         public string Region { get; set; }
         [DataMember(Name = "captchaType")]
         public string CaptchaType { get; set; }
+        [DataMember(Name = "badActionCount")]
+        public int BadActionCount { get; set; }
     }
 }
