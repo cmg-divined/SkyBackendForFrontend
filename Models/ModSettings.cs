@@ -73,9 +73,9 @@ namespace Coflnet.Sky.Commands.Shared
         [SettingsDoc("How many minutes to have pass before showing the x amounts of flips blocked message again, max is 127", false, "minBetweenBlocked")]
         public sbyte MinutesBetweenBlocked;
 
-        [DataMember(Name = "noAdjustToPurse")]
-        [SettingsDoc("Stop your max cost from being auto-adjusted to your purse", "ap")]
-        public bool NoAdjustToPurse;
+        [DataMember(Name = "maxPercentOfPurse")]
+        [SettingsDoc("The maximum amount of your purse you are willing to spend on a single flip", "mp")]
+        public bool MaxPercentOfPurse;
         [DataMember(Name = "noBedDelay")]
         [SettingsDoc("Don't delay bed flips, send them imediately instead", "nbd")]
         public bool NoBedDelay;
