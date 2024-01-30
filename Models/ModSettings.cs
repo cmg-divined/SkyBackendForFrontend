@@ -75,7 +75,7 @@ namespace Coflnet.Sky.Commands.Shared
 
         [DataMember(Name = "maxPercentOfPurse")]
         [SettingsDoc("The maximum amount of your purse you are willing to spend on a single flip", "mp")]
-        public bool MaxPercentOfPurse;
+        public short MaxPercentOfPurse;
         [DataMember(Name = "noBedDelay")]
         [SettingsDoc("Don't delay bed flips, send them imediately instead", "nbd")]
         public bool NoBedDelay;
