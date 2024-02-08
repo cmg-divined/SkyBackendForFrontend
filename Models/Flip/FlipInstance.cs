@@ -55,7 +55,7 @@ namespace Coflnet.Sky.Commands.Shared
             var reduction = 2f;
             if (targetPrice > 10_000_000)
                 reduction = 3;
-            if (targetPrice > 100_000_000)
+            if (targetPrice >= 100_000_000)
                 reduction = 3.5f;
             return (long)(targetPrice * (100 - reduction) / 100 - cost);
         }
