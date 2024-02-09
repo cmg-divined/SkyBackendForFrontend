@@ -498,6 +498,8 @@ public class InventoryParserTests
         """);
         Assert.That(data.First().Tag, Is.EqualTo("POTION_harvest_harbinger"));
         Assert.That(data.Last().Tag, Is.EqualTo("UNIQUE_RUNE_ICE_SKATES"));
+        Console.WriteLine(JsonConvert.SerializeObject(data.Last().FlatenedNBT, Formatting.Indented));
+        Assert.That(data.Last().FlatenedNBT["RUNE_ICE_SKATES"], Is.EqualTo("3"));
     }
 
     [Test]

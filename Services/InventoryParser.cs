@@ -170,7 +170,7 @@ public class InventoryParser
                 {
                     var rune = ExtraAttributes.runes.value as JObject;
                     var type = rune?.Properties().FirstOrDefault()?.Name;
-                    auction.Tag += $"_{type}";
+                    UpdateRune(auction, type);
                 }
             }
             catch (System.Exception e)
@@ -268,7 +268,7 @@ public class InventoryParser
         // format for 2/18/23 4:27 AM
         var format = "M/d/yy h:mm tt";
         var stringDate = attributesWithoutEnchantments["timestamp"].ToString();
-        if(long.TryParse(stringDate, out var milliseconds))
+        if (long.TryParse(stringDate, out var milliseconds))
         {
             auction.ItemCreatedAt = DateTimeOffset.FromUnixTimeMilliseconds(milliseconds).DateTime;
             attributesWithoutEnchantments.Remove("timestamp");
@@ -344,13 +344,21 @@ public class InventoryParser
             {
                 var rune = extraAttributes["runes"] as JObject;
                 var type = rune?.Properties().FirstOrDefault()?.Name;
-                auction.Tag += $"_{type}";
+                UpdateRune(auction, type);
             }
 
             yield return auction;
         }
     }
 
+    private static void UpdateRune(SaveAuction auction, string type)
+    {
+        auction.Tag += $"_{type}";
+        // replace the element in nbt
+        var value = auction.FlatenedNBT[type];
+        auction.FlatenedNBT.Remove(type);
+        auction.FlatenedNBT.Add("RUNE_" + type, value);
+    }
 
     private static void Denest(dynamic ExtraAttributes, Dictionary<string, object> attributesWithoutEnchantments)
     {
