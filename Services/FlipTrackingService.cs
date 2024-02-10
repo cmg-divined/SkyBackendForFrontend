@@ -143,9 +143,9 @@ namespace Coflnet.Sky.Commands
 
         public async Task NewFlip(LowPricedAuction flip, DateTime foundAt = default)
         {
-            var res = await flipTracking.TrackerFlipAuctionIdPostAsync(flip.Auction.Uuid, new Flip()
+            await flipTracking.TrackerFlipAuctionIdPostAsync(flip.Auction.Uuid, new Flip()
             {
-                FinderType = (FinderType?)flip.Finder,
+                FinderType = Enum.TryParse<FinderType>(flip.Finder.ToString(), true, out var finder) ? finder : FinderType.UNKOWN,
                 TargetPrice = (int)flip.TargetPrice,
                 Timestamp = foundAt,
                 AuctionId = flip.UId
