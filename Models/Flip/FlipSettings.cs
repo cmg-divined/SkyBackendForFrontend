@@ -16,18 +16,18 @@ namespace Coflnet.Sky.Commands.Shared
     public class FlipFilters
     {
         [DataMember(Name = "minProfit")]
-        [SettingsDoc("Minimum profit of flips")]
+        [SettingsDoc("Minimum profit of flips", "mp")]
         public long MinProfit;
 
         [DataMember(Name = "minProfitPercent")]
-        [SettingsDoc("Minimum profit Percentage")]
+        [SettingsDoc("Minimum profit Percentage", "mpp")]
         public int MinProfitPercent;
 
-        [SettingsDoc("The minimum sales per 24 hours (has decimals)")]
+        [SettingsDoc("The minimum sales per 24 hours (has decimals)", "mv")]
         [DataMember(Name = "minVolume")]
         public double MinVolume = 2;
 
-        [SettingsDoc("Maximium cost of flips")]
+        [SettingsDoc("Maximium cost of flips", "mc")]
         [DataMember(Name = "maxCost")]
         public long MaxCost;
     }
