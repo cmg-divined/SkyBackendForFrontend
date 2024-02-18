@@ -4,6 +4,7 @@ using System.Diagnostics;
 using Coflnet.Sky.Commands.Tests;
 using System.Threading.Tasks;
 using Coflnet.Sky.Filter;
+using System.Linq;
 
 namespace Coflnet.Sky.Commands.Shared
 {
@@ -285,6 +286,13 @@ namespace Coflnet.Sky.Commands.Shared
             Assert.IsTrue(settings.IsFinderBlocked(LowPricedAuction.FinderType.SNIPER_MEDIAN));
             Assert.IsFalse(settings.IsFinderBlocked(LowPricedAuction.FinderType.SNIPER));
             Assert.IsFalse(settings.IsFinderBlocked(LowPricedAuction.FinderType.FLIPPER));
+        }
+
+        [Test]
+        public void NoDupplicateShortHand()
+        {
+            var updater = new SettingsUpdater();
+            var options = updater.Options();
         }
     }
 
