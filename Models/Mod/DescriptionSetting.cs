@@ -20,6 +20,8 @@ public class DescriptionSetting
     /// </summary>
     [SettingsDoc("Highlight items in ah and trade windows when matching black or whitelist filter")]
     public bool HighlightFilterMatch;
+    [SettingsDoc("What is the minimum profit for highlighting best flip on page")]
+    public long MinProfitForHighlight;
 
     public static DescriptionSetting Default => new DescriptionSetting()
     {
