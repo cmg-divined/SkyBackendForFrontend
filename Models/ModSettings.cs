@@ -74,7 +74,7 @@ namespace Coflnet.Sky.Commands.Shared
         public sbyte MinutesBetweenBlocked;
 
         [DataMember(Name = "maxPercentOfPurse")]
-        [SettingsDoc("The maximum amount of your purse you are willing to spend on a single flip", "mp")]
+        [SettingsDoc("The maximum amount of your purse you are willing to spend on a single flip")]
         public short MaxPercentOfPurse;
         [DataMember(Name = "noBedDelay")]
         [SettingsDoc("Don't delay bed flips, send them imediately instead", "nbd")]
