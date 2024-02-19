@@ -18,6 +18,7 @@ namespace Coflnet.Sky.Commands.Shared
         private BazaarApi bazaarClient;
         private IItemsApi itemClient;
         private FilterEngine FilterEngine;
+        private HashSet<string> bazaarItems;
 
         /// <summary>
         /// Creates a new 
@@ -34,6 +35,15 @@ namespace Coflnet.Sky.Commands.Shared
             FilterEngine = filterEngine;
         }
 
+        private async Task<HashSet<string>> GetBazaarItems()
+        {
+            if (bazaarItems == null || Random.Shared.NextDouble() < 0.01)
+            {
+                bazaarItems = new HashSet<string>(await itemClient.ItemsBazaarTagsGetAsync());
+            }
+            return bazaarItems;
+        }
+
         /// <summary>
         /// Get sumary of price
         /// </summary>
@@ -45,7 +55,7 @@ namespace Coflnet.Sky.Commands.Shared
             int id = GetItemId(itemTag);
 
             var days = 2;
-            var bazaarItems = await itemClient.ItemsBazaarTagsGetAsync();
+            var bazaarItems = await GetBazaarItems();
             if (bazaarItems?.Contains(itemTag) ?? false)
             {
                 var val = await bazaarClient.ApiBazaarItemIdHistoryGetAsync(itemTag, DateTime.UtcNow - TimeSpan.FromDays(days), DateTime.UtcNow);
@@ -197,7 +207,7 @@ namespace Coflnet.Sky.Commands.Shared
             int id = GetItemId(itemTag, false);
             if (id == 0)
                 return new CurrentPrice() { Available = -1 };
-            var bazaarItems = await itemClient.ItemsBazaarTagsGetAsync();
+            var bazaarItems = await GetBazaarItems();
             if (bazaarItems?.Contains(itemTag) ?? false)
             {
                 var val = await bazaarClient.ApiBazaarItemIdSnapshotGetAsync(itemTag, DateTime.UtcNow);
