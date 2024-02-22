@@ -32,6 +32,7 @@ namespace Coflnet.Sky.Commands.Shared
             AdditionalFilters.Add<FlipFinderDetailedFlipFilter>();
             AdditionalFilters.Add<BedFlipDetailedFlipFilter>();
             AdditionalFilters.Add<PreApiDetailedFlipFilter>();
+            AdditionalFilters.Add<PremPlusDetailedFlipFilter>();
             AdditionalFilters.Add<CurrentMayorDetailedFlipFilter>();
             AdditionalFilters.Add<LastMayorDetailedFlipFilter>();
             AdditionalFilters.Add<NextMayorDetailedFlipFilter>();
