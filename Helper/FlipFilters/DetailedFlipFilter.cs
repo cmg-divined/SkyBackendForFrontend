@@ -12,6 +12,5 @@ namespace Coflnet.Sky.Commands.Shared
         object[] Options {get;}
         Filter.FilterType FilterType { get; }
     }
-    
 
 }
