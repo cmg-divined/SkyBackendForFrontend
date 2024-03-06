@@ -12,6 +12,7 @@ namespace Coflnet.Sky.Commands.Shared
     {
         private ConnectionMultiplexer con;
         private ISettingsApi api;
+        public ConnectionMultiplexer Con => con;
         public SettingsService(IConfiguration config, ILogger<SettingsService> logger, ISettingsApi api)
         {
             var redis = config["SETTINGS_REDIS_HOST"];
