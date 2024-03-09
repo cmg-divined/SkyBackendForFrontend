@@ -42,6 +42,8 @@ namespace Coflnet.Sky.Commands
         {
             [JsonProperty("color")]
             public string ColorPrefix { get; set; }
+            [JsonProperty("value")]
+            public long Value { get; set; }
 
             public ColorEnchant(Enchantment enchantment) : base(enchantment.Type, enchantment.Level, enchantment.ItemType)
             {
