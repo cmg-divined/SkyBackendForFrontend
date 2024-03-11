@@ -19,6 +19,7 @@ using Coflnet.Leaderboard.Client.Api;
 using Coflnet.Sky.Settings.Client.Api;
 using Coflnet.Sky.Filter;
 using Coflnet.Sky.EventBroker.Client.Api;
+using Coflnet.Sky.Bazaar.Flipper.Client.Api;
 
 namespace Coflnet.Sky.Commands.Shared
 {
@@ -185,6 +186,8 @@ namespace Coflnet.Sky.Commands.Shared
             services.AddHostedService<FilterLoader>();
             services.AddTransient<HypixelContext>(s => new HypixelContext());
             services.AddSingleton<FilterStateService>();
+            services.AddSingleton<IBazaarFlipperApi, BazaarFlipperApi>(s => 
+                new BazaarFlipperApi(s.GetRequiredService<IConfiguration>()["BAZAARFLIPPER_BASE_URL"]));
 
             _servics = services;
         }
