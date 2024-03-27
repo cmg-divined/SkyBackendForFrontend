@@ -36,6 +36,8 @@ namespace Coflnet.Sky.Commands.Shared
                 instance.OnChange?.Invoke(v);
                 instance.Value = v;
                 instance.AfterChange?.Invoke(v);
+                if(instance.IsDisposed)
+                    instance.Dispose();
             }, defaultGetter);
             // if instance is already disposed we need to unsubscribe, this may or may not be bullshit
             if (instance.IsDisposed)
