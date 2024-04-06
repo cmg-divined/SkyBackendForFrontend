@@ -55,6 +55,7 @@ namespace Coflnet.Sky.Commands.Shared
             });
         static Prometheus.Counter snipesReceived = Prometheus.Metrics.CreateCounter("sky_commands_snipes_received", "How many snipes were received");
         static Prometheus.Counter auctionsConsumed = Prometheus.Metrics.CreateCounter("sky_commands_auctions_received", "How many auctions were consumed");
+        static Prometheus.Gauge tfmEnabled = Prometheus.Metrics.CreateGauge("sky_commands_tfm_enabled", "How many users have TFM enabled");
 
         /// <summary>
         /// Special load burst queue that will send out 5 flips at load
@@ -630,6 +631,8 @@ namespace Coflnet.Sky.Commands.Shared
                         continue;
                     if (settings.AllowedFinders.HasFlag(LowPricedAuction.FinderType.USER))
                         sumary.UserFinderEnabledCount++;
+                    if (settings.AllowedFinders.HasFlag(LowPricedAuction.FinderType.TFM))
+                        sumary.TfmFinderEnabledCount++;
                     minProfit = Math.Min(minProfit, settings.MinProfit);
                 }
                 catch (Exception e)
@@ -638,6 +641,7 @@ namespace Coflnet.Sky.Commands.Shared
                 }
             }
             sumary.LowestMinProfit = minProfit;
+            tfmEnabled.Set(sumary.TfmFinderEnabledCount);
 
             // assign after calculation so that there is no racecondition while calculating
             this.FilterSumary = sumary;
@@ -716,6 +720,7 @@ namespace Coflnet.Sky.Commands.Shared
     public class ServerFilterSumary
     {
         public int UserFinderEnabledCount;
+        public int TfmFinderEnabledCount;
         public long LowestMinProfit;
     }
 }
