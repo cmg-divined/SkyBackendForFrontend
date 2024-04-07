@@ -1,6 +1,3 @@
-
-
-using System;
 using System.Collections.Generic;
 using Coflnet.Sky.Commands.Shared;
 
@@ -28,6 +25,6 @@ public class DescriptionSetting
         Fields = new List<List<DescriptionField>>() {
                     new() { DescriptionField.LBIN, DescriptionField.BazaarBuy, DescriptionField.BazaarSell },
                     new() { DescriptionField.MEDIAN, DescriptionField.VOLUME },
-                    new() { DescriptionField.CRAFT_COST } }
+                    new() { DescriptionField.FullCraftCost } }
     };
 }
