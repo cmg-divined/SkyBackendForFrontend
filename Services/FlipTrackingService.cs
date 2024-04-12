@@ -392,12 +392,14 @@ namespace Coflnet.Sky.Commands
                 Flags = (Shared.FlipFlags)f.Flags
             }).ToArray();
             if (uuids.Count() == 1 && timeSpan >= TimeSpan.FromDays(7) && endTime > DateTime.UtcNow - TimeSpan.FromSeconds(1))
-                SaveProfitToLeaderboard(uuids.First(), newFlips.Where(f=>f.SellTime > DateTime.UtcNow - TimeSpan.FromDays(7)).Sum(f => f.Profit));
-
+                SaveProfitToLeaderboard(uuids.First(), newFlips.Where(f => f.SellTime > DateTime.UtcNow - TimeSpan.FromDays(7)).Sum(f => f.Profit));
+            var profit = newFlips.Sum(r => r.Profit);
+            if (uuids.Count() == 1)
+                logger.LogInformation($"Player {uuids.First()} made {profit} profit in {timeSpan}");
             return new FlipSumary()
             {
                 Flips = newFlips,
-                TotalProfit = newFlips.Sum(r => r.Profit)
+                TotalProfit = profit
             };
 
             using var context = new HypixelContext();
