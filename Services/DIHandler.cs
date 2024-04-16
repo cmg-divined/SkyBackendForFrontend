@@ -88,6 +88,11 @@ namespace Coflnet.Sky.Commands.Shared
                 var config = context.GetRequiredService<IConfiguration>();
                 return new SniperApi(config["SNIPER_BASE_URL"]);
             });
+            services.AddSingleton<IAttributeApi>(context =>
+            {
+                var config = context.GetRequiredService<IConfiguration>();
+                return new AttributeApi(config["SNIPER_BASE_URL"]);
+            });
             services.AddSingleton<ICraftsApi>(context =>
             {
                 var config = context.GetRequiredService<IConfiguration>();
@@ -187,10 +192,10 @@ namespace Coflnet.Sky.Commands.Shared
             services.AddHostedService<FilterLoader>();
             services.AddTransient<HypixelContext>(s => new HypixelContext());
             services.AddSingleton<FilterStateService>();
-            services.AddSingleton<IBazaarFlipperApi, BazaarFlipperApi>(s => 
+            services.AddSingleton<IBazaarFlipperApi, BazaarFlipperApi>(s =>
                 new BazaarFlipperApi(s.GetRequiredService<IConfiguration>()["BAZAARFLIPPER_BASE_URL"]));
-            services.AddSingleton<IAuctionApi, AuctionApi>(s => 
-                new AuctionApi(s.GetRequiredService<IConfiguration>()["AUCTIONS_BASE_URL"]));
+            services.AddSingleton<Auctions.Client.Api.IAuctionApi>(s =>
+                new Auctions.Client.Api.AuctionApi(s.GetRequiredService<IConfiguration>()["AUCTIONS_BASE_URL"]));
 
             _servics = services;
         }
