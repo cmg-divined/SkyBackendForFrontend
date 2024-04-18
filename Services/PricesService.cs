@@ -217,7 +217,7 @@ namespace Coflnet.Sky.Commands.Shared
                 return new CurrentPrice()
                 {
                     Buy = GetBazaarCostForCount(val.BuyOrders, count),
-                    Sell = val.SellOrders.Max(s => s.PricePerUnit),
+                    Sell = val.SellOrders.Select(s => s.PricePerUnit).DefaultIfEmpty(0).Max(),
                     Available = val.BuyOrders.Sum(b => b.Amount)
                 };
             }
@@ -243,7 +243,7 @@ namespace Coflnet.Sky.Commands.Shared
                             return foundcount <= count;
                         }).Sum(a => a.StartingBid);
                 var sell = 0L;
-                if(lowestBins.Count > 0)
+                if (lowestBins.Count > 0)
                     sell = lowestBins.First().StartingBid / lowestBins.First().Count * count;
                 return new CurrentPrice() { Buy = cost, Sell = sell * 0.98, Available = lowestBins.Count };
             }
