@@ -11,7 +11,7 @@ namespace Coflnet.Sky.Commands.Shared
     {
         public virtual object[] Options => new object[] { 1, 100_000_000 };
 
-        public virtual FilterType FilterType => FilterType.NUMERICAL | FilterType.LOWER | FilterType.RANGE;
+        public virtual FilterType FilterType => FilterType.NUMERICAL | FilterType.LOWER;
 
         public Expression<Func<FlipInstance, bool>> GetExpression(Dictionary<string, string> filters, string val)
         {
