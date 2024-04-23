@@ -9,7 +9,6 @@ using Microsoft.EntityFrameworkCore;
 using Coflnet.Sky.Commands.Shared;
 using Coflnet.Sky.FlipTracker.Client.Model;
 using Newtonsoft.Json;
-using OpenTracing;
 using Microsoft.Extensions.Configuration;
 using System.Diagnostics;
 using Coflnet.Sky.McConnect.Api;

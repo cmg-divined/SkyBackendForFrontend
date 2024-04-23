@@ -177,9 +177,7 @@ namespace Coflnet.Sky.Commands.Shared
         private static Regex RomanNumber = new Regex("^[IVX]+$");
         private async Task<Channel<SearchResultItem>> CreateResponse(string search, CancellationToken token)
         {
-            var result = new List<SearchResultItem>();
-            var tracer = OpenTracing.Util.GlobalTracer.Instance;
-            var searchSpan = tracer.ActiveSpan;
+            var searchSpan = Activity.Current;
 
             //var singlePlayer = PlayerSearch.Instance.FindDirect(search);
             var itemTask = GetItems(ReplaceStart(search, "item"), 12);
