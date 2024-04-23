@@ -7,6 +7,7 @@ using RestSharp;
 using Coflnet.Sky.Sniper.Client.Api;
 using System;
 using Microsoft.Extensions.Logging;
+using MessagePack;
 
 namespace Coflnet.Sky.Commands.Shared;
 
@@ -31,7 +32,8 @@ public class SniperClient : ISniperClient
     public async Task<List<Sniper.Client.Model.PriceEstimate>> GetPrices(IEnumerable<SaveAuction> auctionRepresent)
     {
         var request = new RestRequest("/api/sniper/prices", RestSharp.Method.Post);
-        request.AddJsonBody(JsonConvert.SerializeObject(Convert.ToBase64String(MessagePack.LZ4MessagePackSerializer.Serialize(auctionRepresent))));
+        var options =  MessagePackSerializerOptions.Standard.WithCompression(MessagePackCompression.Lz4BlockArray); 
+        request.AddJsonBody(JsonConvert.SerializeObject(Convert.ToBase64String(MessagePackSerializer.Serialize(auctionRepresent, options))));
 
         var respone = await sniperClient.ExecuteAsync(request).ConfigureAwait(false);
         if (respone.StatusCode == 0)

@@ -16,14 +16,14 @@ namespace Coflnet.Sky.Commands.Shared
         [TestCase("0.1dxy", 0.1)]
         public void ConvertInputs(string val, double target)
         {
-            Assert.AreEqual(target, NumberParser.Double(val), 0.0001);
+            Assert.That(NumberParser.Double(val),Is.EqualTo(target).Within(0.0001));
         }
         [TestCase("1", 1)]
         [TestCase("1.9m", 1_900_000)]
         [TestCase("1k", 1_000)]
         public void ConvertInputsLong(string val, long target)
         {
-            Assert.AreEqual(target, NumberParser.Long(val));
+            Assert.That(target,Is.EqualTo(NumberParser.Long(val)));
         }
     }
 }

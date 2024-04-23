@@ -253,24 +253,24 @@ public class InventoryParserTests
         var item = deserialized
                         .Where(i => i != null).Last();
         Console.WriteLine(JsonConvert.SerializeObject(item, Formatting.Indented));
-        Assert.AreEqual("PET_ELEPHANT", item.Tag);
-        Assert.AreEqual("┬ºfIron Helmet", item.ItemName);
-        Assert.AreEqual(1, item.Enchantments.Count);
-        Assert.AreEqual(1, item.Enchantments.Where(e => e.Type == Core.Enchantment.EnchantmentType.growth).First().Level);
-        Assert.AreEqual("0cf52647-c130-43ec-9c46-e2dc162d4894", item.FlatenedNBT["uuid"]);
-        Assert.AreEqual("PET_ITEM_FARMING_SKILL_BOOST_EPIC", item.FlatenedNBT["heldItem"]);
-        Assert.AreEqual("33978271,22665796", item.FlatenedNBT["exp"].Replace('.', ','));
-        Assert.AreEqual("FINE", item.FlatenedNBT["JADE_0"]);
-        Assert.AreEqual("PERFECT", item.FlatenedNBT["COMBAT_0"]);
-        Assert.AreEqual("4303281387", item.FlatenedNBT["mined_crops"]);
-        Assert.AreEqual("SHADOW_WARP_SCROLL WITHER_SHIELD_SCROLL", item.FlatenedNBT["ability_scroll"]);
-        Assert.AreEqual("6", item.FlatenedNBT["MASTER_CRYPT_TANK_ZOMBIE_70"]);
-        Assert.AreEqual(ItemReferences.Reforge.Heavy, item.Reforge);
-        Assert.AreEqual(Tier.COMMON, item.Tier);
+        Assert.That("PET_ELEPHANT",Is.EqualTo(item.Tag));
+        Assert.That("┬ºfIron Helmet",Is.EqualTo(item.ItemName));
+        Assert.That(1,Is.EqualTo(item.Enchantments.Count));
+        Assert.That(1,Is.EqualTo(item.Enchantments.Where(e => e.Type == Core.Enchantment.EnchantmentType.growth).First().Level));
+        Assert.That("0cf52647-c130-43ec-9c46-e2dc162d4894",Is.EqualTo(item.FlatenedNBT["uuid"]));
+        Assert.That("PET_ITEM_FARMING_SKILL_BOOST_EPIC",Is.EqualTo(item.FlatenedNBT["heldItem"]));
+        Assert.That("33978271,22665796", Is.EqualTo(item.FlatenedNBT["exp"].Replace('.',',')));
+        Assert.That("FINE",Is.EqualTo(item.FlatenedNBT["JADE_0"]));
+        Assert.That("PERFECT",Is.EqualTo(item.FlatenedNBT["COMBAT_0"]));
+        Assert.That("4303281387",Is.EqualTo(item.FlatenedNBT["mined_crops"]));
+        Assert.That("SHADOW_WARP_SCROLL WITHER_SHIELD_SCROLL",Is.EqualTo(item.FlatenedNBT["ability_scroll"]));
+        Assert.That("6",Is.EqualTo(item.FlatenedNBT["MASTER_CRYPT_TANK_ZOMBIE_70"]));
+        Assert.That(ItemReferences.Reforge.Heavy,Is.EqualTo(item.Reforge));
+        Assert.That(Tier.COMMON,Is.EqualTo(item.Tier));
 
         var divan = deserialized.Where(i => i != null).Skip(1).First();
-        Assert.AreEqual(new DateTime(2023, 7, 24), divan.ItemCreatedAt.Date);
-        Assert.AreEqual("AMBER_0,AMBER_1,JADE_0,JADE_1,TOPAZ_0", divan.FlatenedNBT["unlocked_slots"]);
+        Assert.That(new DateTime(2023, 7, 24),Is.EqualTo(divan.ItemCreatedAt.Date));
+        Assert.That("AMBER_0,AMBER_1,JADE_0,JADE_1,TOPAZ_0",Is.EqualTo(divan.FlatenedNBT["unlocked_slots"]));
     }
 
     string petSample = """
@@ -394,8 +394,8 @@ public class InventoryParserTests
         var parser = new InventoryParser();
         var serialized = MessagePackSerializer.Serialize(parser.Parse(petSample));
         var item = MessagePackSerializer.Deserialize<List<SaveAuction>>(serialized).First();
-        Assert.AreEqual(Tier.LEGENDARY, item.Tier);
-        Assert.AreEqual(new DateTime(2023, 3, 29), item.ItemCreatedAt.Date);
+        Assert.That(Tier.LEGENDARY,Is.EqualTo(item.Tier));
+        Assert.That(new DateTime(2023, 3, 29),Is.EqualTo(item.ItemCreatedAt.Date));
     }
 
 
@@ -413,16 +413,16 @@ public class InventoryParserTests
         var serialized = MessagePackSerializer.Serialize(parser.Parse(jsonSampleCT));
         var item = MessagePackSerializer.Deserialize<List<SaveAuction>>(serialized)
                         .Where(i => i != null).Last();
-        Assert.AreEqual("DCTR_SPACE_HELM", item.Tag);
-        Assert.AreEqual("§cSpace Helmet", item.ItemName);
-        Assert.AreEqual(ItemReferences.Reforge.None, item.Reforge);
-        Assert.AreEqual(8, item.Enchantments.Count);
-        Assert.AreEqual(3, item.Enchantments.Where(e => e.Type == Core.Enchantment.EnchantmentType.impaling).First().Level);
-        Assert.AreEqual(4, item.Enchantments.Where(e => e.Type == Core.Enchantment.EnchantmentType.chance).First().Level);
-        Assert.AreEqual(1, item.Count);
-        Assert.AreEqual("b14aefbd-cbf8-4ca1-aa2e-5c0422807c60", item.FlatenedNBT["uuid"]);
-        Assert.AreEqual("4/8/23 10:01 AM", item.FlatenedNBT["timestamp"]);
-        Assert.AreEqual(Tier.SPECIAL, item.Tier);
+        Assert.That("DCTR_SPACE_HELM",Is.EqualTo(item.Tag));
+        Assert.That("§cSpace Helmet",Is.EqualTo(item.ItemName));
+        Assert.That(ItemReferences.Reforge.None,Is.EqualTo(item.Reforge));
+        Assert.That(8,Is.EqualTo(item.Enchantments.Count));
+        Assert.That(3,Is.EqualTo(item.Enchantments.Where(e => e.Type == Core.Enchantment.EnchantmentType.impaling).First().Level));
+        Assert.That(4,Is.EqualTo(item.Enchantments.Where(e => e.Type == Core.Enchantment.EnchantmentType.chance).First().Level));
+        Assert.That(1,Is.EqualTo(item.Count));
+        Assert.That("b14aefbd-cbf8-4ca1-aa2e-5c0422807c60",Is.EqualTo(item.FlatenedNBT["uuid"]));
+        Assert.That("4/8/23 10:01 AM",Is.EqualTo(item.FlatenedNBT["timestamp"]));
+        Assert.That(Tier.SPECIAL,Is.EqualTo(item.Tier));
     }
 
     /// <summary>
@@ -612,8 +612,8 @@ public class InventoryParserTests
         ]}
         """);
 
-        Assert.AreEqual("§fIron Helmet", data.First().ItemName);
-        Assert.IsTrue(data.First().Context["lore"].StartsWith("§7Defense:  §a+10\n\n§7Growth I\n§7Grants §a+15 §c❤ Health"));
-        Assert.AreEqual(new DateTime(2023, 2, 18), data.First().ItemCreatedAt.Date);
+        Assert.That("§fIron Helmet",Is.EqualTo(data.First().ItemName));
+        Assert.That(data.First().Context["lore"].StartsWith("§7Defense:  §a+10\n\n§7Growth I\n§7Grants §a+15 §c❤ Health"));
+        Assert.That(new DateTime(2023, 2, 18),Is.EqualTo(data.First().ItemCreatedAt.Date));
     }
 }

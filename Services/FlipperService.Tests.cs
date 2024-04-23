@@ -37,10 +37,10 @@ namespace Coflnet.Sky.Commands.Tests
                 }).ConfigureAwait(false);
             }
             await Task.Delay(20 * TestConstants.DelayMultiplier).ConfigureAwait(false); // wait for the async sending to finish
-            Assert.NotNull(con.LastFlip, "No flip was sent but should have been after " + watch.ElapsedMilliseconds + "ms");
-            Assert.AreEqual(5, con.LastFlip.MedianPrice);
-            Assert.AreEqual(2, con.LastFlip.Volume);
-            Assert.AreEqual(auction, con.LastFlip.Auction);
+            Assert.That(con.LastFlip, Is.Not.Null, "No flip was sent but should have been after " + watch.ElapsedMilliseconds + "ms");
+            Assert.That(5,Is.EqualTo(con.LastFlip.MedianPrice));
+            Assert.That(2,Is.EqualTo(con.LastFlip.Volume));
+            Assert.That(auction,Is.EqualTo(con.LastFlip.Auction));
         }
 
         public class MockConnection : IFlipConnection

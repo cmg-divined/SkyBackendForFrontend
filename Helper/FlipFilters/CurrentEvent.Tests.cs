@@ -54,7 +54,7 @@ public class CurrentEventTests
         var expression = filter.GetExpression(new Dictionary<string, string>(), value.ToString());
         var compiled = expression.Compile();
         var flip = new FlipInstance() { Auction = new() };
-        Assert.IsTrue(compiled(flip), $"Expected {value} for {time}");
+        Assert.That(compiled(flip), $"Expected {value} for {time}");
     }
 
 }

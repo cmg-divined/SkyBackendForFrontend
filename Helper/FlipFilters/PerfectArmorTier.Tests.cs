@@ -15,6 +15,6 @@ public class PerfectArmorTierTests
         {
             Tag = tag,
         };
-        Assert.AreEqual(expected, filter.GetExpression(null, selector).Compile()(flip));
+        Assert.That(expected, Is.EqualTo(filter.GetExpression(null,selector).Compile()(flip)));
     }
 }

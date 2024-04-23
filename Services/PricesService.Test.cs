@@ -21,7 +21,7 @@ namespace Coflnet.Sky.Commands.Shared.Test
             };
             var count = 8;
             double totalCost = new PricesService(null, null, null, null).GetBazaarCostForCount(orders, count);
-            Assert.AreEqual(116, totalCost);
+            Assert.That(116,Is.EqualTo(totalCost));
         }
 
         [Test]
@@ -33,7 +33,7 @@ namespace Coflnet.Sky.Commands.Shared.Test
             };
             var count = 3;
             double totalCost = new PricesService(null, null, null, null).GetBazaarCostForCount(orders, count);
-            Assert.AreEqual(12, totalCost);
+            Assert.That(12,Is.EqualTo(totalCost));
         }
     }
 }

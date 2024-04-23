@@ -19,7 +19,7 @@ namespace Coflnet.Sky.Commands.Shared
         [SetUp]
         public void Setup()
         {
-            DiHandler.OverrideService<FilterEngine,FilterEngine>(new FilterEngine());
+            DiHandler.OverrideService<FilterEngine, FilterEngine>(new FilterEngine());
             sampleFlip = new FlipInstance()
             {
                 MedianPrice = 10,
@@ -49,7 +49,7 @@ namespace Coflnet.Sky.Commands.Shared
             {
                 NoMatch(settings, sampleFlip);
             }
-            Assert.LessOrEqual(watch.ElapsedMilliseconds, 6 * TestConstants.DelayMultiplier);
+            Assert.That(watch.ElapsedMilliseconds, Is.LessThanOrEqualTo(6 * TestConstants.DelayMultiplier));
         }
 
         [Test]
@@ -60,9 +60,9 @@ namespace Coflnet.Sky.Commands.Shared
                 BlackList = new List<ListEntry>() { new() { filter = new Dictionary<string, string>() { { "Bin", "true" } } } }
             };
             var matches = settings.MatchesSettings(sampleFlip);
-            Assert.IsTrue(matches.Item1, "flip should match");
+            Assert.That(matches.Item1, "flip should match");
             sampleFlip.Auction.Bin = true;
-            Assert.IsFalse(settings.MatchesSettings(sampleFlip).Item1, "flip should not match");
+            Assert.That(!settings.MatchesSettings(sampleFlip).Item1, "flip should not match");
         }
 
 
@@ -74,7 +74,7 @@ namespace Coflnet.Sky.Commands.Shared
                 BlackList = new List<ListEntry>() { new() { filter = new Dictionary<string, string>() { { "Enchantment", "aiming" }, { "EnchantLvl", "1" } } } }
             };
             var matches = settings.MatchesSettings(sampleFlip);
-            Assert.IsTrue(matches.Item1, "flip should match");
+            Assert.That(matches.Item1, "flip should match");
         }
 
 
@@ -86,7 +86,7 @@ namespace Coflnet.Sky.Commands.Shared
                 BlackList = new List<ListEntry>() { new() { filter = new Dictionary<string, string>() { { "Enchantment", "critical" }, { "EnchantLvl", "4" } } } }
             };
             var matches = settings.MatchesSettings(sampleFlip);
-            Assert.IsFalse(matches.Item1, "flip should not match");
+            Assert.That(!matches.Item1, "flip should not match");
         }
 
         [Test]
@@ -100,10 +100,10 @@ namespace Coflnet.Sky.Commands.Shared
             };
             var matches = settings.MatchesSettings(sampleFlip);
             Console.WriteLine(new FilterEngine().GetMatchExpression(settings.BlackList[0].filter).ToString());
-            Assert.IsFalse(matches.Item1, "flip should not match " + matches.Item2);
+            Assert.That(!matches.Item1, "flip should not match " + matches.Item2);
             sampleFlip.Auction.FlatenedNBT["candyUsed"] = "0";
             matches = settings.MatchesSettings(sampleFlip);
-            Assert.IsTrue(matches.Item1, "flip should match " + matches.Item2);
+            Assert.That(matches.Item1, "flip should match " + matches.Item2);
         }
 
         [Test]
@@ -121,8 +121,8 @@ namespace Coflnet.Sky.Commands.Shared
             };
             var matches = settings.MatchesSettings(bookOfa);
             var shouldNotBatch = settings.MatchesSettings(reaperOfa);
-            Assert.True(matches.Item1, "flip should match");
-            Assert.IsFalse(shouldNotBatch.Item1, "flip should not match");
+            Assert.That(matches.Item1, "flip should match");
+            Assert.That(!shouldNotBatch.Item1, "flip should not match");
         }
 
 
@@ -130,7 +130,7 @@ namespace Coflnet.Sky.Commands.Shared
         public void MinProfitFilterMatch()
         {
             NBT.Instance = new NBTMock();
-            sampleFlip.Auction.NBTLookup = new NBTLookup[]{ new(1, 2) };
+            sampleFlip.Auction.NBTLookup = new NBTLookup[] { new(1, 2) };
             var settings = new FlipSettings()
             {
                 MinProfit = 10000,
@@ -138,7 +138,7 @@ namespace Coflnet.Sky.Commands.Shared
             };
             var matches = settings.MatchesSettings(sampleFlip);
             System.Console.WriteLine(sampleFlip.Profit);
-            Assert.IsTrue(matches.Item1, matches.Item2);
+            Assert.That(matches.Item1, matches.Item2);
         }
 
 
@@ -147,7 +147,7 @@ namespace Coflnet.Sky.Commands.Shared
         public void VolumeDeciamalFilterMatch()
         {
             NBT.Instance = new NBTMock();
-            sampleFlip.Auction.NBTLookup = new NBTLookup[]{ new(1, 2) };
+            sampleFlip.Auction.NBTLookup = new NBTLookup[] { new(1, 2) };
             var settings = new FlipSettings()
             {
                 MinProfit = 1,
@@ -156,10 +156,10 @@ namespace Coflnet.Sky.Commands.Shared
             };
             sampleFlip.Volume = 0.8f;
             var matches = settings.MatchesSettings(sampleFlip);
-            Assert.IsTrue(matches.Item1, matches.Item2);
+            Assert.That(matches.Item1, matches.Item2);
             sampleFlip.Volume = 0.2f;
             var matches2 = settings.MatchesSettings(sampleFlip);
-            Assert.False(matches2.Item1, matches2.Item2);
+            Assert.That(!matches2.Item1, matches2.Item2);
         }
 
         [Test]
@@ -173,10 +173,10 @@ namespace Coflnet.Sky.Commands.Shared
             settings.WhiteList = new List<ListEntry>() { new() { filter = new Dictionary<string, string>() { { "Volume", "<0.5" } } } };
             sampleFlip.Volume = 0.1f;
             var matches3 = settings.MatchesSettings(sampleFlip);
-            Assert.IsTrue(matches3.Item1, matches3.Item2);
+            Assert.That(matches3.Item1, matches3.Item2);
             sampleFlip.Volume = 1;
             var notMatch = settings.MatchesSettings(sampleFlip);
-            Assert.IsFalse(notMatch.Item1, notMatch.Item2);
+            Assert.That(!notMatch.Item1, notMatch.Item2);
         }
 
         [Test]
@@ -188,7 +188,7 @@ namespace Coflnet.Sky.Commands.Shared
         {
             var volumeFilter = new VolumeDetailedFlipFilter();
             var exp = volumeFilter.GetExpression(null, val);
-            Assert.AreEqual(exp.Compile().Invoke(new FlipInstance() { Volume = vol }), result);
+            Assert.That(exp.Compile().Invoke(new FlipInstance() { Volume = vol }), Is.EqualTo(result));
         }
         [Test]
         [TestCase("1", true)]
@@ -202,7 +202,7 @@ namespace Coflnet.Sky.Commands.Shared
             };
             sampleFlip.Context["refAge"] = val;
             var matches3 = settings.MatchesSettings(sampleFlip);
-            Assert.AreEqual(result, matches3.Item1, matches3.Item2);
+            Assert.That(result, Is.EqualTo(matches3.Item1), matches3.Item2);
         }
 
 
@@ -253,7 +253,7 @@ namespace Coflnet.Sky.Commands.Shared
                     FlatenedNBT = new Dictionary<string, string>() { { "upgrade_level", "5" } }
                 }
             });
-            Assert.IsTrue(result);
+            Assert.That(result);
         }
 
         [Test]
@@ -261,17 +261,17 @@ namespace Coflnet.Sky.Commands.Shared
         {
             var settings = new FlipSettings()
             {
-                WhiteList = new List<ListEntry>() { new() { filter = new () { { "Reforge", "Sharp" }, { "AfterMainFilter", "true" } } } },
+                WhiteList = new List<ListEntry>() { new() { filter = new() { { "Reforge", "Sharp" }, { "AfterMainFilter", "true" } } } },
                 MinProfit = 1000
             };
             sampleFlip.Auction.Reforge = ItemReferences.Reforge.Sharp;
             sampleFlip.Auction.StartingBid = 5;
             sampleFlip.MedianPrice = 500;
             var matches = settings.MatchesSettings(sampleFlip);
-            Assert.IsFalse(matches.Item1, "flip shouldn't match below minprofit");
+            Assert.That(!matches.Item1, "flip shouldn't match below minprofit");
             sampleFlip.MedianPrice = 5000;
             matches = settings.MatchesSettings(sampleFlip);
-            Assert.IsTrue(matches.Item1, "flip should match above minprofit");
+            Assert.That(matches.Item1, "flip should match above minprofit");
         }
 
 
@@ -282,14 +282,14 @@ namespace Coflnet.Sky.Commands.Shared
             {
                 MinProfit = 0,
                 MinVolume = 0,
-                WhiteList = new List<ListEntry>() { new() { filter = new () { { "Volume", "<0.5" } } } },
-                BlackList = new List<ListEntry>() { new() { filter = new () { { "Volume", "<0.5" }, { "ForceBlacklist", "" } } } }
+                WhiteList = new List<ListEntry>() { new() { filter = new() { { "Volume", "<0.5" } } } },
+                BlackList = new List<ListEntry>() { new() { filter = new() { { "Volume", "<0.5" }, { "ForceBlacklist", "" } } } }
             };
             sampleFlip.Volume = 0.1f;
             var result = settings.MatchesSettings(sampleFlip);
 
-            Assert.IsFalse(result.Item1, result.Item2);
-            Assert.AreEqual("forced blacklist matched general filter", result.Item2);
+            Assert.That(!result.Item1, result.Item2);
+            Assert.That("forced blacklist matched general filter", Is.EqualTo(result.Item2));
         }
 
         [Test]
@@ -309,8 +309,8 @@ namespace Coflnet.Sky.Commands.Shared
             sampleFlip.Finder = LowPricedAuction.FinderType.SNIPER_MEDIAN;
             var result = settings.MatchesSettings(sampleFlip);
 
-            Assert.IsTrue(result.Item1, result.Item2);
-            Assert.AreEqual("whitelist matched filter for item", result.Item2);
+            Assert.That(result.Item1, result.Item2);
+            Assert.That("whitelist matched filter for item", Is.EqualTo(result.Item2));
         }
 
         [Test]
@@ -380,12 +380,12 @@ namespace Coflnet.Sky.Commands.Shared
         private static void Matches(FlipSettings targetSettings, FlipInstance flip)
         {
             var matches = targetSettings.MatchesSettings(flip);
-            Assert.IsTrue(matches.Item1, matches.Item2);
+            Assert.That(matches.Item1, matches.Item2);
         }
         private static void NoMatch(FlipSettings targetSettings, FlipInstance flip)
         {
             var matches = targetSettings.MatchesSettings(flip);
-            Assert.IsFalse(matches.Item1, matches.Item2);
+            Assert.That(!matches.Item1, matches.Item2);
         }
 
         private static ListEntry CreateFilter(string key, string value)

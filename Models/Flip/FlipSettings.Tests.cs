@@ -108,12 +108,12 @@ namespace Coflnet.Sky.Commands.Shared
         [Test]
         public void MatchesSettings1()
         {
-            Assert.IsTrue(settings.MatchesSettings(flipA).Item1);
+            Assert.That(settings.MatchesSettings(flipA).Item1);
             var bRes = settings.MatchesSettings(flipB);
-            Assert.IsFalse(bRes.Item1, bRes.Item2);
+            Assert.That(!bRes.Item1, bRes.Item2);
             flipB.Auction.Enchantments.AddRange(flipA.Auction.Enchantments);
             bRes = settings.MatchesSettings(flipB);
-            Assert.IsTrue(bRes.Item1, bRes.Item2);
+            Assert.That(bRes.Item1, bRes.Item2);
         }
         [Test]
         public void BlacklitPetLevel()
@@ -121,7 +121,7 @@ namespace Coflnet.Sky.Commands.Shared
             flipB.Auction.Tag = PetTag;
             flipB.Auction.NBTLookup = new[] { new NBTLookup(1, 2) };
             var bRes = settings.MatchesSettings(flipB);
-            Assert.IsFalse(bRes.Item1, bRes.Item2);
+            Assert.That(!bRes.Item1, bRes.Item2);
         }
 
         [Test]
@@ -154,15 +154,15 @@ namespace Coflnet.Sky.Commands.Shared
                 if (settings.MatchesSettings(flipA).Item1)
                     matchCount++;
             }
-            Assert.Greater(6 * TestConstants.DelayMultiplier, stopWatch.ElapsedMilliseconds, "matching is too slow");
+            Assert.That(6 * TestConstants.DelayMultiplier, Is.GreaterThan(stopWatch.ElapsedMilliseconds), "matching is too slow");
             stopWatch = Stopwatch.StartNew();
             for (int i = 0; i < iterations; i++)
             {
                 if (!settings.MatchesSettings(flipB).Item1)
                     matchCount++;
             }
-            Assert.Greater(140 * TestConstants.DelayMultiplier, stopWatch.ElapsedMilliseconds, "matching blacklist is too slow");
-            Assert.AreEqual(iterations * 2, matchCount);
+            Assert.That(140 * TestConstants.DelayMultiplier, Is.GreaterThan(stopWatch.ElapsedMilliseconds), "matching blacklist is too slow");
+            Assert.That(iterations * 2,Is.EqualTo(matchCount));
         }
 
 
@@ -170,7 +170,7 @@ namespace Coflnet.Sky.Commands.Shared
         public void CreateListMatcherWithNull()
         {
             var matcher = new FlipSettings.ListMatcher(null);
-            Assert.IsFalse(matcher.IsMatch(flipA).Item1);
+            Assert.That(!matcher.IsMatch(flipA).Item1);
         }
         [Test]
         public void PreProcessor()
@@ -193,9 +193,9 @@ namespace Coflnet.Sky.Commands.Shared
                     }
                 },
             });
-            Assert.AreEqual(1, matcher.FullList.Count);
-            Assert.AreEqual(1, matcher.FullList[0].Tags.Count);
-            Assert.AreEqual(2, matcher.FullList[0].filter.Count);
+            Assert.That(1,Is.EqualTo(matcher.FullList.Count));
+            Assert.That(1,Is.EqualTo(matcher.FullList[0].Tags.Count));
+            Assert.That(2,Is.EqualTo(matcher.FullList[0].filter.Count));
         }
 
         [Test]
@@ -238,7 +238,7 @@ namespace Coflnet.Sky.Commands.Shared
 
             var profitp = auction.ProfitPercentage;
 
-            Assert.IsTrue(listEntry.MatchesSettings(auction));
+            Assert.That(listEntry.MatchesSettings(auction));
         }
         [Test]
         public void MinProfitPercentageForHyperion()
@@ -264,28 +264,28 @@ namespace Coflnet.Sky.Commands.Shared
                 }
             };
             // report https://discord.com/channels/267680588666896385/986382602376196116/986382624362737685
-            Assert.IsTrue(listEntry.MatchesSettings(auction));
+            Assert.That(listEntry.MatchesSettings(auction));
         }
 
         [Test]
         public void IsFinderBlockedDefault()
         {
             var settings = new FlipSettings() { };
-            Assert.IsTrue(settings.IsFinderBlocked(LowPricedAuction.FinderType.USER));
-            Assert.IsTrue(settings.IsFinderBlocked(LowPricedAuction.FinderType.FLIPPER));
-            Assert.IsTrue(settings.IsFinderBlocked(LowPricedAuction.FinderType.STONKS));
-            Assert.IsTrue(settings.IsFinderBlocked(LowPricedAuction.FinderType.TFM));
-            Assert.IsFalse(settings.IsFinderBlocked(LowPricedAuction.FinderType.SNIPER));
-            Assert.IsFalse(settings.IsFinderBlocked(LowPricedAuction.FinderType.SNIPER_MEDIAN));
+            Assert.That(settings.IsFinderBlocked(LowPricedAuction.FinderType.USER));
+            Assert.That(settings.IsFinderBlocked(LowPricedAuction.FinderType.FLIPPER));
+            Assert.That(settings.IsFinderBlocked(LowPricedAuction.FinderType.STONKS));
+            Assert.That(settings.IsFinderBlocked(LowPricedAuction.FinderType.TFM));
+            Assert.That(!settings.IsFinderBlocked(LowPricedAuction.FinderType.SNIPER));
+            Assert.That(!settings.IsFinderBlocked(LowPricedAuction.FinderType.SNIPER_MEDIAN));
         }
         [Test]
         public void IsFinderBlocked()
         {
             var settings = new FlipSettings() { AllowedFinders = LowPricedAuction.FinderType.FLIPPER | LowPricedAuction.FinderType.SNIPER };
-            Assert.IsTrue(settings.IsFinderBlocked(LowPricedAuction.FinderType.USER));
-            Assert.IsTrue(settings.IsFinderBlocked(LowPricedAuction.FinderType.SNIPER_MEDIAN));
-            Assert.IsFalse(settings.IsFinderBlocked(LowPricedAuction.FinderType.SNIPER));
-            Assert.IsFalse(settings.IsFinderBlocked(LowPricedAuction.FinderType.FLIPPER));
+            Assert.That(settings.IsFinderBlocked(LowPricedAuction.FinderType.USER));
+            Assert.That(settings.IsFinderBlocked(LowPricedAuction.FinderType.SNIPER_MEDIAN));
+            Assert.That(!settings.IsFinderBlocked(LowPricedAuction.FinderType.SNIPER));
+            Assert.That(!settings.IsFinderBlocked(LowPricedAuction.FinderType.FLIPPER));
         }
 
         [Test]

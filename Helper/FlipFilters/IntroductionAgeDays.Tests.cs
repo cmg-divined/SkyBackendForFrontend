@@ -35,10 +35,10 @@ public class IntroductionAgeDaysTests
         );
         var filter = new IntroductionAgeDaysDetailedFlipFilter();
         var comparer = filter.GetExpression(new Dictionary<string, string>(), "1").Compile();
-        Assert.IsNotNull(comparer);
+        Assert.That(comparer, Is.Not.Null);
         var flipSample = new FlipInstance() { Auction = new Core.SaveAuction() { Tag = "test" } };
         // adding new item now does not change
         ItemDetails.Instance.TagLookup.TryAdd("test", 1);
-        Assert.IsTrue(comparer(flipSample));
+        Assert.That(comparer(flipSample));
     }
 }

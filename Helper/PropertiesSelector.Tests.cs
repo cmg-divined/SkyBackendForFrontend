@@ -17,7 +17,7 @@ namespace Coflnet.Sky.Commands.Helper
                     }
             };
             var prop = PropertiesSelector.GetProperties(auction).Select(p => p.Value).First();
-            Assert.AreEqual("Dragon Hunter: 5", prop);
+            Assert.That("Dragon Hunter: 5",Is.EqualTo(prop));
         }
         [Test]
         public void BedTime()
@@ -28,7 +28,7 @@ namespace Coflnet.Sky.Commands.Helper
                 Start = DateTime.UtcNow.AddSeconds(-10)
             };
             var prop = PropertiesSelector.GetProperties(auction).Select(p => p.Value).First();
-            Assert.AreEqual("Bed: 9s", prop);
+            Assert.That("Bed: 9s",Is.EqualTo(prop));
         }
         [TestCase("0:0:255", "§10000FF")]
         [TestCase("0:190:0", "§200BE00")]
@@ -41,7 +41,7 @@ namespace Coflnet.Sky.Commands.Helper
                 { { "color", input } }
             };
             var prop = PropertiesSelector.GetProperties(auction).Select(p => p.Value).First();
-            Assert.AreEqual($"Color: {shwon}§f", prop);
+            Assert.That($"Color: {shwon}§f",Is.EqualTo(prop));
         }
     }
 }
