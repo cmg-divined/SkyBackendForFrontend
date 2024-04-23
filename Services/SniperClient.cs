@@ -32,7 +32,7 @@ public class SniperClient : ISniperClient
     public async Task<List<Sniper.Client.Model.PriceEstimate>> GetPrices(IEnumerable<SaveAuction> auctionRepresent)
     {
         var request = new RestRequest("/api/sniper/prices", RestSharp.Method.Post);
-        var options =  MessagePackSerializerOptions.Standard.WithCompression(MessagePackCompression.Lz4BlockArray); 
+        var options =  MessagePackSerializerOptions.Standard.WithCompression(MessagePackCompression.Lz4Block); 
         request.AddJsonBody(JsonConvert.SerializeObject(Convert.ToBase64String(MessagePackSerializer.Serialize(auctionRepresent, options))));
 
         var respone = await sniperClient.ExecuteAsync(request).ConfigureAwait(false);
