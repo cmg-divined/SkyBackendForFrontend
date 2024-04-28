@@ -114,12 +114,23 @@ public enum DescriptionField
     [FieldDescription("Modifiers included in cost", "lets you see what was summed up in the cost")]
     ModifierCostList,
     [FieldDescription(
-        "List of flip finders, which", 
-        "deemed the last purchase a flip.", 
-        "Includes their estimated value", 
+        "List of flip finders, which",
+        "deemed the last purchase a flip.",
+        "Includes their estimated value",
         "§cThis can noticably slow description",
         "§cloading because of how its stored")]
     FinderEstimates,
+    [FieldDescription(
+        "How much the median estimate fluctuates",
+        "Uses different time interval-medians",
+        "to calculate the volatility")]
+    Volatility,
+    [FieldDescription(
+        "The price the last reference with",
+        "same valuable attributes sold for.",
+        "§cNot necessarily the same item",
+        "Watch out if this is very low")]
+    LastSoldFor,
     // anything over 9000 gets hidden
     BAZAAR_COST = 9001
 }
