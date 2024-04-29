@@ -286,7 +286,7 @@ namespace Coflnet.Sky.Commands.Shared
                 return; // skip old flips
             runtroughTime.Observe((DateTime.UtcNow - flip.Auction.FindTime).TotalSeconds);
             var tracer = DiHandler.GetService<ActivitySource>();
-            using var activity = tracer.StartActivity("DeliverFlip").SetTag("uuid", flip.Auction.Uuid);
+            using var activity = tracer.StartActivity("DeliverFlip")?.SetTag("uuid", flip.Auction.Uuid);
             flip.Finder = LowPricedAuction.FinderType.FLIPPER;
 
             if (flip.Auction.Context?.ContainsKey("pre-api") ?? true)
@@ -345,7 +345,7 @@ namespace Coflnet.Sky.Commands.Shared
             if (flip.Auction.Context != null)
                 flip.Auction.Context["crec"] = (DateTime.UtcNow - flip.Auction.FindTime).ToString();
             var tracer = DiHandler.GetService<ActivitySource>();
-            using var activity = tracer.StartActivity("DeliverLP").SetTag("uuid", flip.Auction.Uuid);
+            using var activity = tracer.StartActivity("DeliverLP")?.SetTag("uuid", flip.Auction.Uuid);
             var time = (DateTime.UtcNow - flip.Auction.FindTime).TotalSeconds;
 
             if (flip.Auction.Context != null)
@@ -453,7 +453,7 @@ namespace Coflnet.Sky.Commands.Shared
         private async Task SendSlowFlip(FlipInstance flip)
         {
             var activitySource = DiHandler.GetService<ActivitySource>();
-            using var activity = activitySource.StartActivity("SendSlowFlip").SetTag("uuid", flip.Auction.Uuid);
+            using var activity = activitySource.StartActivity("SendSlowFlip")?.SetTag("uuid", flip.Auction.Uuid);
             if (SoldAuctions.ContainsKey(flip.UId))
                 flip.Sold = true;
             await NotifyAll(flip, SlowSubs);
