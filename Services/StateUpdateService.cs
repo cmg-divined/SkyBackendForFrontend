@@ -25,12 +25,11 @@ namespace Coflnet.Sky.Commands.Shared
         {
             this.logger = logger;
             this.config = config;
-            var sha = SHA256.Create();
             producer = kafkaCreator.BuildProducer<string, UpdateMessage>(true, b => b.SetDefaultPartitioner((topic, pcount, key, isNull) =>
             {
                 if (isNull || key.Length < 3)
                     return Random.Shared.Next() % pcount;
-                byte[] encoded = sha.ComputeHash(key.ToArray().TakeWhile(c => c != '-').Select(c => (byte)c).ToArray());
+                byte[] encoded = SHA256.HashData(key.ToArray().TakeWhile(c => c != '-').Select(c => (byte)c).ToArray());
                 int partition = BitConverter.ToUInt16(encoded, 0) % pcount;
                 return partition;
             }));
