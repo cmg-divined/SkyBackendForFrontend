@@ -15,7 +15,7 @@ public class IntroductionAgeDaysDetailedFlipFilter : DetailedFlipFilter
     public Expression<Func<FlipInstance, bool>> GetExpression(Dictionary<string, string> filters, string val)
     {
         if (!int.TryParse(val, out int days))
-            throw new CoflnetException("invalid_days", $"the specified days {val} is not a number");
+            throw new CoflnetException("invalid_days", $"the specified days {val} should be a number `<` (smaller than) is implicitly added");
         var service = DiHandler.GetService<FilterStateService>();
         var state = service.State;
         if(ItemDetails.Instance.TagLookup.Count > 10 && state.ExistingTags.Count == 0)
