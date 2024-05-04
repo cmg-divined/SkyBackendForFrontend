@@ -23,6 +23,8 @@ namespace Coflnet.Sky.Commands.Shared
         public int Order;
         [DataMember(Name = "group")]
         public string Group;
+        [DataMember(Name = "disabbled")]
+        public bool Disabled;
 
         private Func<FlipInstance, bool> filterCache;
 
@@ -35,6 +37,8 @@ namespace Coflnet.Sky.Commands.Shared
 
         public Expression<Func<FlipInstance, bool>> GetExpression()
         {
+            if (Disabled)
+                return f => false;
             var filterCache = new FlipFilter(this.filter);
             //     Expression<Func<FlipInstance,bool>> normal = (flip) => (ItemTag == null || ItemTag == flip.Auction.Tag);
             return filterCache.GetExpression();
