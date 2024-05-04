@@ -88,6 +88,9 @@ namespace Coflnet.Sky.Commands.Shared
         [DataMember(Name = "lastChange")]
         [SettingsDoc("", true)]
         public string LastChanged { get; set; }
+        [DataMember(Name = "blockExport")]
+        [SettingsDoc("Block exporting this flip to the public list", true)]
+        public bool BlockExport;
         [IgnoreDataMember]
         public bool IsCompiled => BlackListMatcher != null && filterCompileLock.CurrentCount != 0;
 
