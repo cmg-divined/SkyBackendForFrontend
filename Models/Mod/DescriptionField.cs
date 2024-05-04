@@ -131,6 +131,11 @@ public enum DescriptionField
         "§cNot necessarily the same item",
         "Watch out if this is very low")]
     LastSoldFor,
+    [FieldDescription(
+        "How long on average it takes to",
+        "sell an item with the same ",
+        "valuable attributes")]
+    TimeToSell,
     // anything over 9000 gets hidden
     BAZAAR_COST = 9001
 }
