@@ -17,5 +17,10 @@ namespace Coflnet.Sky.Commands.Shared
         {
             return typeof(TDerived).Name.Replace("Command", "").Replace(typeof(T).Name, "").ToLower();
         }
+
+        public Tin GetBy<Tin>() where Tin : T
+        {
+            return (Tin)this[GetCleardName<Tin>()];
+        }
     }
 }
