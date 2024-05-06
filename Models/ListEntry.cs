@@ -23,7 +23,7 @@ namespace Coflnet.Sky.Commands.Shared
         public int Order;
         [DataMember(Name = "group")]
         public string Group;
-        [DataMember(Name = "disabbled")]
+        [DataMember(Name = "disabled")]
         public bool Disabled;
 
         private Func<FlipInstance, bool> filterCache;
