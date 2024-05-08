@@ -1,3 +1,5 @@
+using System.Collections.Generic;
+
 namespace Coflnet.Sky.Commands.Shared;
 
 public class ConfigContainer
@@ -8,4 +10,9 @@ public class ConfigContainer
     public string ChangeNotes { get; set; }
     public string OwnerId { get; set; }
     public int Price { get; set; }
+}
+
+public class CreatedConfigs
+{
+    public HashSet<string> Configs { get; set; } = new();
 }
