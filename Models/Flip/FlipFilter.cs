@@ -82,6 +82,7 @@ namespace Coflnet.Sky.Commands.Shared
                     {
                         using var errorAct = DiHandler.GetService<ActivitySource>().StartActivity("error");
                         errorAct?.SetTag("error", "filter_parsing");
+                        errorAct.AddEvent(new ActivityEvent("error", DateTimeOffset.UtcNow, new ActivityTagsCollection { { "error", e.Message } }));
                         Console.WriteLine($"{errorAct?.Id} {e}");
                         throw new CoflnetException("filter_parsing", $"Error in filter {item} with value {match.Value} : {e.Message.Truncate(24)} id:{errorAct?.Id}");
                     }
