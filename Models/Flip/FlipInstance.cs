@@ -52,12 +52,18 @@ namespace Coflnet.Sky.Commands.Shared
 
         public static long ProfitAfterFees(long targetPrice, long cost)
         {
+            float reduction = GetFeesForStartingBid(targetPrice);
+            return (long)(targetPrice * (100 - reduction) / 100 - cost);
+        }
+
+        public static float GetFeesForStartingBid(long targetPrice)
+        {
             var reduction = 2f;
             if (targetPrice > 10_000_000)
                 reduction = 3;
             if (targetPrice >= 100_000_000)
                 reduction = 3.5f;
-            return (long)(targetPrice * (100 - reduction) / 100 - cost);
+            return reduction;
         }
 
         [IgnoreDataMember]
