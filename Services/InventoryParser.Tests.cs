@@ -10,7 +10,6 @@ namespace Coflnet.Sky.Commands.Shared;
 
 public class InventoryParserTests
 {
-    /* Deactivated because multiline string are not a thing in .net 6
     string jsonSample = """
         {
     "_events": {},
@@ -254,24 +253,24 @@ public class InventoryParserTests
         var item = deserialized
                         .Where(i => i != null).Last();
         Console.WriteLine(JsonConvert.SerializeObject(item, Formatting.Indented));
-        Assert.That("PET_ELEPHANT",Is.EqualTo(item.Tag));
-        Assert.That("┬ºfIron Helmet",Is.EqualTo(item.ItemName));
-        Assert.That(1,Is.EqualTo(item.Enchantments.Count));
-        Assert.That(1,Is.EqualTo(item.Enchantments.Where(e => e.Type == Core.Enchantment.EnchantmentType.growth).First().Level));
-        Assert.That("0cf52647-c130-43ec-9c46-e2dc162d4894",Is.EqualTo(item.FlatenedNBT["uuid"]));
-        Assert.That("PET_ITEM_FARMING_SKILL_BOOST_EPIC",Is.EqualTo(item.FlatenedNBT["heldItem"]));
-        Assert.That("33978271,22665796", Is.EqualTo(item.FlatenedNBT["exp"].Replace('.',',')));
-        Assert.That("FINE",Is.EqualTo(item.FlatenedNBT["JADE_0"]));
-        Assert.That("PERFECT",Is.EqualTo(item.FlatenedNBT["COMBAT_0"]));
-        Assert.That("4303281387",Is.EqualTo(item.FlatenedNBT["mined_crops"]));
-        Assert.That("SHADOW_WARP_SCROLL WITHER_SHIELD_SCROLL",Is.EqualTo(item.FlatenedNBT["ability_scroll"]));
-        Assert.That("6",Is.EqualTo(item.FlatenedNBT["MASTER_CRYPT_TANK_ZOMBIE_70"]));
-        Assert.That(ItemReferences.Reforge.Heavy,Is.EqualTo(item.Reforge));
-        Assert.That(Tier.COMMON,Is.EqualTo(item.Tier));
+        Assert.That("PET_ELEPHANT", Is.EqualTo(item.Tag));
+        Assert.That("┬ºfIron Helmet", Is.EqualTo(item.ItemName));
+        Assert.That(1, Is.EqualTo(item.Enchantments.Count));
+        Assert.That(1, Is.EqualTo(item.Enchantments.Where(e => e.Type == Core.Enchantment.EnchantmentType.growth).First().Level));
+        Assert.That("0cf52647-c130-43ec-9c46-e2dc162d4894", Is.EqualTo(item.FlatenedNBT["uuid"]));
+        Assert.That("PET_ITEM_FARMING_SKILL_BOOST_EPIC", Is.EqualTo(item.FlatenedNBT["heldItem"]));
+        Assert.That("33978271,22665796", Is.EqualTo(item.FlatenedNBT["exp"].Replace('.', ',')));
+        Assert.That("FINE", Is.EqualTo(item.FlatenedNBT["JADE_0"]));
+        Assert.That("PERFECT", Is.EqualTo(item.FlatenedNBT["COMBAT_0"]));
+        Assert.That("4303281387", Is.EqualTo(item.FlatenedNBT["mined_crops"]));
+        Assert.That("SHADOW_WARP_SCROLL WITHER_SHIELD_SCROLL", Is.EqualTo(item.FlatenedNBT["ability_scroll"]));
+        Assert.That("6", Is.EqualTo(item.FlatenedNBT["MASTER_CRYPT_TANK_ZOMBIE_70"]));
+        Assert.That(ItemReferences.Reforge.Heavy, Is.EqualTo(item.Reforge));
+        Assert.That(Tier.COMMON, Is.EqualTo(item.Tier));
 
         var divan = deserialized.Where(i => i != null).Skip(1).First();
-        Assert.That(new DateTime(2023, 7, 24),Is.EqualTo(divan.ItemCreatedAt.Date));
-        Assert.That("AMBER_0,AMBER_1,JADE_0,JADE_1,TOPAZ_0",Is.EqualTo(divan.FlatenedNBT["unlocked_slots"]));
+        Assert.That(new DateTime(2023, 7, 24), Is.EqualTo(divan.ItemCreatedAt.Date));
+        Assert.That("AMBER_0,AMBER_1,JADE_0,JADE_1,TOPAZ_0", Is.EqualTo(divan.FlatenedNBT["unlocked_slots"]));
     }
 
     string petSample = """
@@ -395,8 +394,8 @@ public class InventoryParserTests
         var parser = new InventoryParser();
         var serialized = MessagePackSerializer.Serialize(parser.Parse(petSample));
         var item = MessagePackSerializer.Deserialize<List<SaveAuction>>(serialized).First();
-        Assert.That(Tier.LEGENDARY,Is.EqualTo(item.Tier));
-        Assert.That(new DateTime(2023, 3, 29),Is.EqualTo(item.ItemCreatedAt.Date));
+        Assert.That(Tier.LEGENDARY, Is.EqualTo(item.Tier));
+        Assert.That(new DateTime(2023, 3, 29), Is.EqualTo(item.ItemCreatedAt.Date));
     }
 
 
@@ -414,16 +413,16 @@ public class InventoryParserTests
         var serialized = MessagePackSerializer.Serialize(parser.Parse(jsonSampleCT));
         var item = MessagePackSerializer.Deserialize<List<SaveAuction>>(serialized)
                         .Where(i => i != null).Last();
-        Assert.That("DCTR_SPACE_HELM",Is.EqualTo(item.Tag));
-        Assert.That("§cSpace Helmet",Is.EqualTo(item.ItemName));
-        Assert.That(ItemReferences.Reforge.None,Is.EqualTo(item.Reforge));
-        Assert.That(8,Is.EqualTo(item.Enchantments.Count));
-        Assert.That(3,Is.EqualTo(item.Enchantments.Where(e => e.Type == Core.Enchantment.EnchantmentType.impaling).First().Level));
-        Assert.That(4,Is.EqualTo(item.Enchantments.Where(e => e.Type == Core.Enchantment.EnchantmentType.chance).First().Level));
-        Assert.That(1,Is.EqualTo(item.Count));
-        Assert.That("b14aefbd-cbf8-4ca1-aa2e-5c0422807c60",Is.EqualTo(item.FlatenedNBT["uuid"]));
-        Assert.That("4/8/23 10:01 AM",Is.EqualTo(item.FlatenedNBT["timestamp"]));
-        Assert.That(Tier.SPECIAL,Is.EqualTo(item.Tier));
+        Assert.That("DCTR_SPACE_HELM", Is.EqualTo(item.Tag));
+        Assert.That("§cSpace Helmet", Is.EqualTo(item.ItemName));
+        Assert.That(ItemReferences.Reforge.None, Is.EqualTo(item.Reforge));
+        Assert.That(8, Is.EqualTo(item.Enchantments.Count));
+        Assert.That(3, Is.EqualTo(item.Enchantments.Where(e => e.Type == Core.Enchantment.EnchantmentType.impaling).First().Level));
+        Assert.That(4, Is.EqualTo(item.Enchantments.Where(e => e.Type == Core.Enchantment.EnchantmentType.chance).First().Level));
+        Assert.That(1, Is.EqualTo(item.Count));
+        Assert.That("b14aefbd-cbf8-4ca1-aa2e-5c0422807c60", Is.EqualTo(item.FlatenedNBT["uuid"]));
+        Assert.That("4/8/23 10:01 AM", Is.EqualTo(item.FlatenedNBT["timestamp"]));
+        Assert.That(Tier.SPECIAL, Is.EqualTo(item.Tier));
     }
 
     /// <summary>
@@ -613,8 +612,27 @@ public class InventoryParserTests
         ]}
         """);
 
-        Assert.That("§fIron Helmet",Is.EqualTo(data.First().ItemName));
+        Assert.That("§fIron Helmet", Is.EqualTo(data.First().ItemName));
         Assert.That(data.First().Context["lore"].StartsWith("§7Defense:  §a+10\n\n§7Growth I\n§7Grants §a+15 §c❤ Health"));
-        Assert.That(new DateTime(2023, 2, 18),Is.EqualTo(data.First().ItemCreatedAt.Date));
-    }*/
+        Assert.That(new DateTime(2023, 2, 18), Is.EqualTo(data.First().ItemCreatedAt.Date));
+    }
+
+    [Test]
+    public void DoNotCrashForVanilla()
+    {
+        var parser = new InventoryParser();
+        var data = parser.Parse("""
+        {
+        "_events": {},
+        "_eventsCount": 0,
+        "id": 0,
+        "type": "minecraft:inventory",
+        "slots":[
+            {"type":844,"count":1,"metadata":0,"nbt":{"type":"compound","name":"","value":{"HideFlags":{"type":"int","value":254},
+            "display":{"type":"compound","value":{"Lore":{"type":"list","value":{"type":"string","value":["{\"italic\":false,\"extra\":[{\"color\":\"dark_gray\",\"text\":\"Bed Wars\"}],\"text\":\"\"}","{\"italic\":false,\"text\":\"\"}","{\"italic\":false,\"extra\":[{\"color\":\"gray\",\"text\":\"Join a game of 4v4v4v4.\"}],\"text\":\"\"}","{\"italic\":false,\"text\":\"\"}","{\"italic\":false,\"extra\":[{\"color\":\"green\",\"text\":\"► Click to Play\"}],\"text\":\"\"}","{\"italic\":false,\"extra\":[{\"color\":\"gray\",\"text\":\"1,171 currently playing!\"}],\"text\":\"\"}","{\"italic\":false,\"text\":\"\"}","{\"italic\":false,\"extra\":[{\"color\":\"dark_gray\",\"text\":\"Right Click to change this slot!\"}],\"text\":\"\"}"]}},
+            "Name":{"type":"string","value":"{\"italic\":false,\"extra\":[{\"color\":\"green\",\"text\":\"4v4v4v4 \"}],\"text\":\"\"}"}}},"ExtraAttributes":{"type":"compound","value":{"animatedItemIdentifier":{"type":"string","value":"c7925960-db90-404a-aaf1-546f776bcc24"}}},"Damage":{"type":"int","value":14}}},"stackId":null,"name":"red_bed","displayName":"Red Bed","stackSize":1,"slot":14}
+        ]}
+        """);
+        Assert.That(data.First()?.ItemName, Is.Null);
+    }
 }
