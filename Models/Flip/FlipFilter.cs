@@ -55,6 +55,7 @@ namespace Coflnet.Sky.Commands.Shared
             AdditionalFilters.Add<PerfectArmorTierDetailedFlipFilter>();
             AdditionalFilters.Add<RemoveAfterDetailedFlipFilter>();
             AdditionalFilters.Add<VolatilityDetailedFlipFilter>();
+            AdditionalFilters.Add<ReferenceCountFlipFilter>();
         }
 
         public FlipFilter(Dictionary<string, string> originalf)
