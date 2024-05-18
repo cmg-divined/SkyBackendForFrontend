@@ -6,7 +6,7 @@ using Coflnet.Sky.Filter;
 namespace Coflnet.Sky.Commands.Shared;
 
 [FilterDescription("How many days ago the oldest reference used for anit market manipulation was sold. 0 is today")]
-public class OldestReferenceAgeFlipFilter : NumberDetailedFlipFilter
+public class OldestReferenceAgeDetailedFlipFilter : NumberDetailedFlipFilter
 {
     protected override Expression<Func<FlipInstance, double>> GetSelector()
     {
