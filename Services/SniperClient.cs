@@ -32,7 +32,7 @@ public class SniperClient : ISniperClient
     public async Task<List<Sniper.Client.Model.PriceEstimate>> GetPrices(IEnumerable<SaveAuction> auctionRepresent)
     {
         var request = new RestRequest("/api/sniper/prices", RestSharp.Method.Post);
-        var options =  MessagePackSerializerOptions.Standard.WithCompression(MessagePackCompression.Lz4Block); 
+        var options = MessagePackSerializerOptions.Standard.WithCompression(MessagePackCompression.Lz4Block);
         request.AddJsonBody(JsonConvert.SerializeObject(Convert.ToBase64String(MessagePackSerializer.Serialize(auctionRepresent, options))));
 
         var respone = await sniperClient.ExecuteAsync(request).ConfigureAwait(false);
@@ -57,7 +57,7 @@ public class SniperClient : ISniperClient
         return await sniperApi.ApiSniperPricesCleanGetAsync();
     }
 
-    public static double InstaSellPrice(Sniper.Client.Model.PriceEstimate pricing)
+    public static (double, bool fromMedian) InstaSellPrice(Sniper.Client.Model.PriceEstimate pricing)
     {
         var deduct = 0.12;
         if (pricing.Median < 15_000_000)
@@ -68,6 +68,6 @@ public class SniperClient : ISniperClient
         var target = Math.Max(fromMed, Math.Min(pricing.Lbin.Price * (1 - deduct - 0.08), fromMed * 1.2));
         if (pricing.ItemKey != pricing.LbinKey)
             target = fromMed;
-        return target;
+        return (target, fromMed == target);
     }
 }
