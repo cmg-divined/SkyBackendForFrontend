@@ -193,7 +193,7 @@ namespace Coflnet.Sky.Commands.Shared
             {
                 var source = DiHandler.GetService<ActivitySource>();
                 using var activity = source.StartActivity("itemSearch");
-                activity.SetTag("search", search);
+                activity?.SetTag("search", search);
                 await FindItems(search, itemTask, Results, activity);
             }, token).ConfigureAwait(false);
 
