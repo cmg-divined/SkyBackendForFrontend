@@ -193,6 +193,7 @@ namespace Coflnet.Sky.Commands.Shared
             {
                 var source = DiHandler.GetService<ActivitySource>();
                 using var activity = source.StartActivity("itemSearch");
+                activity.SetTag("search", search);
                 await FindItems(search, itemTask, Results, activity);
             }, token).ConfigureAwait(false);
 
@@ -423,7 +424,7 @@ namespace Coflnet.Sky.Commands.Shared
             var orderedResult = result.Where(r => r.Name != null)
                             .Select(r =>
                             {
-                                var lower = r.Name.ToLower();
+                                var lower = r.Name.ToLower().Replace("- bazaar", "");
                                 return new
                                 {
                                     rating = String.IsNullOrEmpty(r.Name) ? 0 :
