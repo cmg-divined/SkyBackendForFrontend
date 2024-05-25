@@ -50,11 +50,11 @@ public class FilterStateService
         }
         else
             return;
-        var response = await mayorApi.MayorCurrentGetWithHttpInfoAsync();
-        State.CurrentMayor = JsonConvert.DeserializeObject<ModelCandidate>(response.Data.ToString()).Name;
-        State.PreviousMayor = mayorApi.MayorLastGet();
         try
         {
+            State.PreviousMayor = mayorApi.MayorLastGet();
+            var response = await mayorApi.MayorCurrentGetWithHttpInfoAsync();
+            State.CurrentMayor = JsonConvert.DeserializeObject<ModelCandidate>(response.Data.ToString()).Name;
             State.NextMayor = (await mayorApi.MayorNextGetAsync())?.Name;
         }
         catch (Exception e)
