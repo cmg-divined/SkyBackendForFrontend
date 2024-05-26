@@ -10,6 +10,6 @@ public class VolatilityDetailedFlipFilter : NumberDetailedFlipFilter
 {
     protected override Expression<Func<FlipInstance, double>> GetSelector()
     {
-        return flip => flip.Auction.Context.ContainsKey("volat") ? double.Parse(flip.Auction.Context["volat"]) : 0;
+        return flip => flip.Context.ContainsKey("volat") ? double.Parse(flip.Context["volat"]) : 0;
     }
 }

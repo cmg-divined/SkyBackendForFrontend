@@ -10,6 +10,6 @@ public class PremPlusDetailedFlipFilter : BoolDetailedFlipFilter
 {
     public override Expression<Func<FlipInstance, bool>> GetStateExpression(bool expected)
     {
-        return flip => (flip.Auction.Context != null && flip.Auction.Context.ContainsKey("bfcs")) == expected;
+        return flip => (flip.Context != null && flip.Context.ContainsKey("bfcs")) == expected;
     }
 }

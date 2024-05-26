@@ -10,6 +10,6 @@ public class OldestReferenceAgeDetailedFlipFilter : NumberDetailedFlipFilter
 {
     protected override Expression<Func<FlipInstance, double>> GetSelector()
     {
-        return flip => flip.Auction.Context.ContainsKey("oldRef") ? double.Parse(flip.Auction.Context["oldRef"]) : 0;
+        return flip => flip.Context.ContainsKey("oldRef") ? double.Parse(flip.Context["oldRef"]) : 0;
     }
 }

@@ -10,6 +10,6 @@ public class ReferenceCountDetailedFlipFilter : NumberDetailedFlipFilter
 {
     protected override Expression<Func<FlipInstance, double>> GetSelector()
     {
-        return flip => flip.Auction.Context.ContainsKey("refCount") ? double.Parse(flip.Auction.Context["refCount"]) : 0;
+        return flip => flip.Context.ContainsKey("refCount") ? double.Parse(flip.Context["refCount"]) : 0;
     }
 }
