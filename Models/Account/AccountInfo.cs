@@ -37,6 +37,10 @@ namespace Coflnet.Sky.Commands.Shared
         public string CaptchaType { get; set; }
         [DataMember(Name = "badActionCount")]
         public int BadActionCount { get; set; }
+        [DataMember(Name = "shadinessLevel")]
+        public int ShadinessLevel { get; set; } = -1;
+        [DataMember(Name = "createdAt")]
+        public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
         /// <summary>
         /// Timestamp of when user connected with a macro client for the last time
         /// </summary>
