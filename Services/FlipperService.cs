@@ -675,6 +675,7 @@ namespace Coflnet.Sky.Commands.Shared
             RunIsolatedForever(ConsumeNewAuctions, "consuming new auctions for user filter", stoppingToken);
 
             RunIsolatedForever(ProcessSlowQueue, "slow queue processor", stoppingToken, 200);
+            DiHandler.ServiceProvider.GetRequiredService<SettingsService>(); // warmup
             return Task.CompletedTask;
         }
 
