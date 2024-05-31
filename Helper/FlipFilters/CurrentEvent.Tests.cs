@@ -53,6 +53,11 @@ public class CurrentEventTests
     {
         AssertEvent(new DateTime(2023, 6, 3, 11, 54, 1, DateTimeKind.Utc), Events.NotDarkAuction);
     }
+    [Test]
+    public void JacobsFarmingContest()
+    {
+        AssertEvent(new DateTime(2023, 6, 3, 11, 25, 1, DateTimeKind.Utc), Events.JacobsFarmingContest);
+    }
 
 
     private static void AssertEvent(DateTime start, Events target, Events eventBefore = Events.None)

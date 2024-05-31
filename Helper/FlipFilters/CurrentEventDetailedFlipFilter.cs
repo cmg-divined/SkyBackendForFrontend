@@ -18,11 +18,13 @@ public class CurrentEventDetailedFlipFilter : DetailedFlipFilter
         DarkAuction,
         NewYear,
         SeasonOfJerry,
+        JacobsFarmingContest,
         NotTravelingZoo = 101,
         NotSpookyFestival,
         NotDarkAuction,
         NotNewYear,
-        NotSeasonOfJerry
+        NotSeasonOfJerry,
+        NotJacobsFarmingContest
     }
     public enum Months
     {
@@ -67,8 +69,12 @@ public class CurrentEventDetailedFlipFilter : DetailedFlipFilter
         {
             return a => (Now.Minute >= 55 && Now.Minute <= 59) == shouldBeTrue;
         }
+        if(eventVal == Events.JacobsFarmingContest)
+        {
+            return a => (Now.Minute >= 15 && Now.Minute <= 35) == shouldBeTrue;
+        }
 
-        return a => (currentEvent == eventVal) == shouldBeTrue;
+        return a => currentEvent == eventVal == shouldBeTrue;
     }
 
     private int GetCurrentDay()
