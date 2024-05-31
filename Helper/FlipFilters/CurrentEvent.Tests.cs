@@ -38,6 +38,21 @@ public class CurrentEventTests
     {
         AssertEvent(new DateTime(2023, 6, 2, 11, 15, 1, DateTimeKind.Utc), Events.SeasonOfJerry);
     }
+    [Test]
+    public void NotSeasonOfJerry()
+    {
+        AssertEvent(new DateTime(2023, 6, 3, 11, 15, 1, DateTimeKind.Utc), Events.NotSeasonOfJerry);
+    }
+    [Test]
+    public void DarkAuction()
+    {
+        AssertEvent(new DateTime(2023, 6, 3, 11, 55, 1, DateTimeKind.Utc), Events.DarkAuction);
+    }
+    [Test]
+    public void NotDarkAuction()
+    {
+        AssertEvent(new DateTime(2023, 6, 3, 11, 54, 1, DateTimeKind.Utc), Events.NotDarkAuction);
+    }
 
 
     private static void AssertEvent(DateTime start, Events target, Events eventBefore = Events.None)
