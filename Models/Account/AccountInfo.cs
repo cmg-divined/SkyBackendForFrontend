@@ -46,5 +46,7 @@ namespace Coflnet.Sky.Commands.Shared
         /// </summary>
         [DataMember(Name = "lastMacroConnect")]
         public DateTime LastMacroConnect { get; set; }
+        [DataMember(Name = "nickName")]
+        public string NickName { get; set; }
     }
 }
