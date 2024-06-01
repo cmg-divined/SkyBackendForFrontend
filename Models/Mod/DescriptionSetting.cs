@@ -27,4 +27,7 @@ public class DescriptionSetting
                     new() { DescriptionField.MEDIAN, DescriptionField.VOLUME },
                     new() { DescriptionField.FullCraftCost } }
     };
+
+    [SettingsDoc("If the extra lore should be displayed or not")]
+    public bool Disabled { get; set; }
 }
