@@ -26,5 +26,10 @@ namespace Coflnet.Sky.Commands.Shared
             var response = await Client.ExecuteAsync(new RestRequest("auctions/ended", Method.Get));
             return JsonConvert.DeserializeObject<List<AuctionResult>>(JsonConvert.DeserializeObject<string>(response.Content));
         }
+        public static async Task<string> DeleteUser(string email, string googleId)
+        {
+            var response = await Client.ExecuteAsync(new RestRequest($"user/{email}?id={googleId}", Method.Delete));
+            return JsonConvert.DeserializeObject<string>(JsonConvert.DeserializeObject<string>(response.Content));
+        }
     }
 }
