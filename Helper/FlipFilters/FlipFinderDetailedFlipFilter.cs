@@ -20,7 +20,8 @@ namespace Coflnet.Sky.Commands.Shared
             LowPricedAuction.FinderType.STONKS,
             LowPricedAuction.FinderType.TFM,
             LowPricedAuction.FinderType.ALL_EXCEPT_USER,
-            LowPricedAuction.FinderType.AI
+            LowPricedAuction.FinderType.AI,
+            LowPricedAuction.FinderType.MedianBased,
         }.Select(t=> (object)t).ToArray();
 
         public FilterType FilterType => FilterType.Equal;
