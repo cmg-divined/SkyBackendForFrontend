@@ -60,6 +60,9 @@ namespace Coflnet.Sky.Commands.Shared
         [DataMember(Name = "fastMode")]
         [SettingsDoc("Use the fast lane flips", true)]
         public bool FastMode;
+        [DataMember(Name = "publishedAs")]
+        [SettingsDoc("What this settings is published under", true)]
+        public string PublishedAs;
 
         /// <summary>
         /// The initiating party that sent the change
