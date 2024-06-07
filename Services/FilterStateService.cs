@@ -147,6 +147,6 @@ public class FilterStateService
         {
             local.itemCategories.AddOrUpdate(item.Key, item.Value, (k, v) => v.Union(item.Value).ToHashSet());
         }
-        newState.LastUpdate = DateTime.UtcNow;
+        local.LastUpdate = DateTime.UtcNow;
     }
 }
