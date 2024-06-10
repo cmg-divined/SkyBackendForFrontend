@@ -48,5 +48,11 @@ namespace Coflnet.Sky.Commands.Shared
         public DateTime LastMacroConnect { get; set; }
         [DataMember(Name = "nickName")]
         public string NickName { get; set; }
+        [DataMember(Name = "captchaBold")]
+        public string CaptchaBoldChar;
+        [DataMember(Name = "captchaSlim")]
+        public string CaptchaSlimChar;
+        [DataMember(Name = "captchaSpaceCount")]
+        public int CaptchaSpaceCount;
     }
 }
