@@ -8,7 +8,7 @@ using Coflnet.Sky.Filter;
 namespace Coflnet.Sky.Commands.Shared;
 public class IntroductionAgeDaysDetailedFlipFilter : DetailedFlipFilter
 {
-    public FilterType FilterType => FilterType.LOWER | FilterType.Equal;
+    public FilterType FilterType => FilterType.LOWER | FilterType.RANGE;
 
     public object[] Options => new object[] { 1, 14 };
 
