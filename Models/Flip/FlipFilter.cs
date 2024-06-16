@@ -58,6 +58,8 @@ namespace Coflnet.Sky.Commands.Shared
             AdditionalFilters.Add<ReferenceCountDetailedFlipFilter>();
             AdditionalFilters.Add<OldestReferenceAgeDetailedFlipFilter>();
             AdditionalFilters.Add<DoNotRelistDetailedFlipFilter>();
+            AdditionalFilters.Add<ReduceTargetByDetailedFlipFilter>();
+            AdditionalFilters.Add<RelistAtDetailedFlipFilter>();
         }
 
         public FlipFilter(Dictionary<string, string> originalf)
