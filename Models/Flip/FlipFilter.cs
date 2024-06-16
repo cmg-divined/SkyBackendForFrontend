@@ -60,6 +60,8 @@ namespace Coflnet.Sky.Commands.Shared
             AdditionalFilters.Add<DoNotRelistDetailedFlipFilter>();
             AdditionalFilters.Add<ReduceTargetByDetailedFlipFilter>();
             AdditionalFilters.Add<RelistAtDetailedFlipFilter>();
+            AdditionalFilters.Add<TargetPriceDetailedFlipFilter>();
+            AdditionalFilters.Add<CapTargetPriceAtDetailedFlipFilter>();
         }
 
         public FlipFilter(Dictionary<string, string> originalf)
