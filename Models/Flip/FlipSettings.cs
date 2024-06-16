@@ -137,6 +137,10 @@ namespace Coflnet.Sky.Commands.Shared
             try
             {
                 var match = WhiteListMatcher.IsMatch(flip);
+                if (flip.Context.TryGetValue("target", out string stringVal) && double.TryParse(stringVal, out double target))
+                {
+                    flip.Target = (long)target;
+                }
                 if (match.Item1)
                     return (true, "whitelist " + match.Item2);
             }
@@ -170,7 +174,7 @@ namespace Coflnet.Sky.Commands.Shared
         private static void LogError(FlipInstance flip, string title, ListMatcher matcher, Exception e)
         {
             Activity.Current?.AddTag("flip", JSON.Stringify(flip));
-            Activity.Current?.AddTag("filter", JSON.Stringify(matcher?.FullList?.Where(x=>x!=null).Select(x => new { x.ItemTag, x.filter })));
+            Activity.Current?.AddTag("filter", JSON.Stringify(matcher?.FullList?.Where(x => x != null).Select(x => new { x.ItemTag, x.filter })));
             throw new Exception("Error while matching " + title + " " + e?.Message, e);
         }
 

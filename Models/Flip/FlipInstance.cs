@@ -69,7 +69,25 @@ namespace Coflnet.Sky.Commands.Shared
         [IgnoreDataMember]
         public long ProfitPercentage => (Profit * 100 / (LastKnownCost == 0 ? int.MaxValue : LastKnownCost));
         [IgnoreDataMember]
-        public long Target => (Finder == LowPricedAuction.FinderType.SNIPER ? LowestBin : MedianPrice) ?? MedianPrice;
+        public long Target
+        {
+            get
+            {
+                return (Finder == LowPricedAuction.FinderType.SNIPER? LowestBin : MedianPrice) ?? MedianPrice; 
+            }
+            set
+            {
+                if (Finder == LowPricedAuction.FinderType.SNIPER)
+                {
+                    LowestBin = value;
+                }
+                else
+                {
+                    MedianPrice = value;
+                }
+            }
+        }
+        
 
         [DataMember(Name = "context")]
         public Dictionary<string, string> Context { get; set; }
