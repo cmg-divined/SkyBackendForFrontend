@@ -57,6 +57,7 @@ namespace Coflnet.Sky.Commands.Shared
             AdditionalFilters.Add<VolatilityDetailedFlipFilter>();
             AdditionalFilters.Add<ReferenceCountDetailedFlipFilter>();
             AdditionalFilters.Add<OldestReferenceAgeDetailedFlipFilter>();
+            AdditionalFilters.Add<DoNotRelistDetailedFlipFilter>();
         }
 
         public FlipFilter(Dictionary<string, string> originalf)
