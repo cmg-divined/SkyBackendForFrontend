@@ -8,9 +8,9 @@ namespace Coflnet.Sky.Commands.Shared;
 [FilterDescription("Filter for the price estimations")]
 public class TargetPriceDetailedFlipFilter : NumberDetailedFlipFilter
 {
-    public FilterType FilterType => FilterType.NUMERICAL;
+    public override FilterType FilterType => FilterType.NUMERICAL;
 
-    protected virtual Expression<Func<FlipInstance, double>> GetSelector()
+    protected override Expression<Func<FlipInstance, double>> GetSelector()
     {
         return (f) => f.Target;
     }

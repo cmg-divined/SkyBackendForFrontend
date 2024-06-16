@@ -12,8 +12,8 @@ namespace Coflnet.Sky.Commands.Shared
     public class NumberDetailedFlipFilter : DetailedFlipFilter
     {
         public virtual object[] Options => new object[]{1,10_000_000_000};
-        public FilterType FilterType => FilterType.NUMERICAL | FilterType.RANGE;
-        public Expression<Func<FlipInstance, bool>> GetExpression(Dictionary<string, string> filters, string content)
+        public virtual FilterType FilterType => FilterType.NUMERICAL | FilterType.RANGE;
+        public virtual Expression<Func<FlipInstance, bool>> GetExpression(Dictionary<string, string> filters, string content)
         {
             var selector = GetSelector();
             if (content.Contains("-"))

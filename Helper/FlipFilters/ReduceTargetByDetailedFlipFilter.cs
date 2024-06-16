@@ -10,11 +10,11 @@ namespace Coflnet.Sky.Commands.Shared;
 [FilterDescription("Above 1 reduces by absolute number, from 0-1 uses percentage 0.2 removes 20%")]
 public class ReduceTargetByDetailedFlipFilter : NumberDetailedFlipFilter
 {
-    public object[] Options => [0, 10_000_000_000];
+    public override object[] Options => [0, 10_000_000_000];
 
     public FilterType FilterType => FilterType.NUMERICAL;
 
-    public Expression<Func<FlipInstance, bool>> GetExpression(Dictionary<string, string> filters, string val)
+    public override Expression<Func<FlipInstance, bool>> GetExpression(Dictionary<string, string> filters, string val)
     {
         var target = NumberParser.Double(val);
         if (target < 1)
