@@ -365,14 +365,14 @@ namespace Coflnet.Sky.Commands
             // use flipTracking.FlipsPlayerIdGetAsync(uuid)
             var allSoldFlips = await Task.WhenAll(uuids.Select(async uuid =>
             {
-                return await flipTracking.FlipsPlayerIdGetAsync(Guid.Parse(uuid), startTime, endTime);
+                return (await flipTracking.FlipsPlayerIdGetAsync(Guid.Parse(uuid), startTime, endTime), uuid);
             }));
 
-            var relevantFlips = allSoldFlips.Where(f => f != null).SelectMany(f => f)
-                .Where(f => f != null && f.Profit != 0)
-                .GroupBy(f => f.PurchaseAuctionId)
+            var relevantFlips = allSoldFlips.Where(f => f.Item1 != null).SelectMany(f => f.Item1.Select(fl => (Flip: fl, f.uuid)))
+                .Where(f => f.Flip != null && f.Flip.Profit != 0)
+                .GroupBy(f => f.Flip.PurchaseAuctionId)
                 .Select(g => g.Last()).ToList();
-            var newFlips = relevantFlips.Select(f => new FlipDetails()
+            var newFlips = relevantFlips.Select(f => f.Flip).Select(f => new FlipDetails()
             {
                 BuyTime = f.PurchaseTime,
                 Finder = Enum.TryParse<LowPricedAuction.FinderType>(f.FinderType.ToString(), out var finder) ? finder : LowPricedAuction.FinderType.UNKOWN,
@@ -390,11 +390,18 @@ namespace Coflnet.Sky.Commands
                 // flag enum converted to array
                 Flags = (Shared.FlipFlags)f.Flags
             }).ToArray();
-            if (uuids.Count() == 1 && timeSpan >= TimeSpan.FromDays(7) && endTime > DateTime.UtcNow - TimeSpan.FromSeconds(1))
-                SaveProfitToLeaderboard(uuids.First(), newFlips.Where(f => f.SellTime > DateTime.UtcNow - TimeSpan.FromDays(7)).Sum(f => f.Profit));
+            foreach (var uuid in uuids)
+            {
+                if (timeSpan < TimeSpan.FromDays(7) || endTime <= DateTime.UtcNow - TimeSpan.FromSeconds(1))
+                    continue;
+                var accountProfit = relevantFlips
+                    .Where(f => f.uuid == uuid)
+                    .Where(f => f.Flip.SellTime > DateTime.UtcNow - TimeSpan.FromDays(7))
+                    .Sum(f => f.Flip.Profit);
+                SaveProfitToLeaderboard(uuids.First(), accountProfit);
+                logger.LogInformation($"Player {uuid} made {accountProfit} profit in {timeSpan}");
+            }
             var profit = newFlips.Sum(r => r.Profit);
-            if (uuids.Count() == 1)
-                logger.LogInformation($"Player {uuids.First()} made {profit} profit in {timeSpan}");
             return new FlipSumary()
             {
                 Flips = newFlips,
