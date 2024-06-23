@@ -183,7 +183,7 @@ namespace Coflnet.Sky.Commands.Shared
             if (BlackListMatcher != null)
                 return;
             // return if already compiling
-            if (!filterCompileLock.Wait(0))
+            if (!filterCompileLock.Wait(0) || filterCompileCancel.Token.IsCancellationRequested)
             {
                 return;
             }
@@ -200,7 +200,7 @@ namespace Coflnet.Sky.Commands.Shared
         private void InitializeMatchers()
         {
             var token = filterCompileCancel.Token;
-            if (ForcedBlackListMatcher == null)
+            if (ForcedBlackListMatcher == null && !token.IsCancellationRequested)
                 ForcedBlackListMatcher = new ListMatcher(GetForceBlacklist());
             if (WhiteListMatcher == null && !token.IsCancellationRequested)
                 WhiteListMatcher = new ListMatcher(WhiteList?.Except(GetAfterMainWhitelist()).ToList());
