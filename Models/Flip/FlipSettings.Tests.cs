@@ -169,7 +169,7 @@ namespace Coflnet.Sky.Commands.Shared
         [Test]
         public void CreateListMatcherWithNull()
         {
-            var matcher = new FlipSettings.ListMatcher(null);
+            var matcher = new FlipSettings.ListMatcher(null, System.Threading.CancellationToken.None);
             Assert.That(!matcher.IsMatch(flipA).Item1);
         }
         [Test]
@@ -192,7 +192,7 @@ namespace Coflnet.Sky.Commands.Shared
                     {
                     }
                 },
-            });
+            }, System.Threading.CancellationToken.None);
             Assert.That(1,Is.EqualTo(matcher.FullList.Count));
             Assert.That(1,Is.EqualTo(matcher.FullList[0].Tags.Count));
             Assert.That(2,Is.EqualTo(matcher.FullList[0].filter.Count));

@@ -137,7 +137,7 @@ namespace Coflnet.Sky.Commands.Shared
             try
             {
                 var match = WhiteListMatcher.IsMatch(flip);
-                if (flip.Context.TryGetValue("target", out string stringVal) && double.TryParse(stringVal, out double target))
+                if ((flip.Context?.TryGetValue("target", out string stringVal) ?? false) && double.TryParse(stringVal, out double target))
                 {
                     flip.Target = (long)target;
                 }
@@ -201,13 +201,13 @@ namespace Coflnet.Sky.Commands.Shared
         {
             var token = filterCompileCancel.Token;
             if (ForcedBlackListMatcher == null && !token.IsCancellationRequested)
-                ForcedBlackListMatcher = new ListMatcher(GetForceBlacklist());
+                ForcedBlackListMatcher = new ListMatcher(GetForceBlacklist(), token);
             if (WhiteListMatcher == null && !token.IsCancellationRequested)
-                WhiteListMatcher = new ListMatcher(WhiteList?.Except(GetAfterMainWhitelist()).ToList());
+                WhiteListMatcher = new ListMatcher(WhiteList?.Except(GetAfterMainWhitelist()).ToList(), token);
             if (AfterMainWhiteListMatcher == null && !token.IsCancellationRequested)
-                AfterMainWhiteListMatcher = new ListMatcher(GetAfterMainWhitelist());
+                AfterMainWhiteListMatcher = new ListMatcher(GetAfterMainWhitelist(), token);
             if (BlackListMatcher == null && !token.IsCancellationRequested)
-                BlackListMatcher = new ListMatcher(BlackList?.Except(GetForceBlacklist()).ToList());
+                BlackListMatcher = new ListMatcher(BlackList?.Except(GetForceBlacklist()).ToList(), token);
         }
 
         private (bool, string) MainSettingsMatch(FlipInstance flip)
@@ -342,7 +342,7 @@ namespace Coflnet.Sky.Commands.Shared
             Dictionary<string, Func<FlipInstance, bool>> Matchers = new Dictionary<string, Func<FlipInstance, bool>>();
 
 
-            public ListMatcher(List<ListEntry> BlackList)
+            public ListMatcher(List<ListEntry> BlackList, CancellationToken token)
             {
                 if (BlackList == null || BlackList.Count == 0)
                     return;
@@ -362,16 +362,20 @@ namespace Coflnet.Sky.Commands.Shared
                 ConcurrentDictionary<string, Expression<Func<FlipInstance, bool>>> isMatch = new();
                 foreach (var item in RemainingFilters)
                 {
+                    if (token.IsCancellationRequested)
+                        return;
                     string key = KeyFromTag(item.ItemTag);
                     isMatch.AddOrUpdate(key, item.GetExpression(), (k, old) => old.Or(item.GetExpression()));
                 }
-                AssignMatchers(isMatch);
+                AssignMatchers(isMatch, token);
             }
 
-            private void AssignMatchers(ConcurrentDictionary<string, Expression<Func<FlipInstance, bool>>> isMatch)
+            private void AssignMatchers(ConcurrentDictionary<string, Expression<Func<FlipInstance, bool>>> isMatch, CancellationToken token)
             {
                 foreach (var item in isMatch)
                 {
+                    if (token.IsCancellationRequested)
+                        return;
                     try
                     {
                         Matchers.Add(item.Key, item.Value.Compile());
