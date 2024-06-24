@@ -398,6 +398,8 @@ namespace Coflnet.Sky.Commands
                     .Where(f => f.uuid == uuid)
                     .Where(f => f.Flip.SellTime > DateTime.UtcNow - TimeSpan.FromDays(7))
                     .Sum(f => f.Flip.Profit);
+                if (accountProfit == 0)
+                    continue;
                 SaveProfitToLeaderboard(uuids.First(), accountProfit);
                 logger.LogInformation($"Player {uuid} made {accountProfit} profit in {timeSpan}");
             }
