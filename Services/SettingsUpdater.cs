@@ -229,7 +229,7 @@ namespace Coflnet.Sky.Commands.Shared
                 {
                     var values = Enum.GetNames(field.FieldType);
                     if (field.FieldType == typeof(LowPricedAuction.FinderType))
-                        throw new CoflnetException("parse", "Invalid selection. Use either one or more of flipper,sniper,sniper_median,user");
+                        throw new CoflnetException("parse", "Invalid selection. Use either one or more of flipper,sniper,sniper_median,user,CraftCost");
                     throw new CoflnetException("parse", "Your input could not be parsed in any of " + String.Join(',', values));
                 }
             else if (field.FieldType.IsPrimitive && field.FieldType != typeof(bool))
