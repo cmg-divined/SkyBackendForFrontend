@@ -199,15 +199,20 @@ namespace Coflnet.Sky.Commands.Shared
 
         private void InitializeMatchers()
         {
+            Activity.Current.Log("initializing filter matcher");
             var token = filterCompileCancel.Token;
             if (ForcedBlackListMatcher == null && !token.IsCancellationRequested)
                 ForcedBlackListMatcher = new ListMatcher(GetForceBlacklist(), token);
+            Activity.Current.Log("initialized force blacklist");
             if (WhiteListMatcher == null && !token.IsCancellationRequested)
                 WhiteListMatcher = new ListMatcher(WhiteList?.Except(GetAfterMainWhitelist()).ToList(), token);
+            Activity.Current.Log("initialized whitelist matcher");
             if (AfterMainWhiteListMatcher == null && !token.IsCancellationRequested)
                 AfterMainWhiteListMatcher = new ListMatcher(GetAfterMainWhitelist(), token);
+            Activity.Current.Log("initialized after main whitelist matcher");
             if (BlackListMatcher == null && !token.IsCancellationRequested)
                 BlackListMatcher = new ListMatcher(BlackList?.Except(GetForceBlacklist()).ToList(), token);
+            Activity.Current.Log("initialized blacklist matcher");
         }
 
         private (bool, string) MainSettingsMatch(FlipInstance flip)
