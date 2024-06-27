@@ -366,7 +366,7 @@ namespace Coflnet.Sky.Commands
             var allSoldFlips = await Task.WhenAll(uuids.Select(async uuid =>
             {
                 var list = await flipTracking.FlipsPlayerIdGetAsync(Guid.Parse(uuid), startTime, endTime);
-                if(list == null)
+                if (list == null)
                     throw new CoflnetException("load_failed", $"Loading flips for {uuid} failed");
                 return (list, uuid);
             }));
@@ -402,7 +402,7 @@ namespace Coflnet.Sky.Commands
                     .Where(f => f.Flip.SellTime > DateTime.UtcNow - TimeSpan.FromDays(7))
                     .Sum(f => f.Flip.Profit);
                 logger.LogInformation($"Player {uuid} made {accountProfit} profit in {timeSpan} {relevantFlips.Count} flips checked ({allSoldFlips.Count()})");
-                if (accountProfit == 0)
+                if (accountProfit == 0 && relevantFlips.Count() <= 1)
                     continue;
                 SaveProfitToLeaderboard(uuids.First(), accountProfit);
             }
