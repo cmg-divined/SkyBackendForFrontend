@@ -385,7 +385,7 @@ namespace Coflnet.Sky.Commands.Shared
                         var startTime = DateTime.Now;
                         var compiled = item.Value.Compile();
                         Matchers.Add(item.Key, compiled);
-                        if (item.Key != string.Empty)
+                        if (item.Key != string.Empty && !Matchers.ContainsKey("STARRED_" + item.Key))
                             Matchers.Add("STARRED_" + item.Key, compiled);
                         if (DateTime.Now - startTime > TimeSpan.FromMilliseconds(100))
                             Activity.Current?.Log($"Took {DateTime.Now - startTime} ticks to compile filter for {item.Key}");
