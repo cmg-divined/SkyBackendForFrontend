@@ -10,7 +10,7 @@ namespace Coflnet.Sky.Commands.Shared
     {
         public override object[] Options => new object[]{0.05,1000};
 
-        protected override Expression<Func<FlipInstance, double>> GetSelector()
+        protected override Expression<Func<FlipInstance, double>> GetSelector(FilterContext filters)
         {
             return (f) => f.Volume;
         }

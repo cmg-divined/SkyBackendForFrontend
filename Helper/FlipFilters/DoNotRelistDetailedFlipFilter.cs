@@ -12,7 +12,7 @@ public class DoNotRelistDetailedFlipFilter : DetailedFlipFilter
 
     public FilterType FilterType => FilterType.BOOLEAN;
 
-    public Expression<Func<FlipInstance, bool>> GetExpression(Dictionary<string, string> filters, string val)
+    public Expression<Func<FlipInstance, bool>> GetExpression(FilterContext filters, string val)
     {
         return f => f.Context.TryAdd("target", "-2");
     }

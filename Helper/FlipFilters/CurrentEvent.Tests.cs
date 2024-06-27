@@ -71,7 +71,7 @@ public class CurrentEventTests
     {
         var filter = new StaticTimeFilter();
         filter.Time = time;
-        var expression = filter.GetExpression(new Dictionary<string, string>(), value.ToString());
+        var expression = filter.GetExpression(new(new(), null), value.ToString());
         var compiled = expression.Compile();
         var flip = new FlipInstance() { Auction = new() };
         Assert.That(compiled(flip), $"Expected {value} for {time}");

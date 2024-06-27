@@ -27,7 +27,7 @@ namespace Coflnet.Sky.Commands.Shared
 
         public FilterType FilterType => FilterType.Equal;
 
-        public Expression<Func<FlipInstance, bool>> GetExpression(Dictionary<string, string> filters, string val)
+        public Expression<Func<FlipInstance, bool>> GetExpression(FilterContext filters, string val)
         {
             if (!Enum.TryParse<LowPricedAuction.FinderType>(val, true, out LowPricedAuction.FinderType targetType))
                 throw new CoflnetException("invalid_finder", "the specified finder {val} does not exist");

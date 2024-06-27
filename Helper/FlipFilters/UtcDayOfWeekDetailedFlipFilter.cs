@@ -10,7 +10,7 @@ public class UtcDayOfWeekDetailedFlipFilter : NumberDetailedFlipFilter
 {
     public override object[] Options => new object[] { 0, 6 };
 
-    protected override Expression<Func<FlipInstance, double>> GetSelector()
+    protected override Expression<Func<FlipInstance, double>> GetSelector(FilterContext filters)
     {
         return (f) => (int)DateTime.UtcNow.DayOfWeek;
     }

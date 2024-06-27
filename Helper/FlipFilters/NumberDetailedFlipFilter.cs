@@ -13,9 +13,9 @@ namespace Coflnet.Sky.Commands.Shared
     {
         public virtual object[] Options => new object[]{1,10_000_000_000};
         public virtual FilterType FilterType => FilterType.NUMERICAL | FilterType.RANGE;
-        public virtual Expression<Func<FlipInstance, bool>> GetExpression(Dictionary<string, string> filters, string content)
+        public virtual Expression<Func<FlipInstance, bool>> GetExpression(FilterContext filters, string content)
         {
-            var selector = GetSelector();
+            var selector = GetSelector(filters);
             if (content.Contains("-"))
             {
                 var parts = content.Split("-").Select(a => NumberParser.Double(a)).ToArray();
@@ -35,7 +35,7 @@ namespace Coflnet.Sky.Commands.Shared
             //return flip => flip.ProfitPercentage > min;
         }
 
-        protected virtual Expression<Func<FlipInstance, double>> GetSelector()
+        protected virtual Expression<Func<FlipInstance, double>> GetSelector(FilterContext filters)
         {
             return (f) => (double)f.Volume;
         }

@@ -20,7 +20,7 @@ namespace Coflnet.Sky.Commands.Shared
         [SetUp]
         public void Setup()
         {
-            DiHandler.OverrideService<FilterEngine,FilterEngine>(new FilterEngine());
+            DiHandler.OverrideService<FilterEngine, FilterEngine>(new FilterEngine());
             flipA = new FlipInstance()
             {
                 Auction = new SaveAuction()
@@ -102,7 +102,7 @@ namespace Coflnet.Sky.Commands.Shared
 
         private static void CreateLookup(FlipInstance flip)
         {
-            flip.Auction.NBTLookup = new [] { new NBTLookup(1, 2) };
+            flip.Auction.NBTLookup = new[] { new NBTLookup(1, 2) };
         }
 
         [Test]
@@ -143,7 +143,7 @@ namespace Coflnet.Sky.Commands.Shared
         public void MatchesSpeed()
         {
             var hostName = System.Net.Dns.GetHostName();
-            if(hostName.Contains("-build"))
+            if (hostName.Contains("-build"))
                 Assert.Ignore("Running on build server");
             var matchCount = 0;
             var iterations = 2000;
@@ -162,14 +162,14 @@ namespace Coflnet.Sky.Commands.Shared
                     matchCount++;
             }
             Assert.That(140 * TestConstants.DelayMultiplier, Is.GreaterThan(stopWatch.ElapsedMilliseconds), "matching blacklist is too slow");
-            Assert.That(iterations * 2,Is.EqualTo(matchCount));
+            Assert.That(iterations * 2, Is.EqualTo(matchCount));
         }
 
 
         [Test]
         public void CreateListMatcherWithNull()
         {
-            var matcher = new FlipSettings.ListMatcher(null, System.Threading.CancellationToken.None);
+            var matcher = new FlipSettings.ListMatcher(null, null, System.Threading.CancellationToken.None);
             Assert.That(!matcher.IsMatch(flipA).Item1);
         }
         [Test]
@@ -192,10 +192,10 @@ namespace Coflnet.Sky.Commands.Shared
                     {
                     }
                 },
-            }, System.Threading.CancellationToken.None);
-            Assert.That(1,Is.EqualTo(matcher.FullList.Count));
-            Assert.That(1,Is.EqualTo(matcher.FullList[0].Tags.Count));
-            Assert.That(2,Is.EqualTo(matcher.FullList[0].filter.Count));
+            }, null, System.Threading.CancellationToken.None);
+            Assert.That(1, Is.EqualTo(matcher.FullList.Count));
+            Assert.That(1, Is.EqualTo(matcher.FullList[0].Tags.Count));
+            Assert.That(2, Is.EqualTo(matcher.FullList[0].filter.Count));
         }
 
         [Test]
@@ -238,7 +238,7 @@ namespace Coflnet.Sky.Commands.Shared
 
             var profitp = auction.ProfitPercentage;
 
-            Assert.That(listEntry.MatchesSettings(auction));
+            Assert.That(listEntry.MatchesSettings(auction, null));
         }
         [Test]
         public void MinProfitPercentageForHyperion()
@@ -264,7 +264,7 @@ namespace Coflnet.Sky.Commands.Shared
                 }
             };
             // report https://discord.com/channels/267680588666896385/986382602376196116/986382624362737685
-            Assert.That(listEntry.MatchesSettings(auction));
+            Assert.That(listEntry.MatchesSettings(auction, null));
         }
 
         [Test]

@@ -10,7 +10,7 @@ public class UtcHourOfDayDetailedFlipFilter : NumberDetailedFlipFilter
 {
     public override object[] Options => new object[] { 0, 23 };
 
-    protected override Expression<Func<FlipInstance, double>> GetSelector()
+    protected override Expression<Func<FlipInstance, double>> GetSelector(FilterContext filters)
     {
         return (f) => DateTime.UtcNow.Hour;
     }

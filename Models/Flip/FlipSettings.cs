@@ -96,7 +96,8 @@ namespace Coflnet.Sky.Commands.Shared
         public bool BlockExport;
         [IgnoreDataMember]
         public bool IsCompiled => BlackListMatcher != null && filterCompileLock.CurrentCount != 0;
-
+        [IgnoreDataMember]
+        public IPlayerInfo PlayerInfo;
 
         private SemaphoreSlim filterCompileLock = new SemaphoreSlim(1, 1);
         private CancellationTokenSource filterCompileCancel = new CancellationTokenSource();
@@ -202,16 +203,16 @@ namespace Coflnet.Sky.Commands.Shared
             Activity.Current.Log("initializing filter matcher");
             var token = filterCompileCancel.Token;
             if (ForcedBlackListMatcher == null && !token.IsCancellationRequested)
-                ForcedBlackListMatcher = new ListMatcher(GetForceBlacklist(), token);
+                ForcedBlackListMatcher = new ListMatcher(GetForceBlacklist(), PlayerInfo, token);
             Activity.Current.Log("initialized force blacklist");
             if (WhiteListMatcher == null && !token.IsCancellationRequested)
-                WhiteListMatcher = new ListMatcher(WhiteList?.Except(GetAfterMainWhitelist()).ToList(), token);
+                WhiteListMatcher = new ListMatcher(WhiteList?.Except(GetAfterMainWhitelist()).ToList(), PlayerInfo, token);
             Activity.Current.Log("initialized whitelist matcher");
             if (AfterMainWhiteListMatcher == null && !token.IsCancellationRequested)
-                AfterMainWhiteListMatcher = new ListMatcher(GetAfterMainWhitelist(), token);
+                AfterMainWhiteListMatcher = new ListMatcher(GetAfterMainWhitelist(), PlayerInfo, token);
             Activity.Current.Log("initialized after main whitelist matcher");
             if (BlackListMatcher == null && !token.IsCancellationRequested)
-                BlackListMatcher = new ListMatcher(BlackList?.Except(GetForceBlacklist()).ToList(), token);
+                BlackListMatcher = new ListMatcher(BlackList?.Except(GetForceBlacklist()).ToList(), PlayerInfo, token);
             Activity.Current.Log("initialized blacklist matcher");
         }
 
@@ -347,7 +348,7 @@ namespace Coflnet.Sky.Commands.Shared
             Dictionary<string, Func<FlipInstance, bool>> Matchers = new Dictionary<string, Func<FlipInstance, bool>>();
 
 
-            public ListMatcher(List<ListEntry> BlackList, CancellationToken token)
+            public ListMatcher(List<ListEntry> BlackList, IPlayerInfo playerInfo, CancellationToken token)
             {
                 if (BlackList == null || BlackList.Count == 0)
                     return;
@@ -370,7 +371,7 @@ namespace Coflnet.Sky.Commands.Shared
                     if (token.IsCancellationRequested)
                         return;
                     string key = KeyFromTag(item.ItemTag);
-                    isMatch.AddOrUpdate(key, item.GetExpression(), (k, old) => old.Or(item.GetExpression()));
+                    isMatch.AddOrUpdate(key, item.GetExpression(playerInfo), (k, old) => old.Or(item.GetExpression(playerInfo)));
                 }
                 AssignMatchers(isMatch, token);
             }

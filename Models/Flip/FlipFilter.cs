@@ -62,9 +62,10 @@ namespace Coflnet.Sky.Commands.Shared
             AdditionalFilters.Add<RelistAtDetailedFlipFilter>();
             AdditionalFilters.Add<TargetPriceDetailedFlipFilter>();
             AdditionalFilters.Add<CapTargetPriceAtDetailedFlipFilter>();
+            AdditionalFilters.Add<ListingSlotsLeft>();
         }
 
-        public FlipFilter(Dictionary<string, string> originalf)
+        public FlipFilter(Dictionary<string, string> originalf, IPlayerInfo playerInfo)
         {
             if (originalf == null || originalf.Count == 0)
             {
@@ -80,7 +81,8 @@ namespace Coflnet.Sky.Commands.Shared
                     try
                     {
                         filters.Remove(match.Key);
-                        var newPart = AdditionalFilters[item].GetExpression(filters, match.Value);
+                        var context = new FilterContext(filters, playerInfo);
+                        var newPart = AdditionalFilters[item].GetExpression(context, match.Value);
                         if (expression == null)
                             expression = newPart;
                         else if (newPart != null)

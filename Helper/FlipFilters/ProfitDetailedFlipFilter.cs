@@ -8,7 +8,7 @@ namespace Coflnet.Sky.Commands.Shared
     [FilterDescription("Selects estimated profit of flip")]
     public class ProfitDetailedFlipFilter : NumberDetailedFlipFilter
     {
-        protected override Expression<Func<FlipInstance, double>> GetSelector()
+        protected override Expression<Func<FlipInstance, double>> GetSelector(FilterContext filters)
         {
             return (f) => f.Profit;
         }

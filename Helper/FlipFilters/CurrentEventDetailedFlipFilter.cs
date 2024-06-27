@@ -46,7 +46,7 @@ public class CurrentEventDetailedFlipFilter : DetailedFlipFilter
     public FilterType FilterType => FilterType.Equal;
     protected virtual DateTime Now => DateTime.UtcNow;
 
-    public Expression<Func<FlipInstance, bool>> GetExpression(Dictionary<string, string> filters, string val)
+    public Expression<Func<FlipInstance, bool>> GetExpression(FilterContext filters, string val)
     {
         var eventVal = (Events)Enum.Parse(typeof(Events), val);
         var currentDay = GetCurrentDay();

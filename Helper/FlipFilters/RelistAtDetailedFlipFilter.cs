@@ -14,7 +14,7 @@ public class RelistAtDetailedFlipFilter : NumberDetailedFlipFilter
 
     public FilterType FilterType => FilterType.NUMERICAL;
 
-    public Expression<Func<FlipInstance, bool>> GetExpression(Dictionary<string, string> filters, string val)
+    public Expression<Func<FlipInstance, bool>> GetExpression(FilterContext filters, string val)
     {
         var target = NumberParser.Double(val);
         return f => f.Context.TryAdd("target", target.ToString());

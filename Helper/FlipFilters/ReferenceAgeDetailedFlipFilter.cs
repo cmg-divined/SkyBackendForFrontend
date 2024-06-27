@@ -7,7 +7,7 @@ namespace Coflnet.Sky.Commands.Shared;
 [FilterDescription("The maximum age of the 3rd most recent reference (short term median)")]
 public class ReferenceAgeDetailedFlipFilter : NumberDetailedFlipFilter
 {
-    protected override Expression<Func<FlipInstance, double>> GetSelector()
+    protected override Expression<Func<FlipInstance, double>> GetSelector(FilterContext filters)
     {
         return (f) => f.Context.ContainsKey("refAge") ? double.Parse(f.Context["refAge"]) : 7;
     }

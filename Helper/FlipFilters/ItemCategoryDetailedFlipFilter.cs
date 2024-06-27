@@ -18,7 +18,7 @@ namespace Coflnet.Sky.Commands.Shared
         public FilterType FilterType => FilterType.Equal;
         private static DateTime lastUpdate = DateTime.MinValue;
 
-        public Expression<Func<FlipInstance, bool>> GetExpression(Dictionary<string, string> filters, string val)
+        public Expression<Func<FlipInstance, bool>> GetExpression(FilterContext filters, string val)
         {
             if (!Enum.TryParse<ItemCategory>(val, true, out ItemCategory itemCategory))
                 throw new CoflnetException("invalid_category", $"the specified category {val} does not exist");

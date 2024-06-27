@@ -8,7 +8,7 @@ namespace Coflnet.Sky.Commands.Shared
 {
     public interface DetailedFlipFilter
     {
-        Expression<Func<FlipInstance, bool>> GetExpression(Dictionary<string, string> filters, string val);
+        Expression<Func<FlipInstance, bool>> GetExpression(FilterContext filters, string val);
         object[] Options {get;}
         Filter.FilterType FilterType { get; }
     }

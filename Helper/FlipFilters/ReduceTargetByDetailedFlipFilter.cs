@@ -14,7 +14,7 @@ public class ReduceTargetByDetailedFlipFilter : NumberDetailedFlipFilter
 
     public FilterType FilterType => FilterType.NUMERICAL;
 
-    public override Expression<Func<FlipInstance, bool>> GetExpression(Dictionary<string, string> filters, string val)
+    public override Expression<Func<FlipInstance, bool>> GetExpression(FilterContext filters, string val)
     {
         var target = NumberParser.Double(val);
         if (target < 1)

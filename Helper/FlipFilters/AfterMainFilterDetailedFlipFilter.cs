@@ -13,7 +13,7 @@ namespace Coflnet.Sky.Commands.Shared
 
         public FilterType FilterType => FilterType.BOOLEAN | FilterType.SIMPLE;
 
-        public Expression<Func<FlipInstance, bool>> GetExpression(Dictionary<string, string> filters, string val)
+        public Expression<Func<FlipInstance, bool>> GetExpression(FilterContext filters, string val)
         {
             return null;
         }

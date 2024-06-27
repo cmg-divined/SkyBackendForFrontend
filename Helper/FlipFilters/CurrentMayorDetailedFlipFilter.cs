@@ -18,7 +18,7 @@ public class CurrentMayorDetailedFlipFilter : DetailedFlipFilter
 
     protected (Func<string> val, DateTime lastUpdate) lastUpdate;
 
-    public Expression<Func<FlipInstance, bool>> GetExpression(Dictionary<string, string> filters, string val)
+    public Expression<Func<FlipInstance, bool>> GetExpression(FilterContext filters, string val)
     {
         // normalize the name
         val = Options.FirstOrDefault(t => t.ToString().ToLower() == val.ToLower())?.ToString();

@@ -12,7 +12,7 @@ public class IntroductionAgeDaysDetailedFlipFilter : DetailedFlipFilter
 
     public object[] Options => new object[] { 1, 14 };
 
-    public Expression<Func<FlipInstance, bool>> GetExpression(Dictionary<string, string> filters, string val)
+    public Expression<Func<FlipInstance, bool>> GetExpression(FilterContext filters, string val)
     {
         if (!int.TryParse(val, out int days))
             throw new CoflnetException("invalid_days", $"the specified days {val} should be a number `<` (smaller than) is implicitly added");

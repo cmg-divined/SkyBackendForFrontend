@@ -13,7 +13,7 @@ namespace Coflnet.Sky.Commands.Shared
 
         public virtual FilterType FilterType => FilterType.NUMERICAL | FilterType.LOWER;
 
-        public Expression<Func<FlipInstance, bool>> GetExpression(Dictionary<string, string> filters, string val)
+        public Expression<Func<FlipInstance, bool>> GetExpression(FilterContext filters, string val)
         {
             AssertNoRange(val);
             var numeric = NumberParser.Long(val);

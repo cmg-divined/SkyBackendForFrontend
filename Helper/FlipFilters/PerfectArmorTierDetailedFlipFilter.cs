@@ -13,12 +13,12 @@ public class PerfectArmorTierDetailedFlipFilter : NumberDetailedFlipFilter
 
     public FilterType FilterType => FilterType.NUMERICAL | FilterType.LOWER | FilterType.RANGE;
 
-    public Expression<Func<FlipInstance, bool>> GetExpression(Dictionary<string, string> filters, string val)
+    public Expression<Func<FlipInstance, bool>> GetExpression(FilterContext filters, string val)
     {
         return StartsWithPerfect().And(base.GetExpression(filters, val));
     }
 
-    protected override Expression<Func<FlipInstance, double>> GetSelector()
+    protected override Expression<Func<FlipInstance, double>> GetSelector(FilterContext filters)
     {
         return f => double.Parse(f.Tag.Split("_", 5, StringSplitOptions.None).Last());
     }

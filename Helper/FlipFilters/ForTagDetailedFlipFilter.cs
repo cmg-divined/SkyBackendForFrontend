@@ -10,7 +10,7 @@ public class ForTagDetailedFlipFilter : DetailedFlipFilter
     public object[] Options => new object[] { };
     public FilterType FilterType => FilterType.RANGE;
 
-    public Expression<Func<FlipInstance, bool>> GetExpression(Dictionary<string, string> filters, string val)
+    public Expression<Func<FlipInstance, bool>> GetExpression(FilterContext filters, string val)
     {
         throw new NotImplementedException();
     }

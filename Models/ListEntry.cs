@@ -28,18 +28,18 @@ namespace Coflnet.Sky.Commands.Shared
 
         private Func<FlipInstance, bool> filterCache;
 
-        public bool MatchesSettings(FlipInstance flip)
+        public bool MatchesSettings(FlipInstance flip, IPlayerInfo playerInfo)
         {
             if (filterCache == null)
-                filterCache = GetExpression().Compile();
+                filterCache = GetExpression(playerInfo).Compile();
             return (ItemTag == null || ItemTag == flip.Auction.Tag) && filterCache(flip);
         }
 
-        public Expression<Func<FlipInstance, bool>> GetExpression()
+        public Expression<Func<FlipInstance, bool>> GetExpression(IPlayerInfo playerInfo = null)
         {
             if (Disabled)
                 return f => false;
-            var filterCache = new FlipFilter(this.filter);
+            var filterCache = new FlipFilter(filter, playerInfo);
             //     Expression<Func<FlipInstance,bool>> normal = (flip) => (ItemTag == null || ItemTag == flip.Auction.Tag);
             return filterCache.GetExpression();
         }

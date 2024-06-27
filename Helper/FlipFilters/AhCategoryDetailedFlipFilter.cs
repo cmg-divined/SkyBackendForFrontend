@@ -14,7 +14,7 @@ public class AhCategoryDetailedFlipFilter : DetailedFlipFilter
 
     public FilterType FilterType => FilterType.Equal;
 
-    public Expression<Func<FlipInstance, bool>> GetExpression(Dictionary<string, string> filters, string val)
+    public Expression<Func<FlipInstance, bool>> GetExpression(FilterContext filters, string val)
     {
         if (!Enum.TryParse<Category>(val, true, out Category ahCategory))
             throw new CoflnetException("invalid_category", $"the specified category {val} does not exist");
