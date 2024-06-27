@@ -8,6 +8,7 @@ using Coflnet.Sky.Filter;
 using Coflnet.Sky.Items.Client.Model;
 using Microsoft.Extensions.DependencyInjection;
 using System.Collections.Concurrent;
+using System.Diagnostics;
 
 namespace Coflnet.Sky.Commands.Shared
 {
@@ -26,6 +27,7 @@ namespace Coflnet.Sky.Commands.Shared
             var service = DiHandler.GetService<FilterStateService>();
             if (!service.State.itemCategories.ContainsKey(itemCategory))
             {
+                Activity.Current.Log($"Got itemCategory {itemCategory}, updating cache");
                 service.GetItemCategory(itemCategory);
             }
             var tags = service.State.itemCategories[itemCategory];
