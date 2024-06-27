@@ -358,12 +358,6 @@ namespace Coflnet.Sky.Commands.Shared
                 {
                     AddFiltersBasedOnTags(forTags, item);
                     AddElement(item);
-                    if (item.ItemTag != null)
-                        AddElement(new ListEntry()
-                        {
-                            filter = item.filter,
-                            ItemTag = "STARRED_" + item.ItemTag
-                        });
                 }
                 ConcurrentDictionary<string, Expression<Func<FlipInstance, bool>>> isMatch = new();
                 foreach (var item in RemainingFilters)
@@ -389,7 +383,10 @@ namespace Coflnet.Sky.Commands.Shared
                     try
                     {
                         var startTime = DateTime.Now;
-                        Matchers.Add(item.Key, item.Value.Compile());
+                        var compiled = item.Value.Compile();
+                        Matchers.Add(item.Key, compiled);
+                        if (item.Key != string.Empty)
+                            Matchers.Add("STARRED_" + item.Key, compiled);
                         if (DateTime.Now - startTime > TimeSpan.FromMilliseconds(100))
                             Activity.Current?.Log($"Took {DateTime.Now - startTime} ticks to compile filter for {item.Key}");
 
