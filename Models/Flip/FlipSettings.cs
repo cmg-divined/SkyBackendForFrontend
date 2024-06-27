@@ -371,8 +371,12 @@ namespace Coflnet.Sky.Commands.Shared
                     if (token.IsCancellationRequested)
                         return;
                     string key = KeyFromTag(item.ItemTag);
+                    var startTime = Stopwatch.GetTimestamp();
                     isMatch.AddOrUpdate(key, item.GetExpression(playerInfo), (k, old) => old.Or(item.GetExpression(playerInfo)));
+                    if (Stopwatch.GetTimestamp() - startTime > 100)
+                        Activity.Current?.Log($"Took {Stopwatch.GetTimestamp() - startTime} ticks to compile filter for {item.ItemTag} {item.filter.FirstOrDefault()}");
                 }
+                Activity.Current?.Log("converted filters to expressions");
                 AssignMatchers(isMatch, token);
             }
 
@@ -384,7 +388,10 @@ namespace Coflnet.Sky.Commands.Shared
                         return;
                     try
                     {
+                        var startTime = Stopwatch.GetTimestamp();
                         Matchers.Add(item.Key, item.Value.Compile());
+                        if (Stopwatch.GetTimestamp() - startTime > 100)
+                            Activity.Current?.Log($"Took {Stopwatch.GetTimestamp() - startTime} ticks to compile filter for {item.Key}");
 
                     }
                     catch (Exception e)

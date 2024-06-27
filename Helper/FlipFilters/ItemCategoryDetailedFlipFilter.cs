@@ -17,7 +17,6 @@ namespace Coflnet.Sky.Commands.Shared
         public object[] Options => Enum.GetValues<ItemCategory>().Select(t => (object)t).ToArray();
 
         public FilterType FilterType => FilterType.Equal;
-        private static DateTime lastUpdate = DateTime.MinValue;
 
         public Expression<Func<FlipInstance, bool>> GetExpression(FilterContext filters, string val)
         {
