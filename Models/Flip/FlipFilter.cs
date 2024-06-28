@@ -63,6 +63,7 @@ namespace Coflnet.Sky.Commands.Shared
             AdditionalFilters.Add<TargetPriceDetailedFlipFilter>();
             AdditionalFilters.Add<CapTargetPriceAtDetailedFlipFilter>();
             AdditionalFilters.Add<ListingSlotsLeft>();
+            AdditionalFilters.Add<KeepOnImportDetailedFlipFilter>();
         }
 
         public FlipFilter(Dictionary<string, string> originalf, IPlayerInfo playerInfo)
@@ -112,6 +113,30 @@ namespace Coflnet.Sky.Commands.Shared
             Filters = FilterEngine.GetMatcher(filters);
             if (expression != null)
                 FlipFilters = expression.Compile();
+        }
+
+        public static void CopyRelevantToNew(FlipSettings newSettings, FlipSettings old)
+        {
+            var onImportName = CamelCaseNameDictionary<DetailedFlipFilter>.GetCleardName<KeepOnImportDetailedFlipFilter>();
+            CopyIfFlagged(old.BlackList, newSettings.BlackList);
+            CopyIfFlagged(old.WhiteList, newSettings.WhiteList);
+
+            void CopyIfFlagged(List<ListEntry> oldList, List<ListEntry> newList)
+            {
+                //remove all in newList
+                foreach (var item in newList)
+                {
+                    if (item.filter?.All(f => f.Key != onImportName) ?? true)
+                        continue;
+                    item.filter.Remove(onImportName);
+                }
+                foreach (var filter in oldList)
+                {
+                    if (filter.filter?.All(f => f.Key != onImportName) ?? true)
+                        continue;
+                    newList.Add(filter);
+                }
+            }
         }
 
         public bool IsMatch(FlipInstance flip)
