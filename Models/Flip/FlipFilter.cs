@@ -117,6 +117,8 @@ namespace Coflnet.Sky.Commands.Shared
 
         public static void CopyRelevantToNew(FlipSettings newSettings, FlipSettings old)
         {
+            if (old == null)
+                return;
             var onImportName = CamelCaseNameDictionary<DetailedFlipFilter>.GetCleardName<KeepOnImportDetailedFlipFilter>();
             CopyIfFlagged(old.BlackList, newSettings.BlackList);
             CopyIfFlagged(old.WhiteList, newSettings.WhiteList);
