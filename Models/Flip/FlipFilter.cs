@@ -132,9 +132,11 @@ namespace Coflnet.Sky.Commands.Shared
                         continue;
                     item.filter.Remove(onImportName);
                 }
+                if(oldList == null)
+                    return;
                 foreach (var filter in oldList)
                 {
-                    if (filter.filter?.All(f => f.Key != onImportName) ?? true)
+                    if (filter?.filter?.All(f => f.Key != onImportName) ?? true)
                         continue;
                     newList.Add(filter);
                 }
