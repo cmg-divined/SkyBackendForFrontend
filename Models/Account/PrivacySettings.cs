@@ -11,6 +11,8 @@ namespace Coflnet.Sky.Commands.Shared
         public bool CollectChat;
         [SettingsDoc("Upload chest and inventory content (required for trade tracking)")]
         public bool CollectInventory;
+        [SettingsDoc("Stop trades from being stored")]
+        public bool DisableTradeStoring;
         [SettingsDoc("Read and upload tab contents when joining server (detect profile type, server and island location)")]
         public bool CollectTab;
         [SettingsDoc("Read and upload scoreboard peridicly to detect purse")]
