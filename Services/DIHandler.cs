@@ -193,6 +193,7 @@ namespace Coflnet.Sky.Commands.Shared
             services.AddHostedService<FilterLoader>();
             services.AddTransient<HypixelContext>(s => new HypixelContext());
             services.AddSingleton<FilterStateService>();
+            services.AddSingleton<IProfileClient, ProfileClient>();
             services.AddSingleton<IBazaarFlipperApi, BazaarFlipperApi>(s =>
                 new BazaarFlipperApi(s.GetRequiredService<IConfiguration>()["BAZAARFLIPPER_BASE_URL"]));
             services.AddSingleton<Auctions.Client.Api.IAuctionApi>(s =>

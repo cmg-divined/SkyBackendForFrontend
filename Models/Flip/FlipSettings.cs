@@ -109,7 +109,7 @@ namespace Coflnet.Sky.Commands.Shared
         }
 
         /// <summary>
-        /// Determines if a flip matches a the <see cref="Filters"/>> of this instance
+        /// Determines if a flip matches a the <see cref="Filters"/> of this instance
         /// </summary>
         /// <param name="flip"></param>
         /// <returns>true if it matches</returns>
@@ -394,7 +394,7 @@ namespace Coflnet.Sky.Commands.Shared
                     catch (Exception e)
                     {
                         Console.WriteLine($"Could not compile matcher for {item.Key}  {item.Value}");
-                        throw e;
+                        throw;
                     }
                 }
             }
