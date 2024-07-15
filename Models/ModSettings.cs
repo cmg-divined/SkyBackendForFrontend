@@ -103,5 +103,8 @@ namespace Coflnet.Sky.Commands.Shared
         [SettingsDoc("The maximum amount of flips to buy and store in inventory", "maxItemsInInventory")]
         [DataMember(Name = "maxItemsInInventory")]
         public int MaxFlipItemsInInventory;
+        [SettingsDoc($"Disables spam protection. By default only ~5 most valuable flips are shown that fit the settings. CAUTION: This can lead to spam flips")]
+        [DataMember(Name = "disableSpamProtection")]
+        public bool DisableSpamProtection;
     }
 }
