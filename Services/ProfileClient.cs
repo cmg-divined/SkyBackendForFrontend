@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using Microsoft.Extensions.Configuration;
 using RestSharp;
 
@@ -6,7 +7,7 @@ namespace Coflnet.Sky.Commands.Shared;
 
 public interface IProfileClient
 {
-    ProfileClient.ForgeData GetForgeData(string playerId, string profile);
+    Task<ProfileClient.ForgeData> GetForgeData(string playerId, string profile);
 }
 
 public class ProfileClient : IProfileClient
@@ -14,12 +15,12 @@ public class ProfileClient : IProfileClient
     private RestClient profileClient = null;
     public ProfileClient(IConfiguration config) =>
                 profileClient = new RestClient(config["PROFILE_BASE_URL"]);
-    
-    
-    public ForgeData GetForgeData(string playerId, string profile)
+
+
+    public async Task<ForgeData> GetForgeData(string playerId, string profile)
     {
         var request = new RestRequest($"api/profile/{playerId}/{profile}/data/forge", Method.Get);
-        var response = profileClient.Execute<ForgeData>(request);
+        var response = await profileClient.ExecuteAsync<ForgeData>(request);
         return response.Data;
     }
 
