@@ -33,9 +33,9 @@ public class SearchResultItem
 
     public SearchResultItem(ItemDetails.ItemSearchResult item)
     {
-        this.Name = item.Name;
-        this.Id = item.Tag;
-        this.Type = "item";
+        Name = item.Name;
+        Id = item.Tag;
+        Type = "item";
         var isPet = IsPet(item);
         if (item.Tag != null && !item.Tag.StartsWith("POTION") && !isPet && !item.Tag.StartsWith("RUNE"))
             if (item.Tag.StartsWith("ENCHANTMENT_"))
@@ -43,30 +43,30 @@ public class SearchResultItem
             else
                 IconUrl = "https://sky.coflnet.com/static/icon/" + item.Tag;
         else
-            this.IconUrl = item.IconUrl;
+            IconUrl = item.IconUrl;
         if (isPet && !Name.Contains("Pet") && Name != null)
-            this.Name += " Pet";
+            Name += " Pet";
 
-        this.HitCount = item.HitCount + ITEM_EXTRA_IMPORTANCE;
+        HitCount = item.HitCount + ITEM_EXTRA_IMPORTANCE;
         if (ItemReferences.RemoveReforgesAndLevel(Name) != Name)
-            this.HitCount -= NOT_NORMALIZED_PENILTY;
-        this.Tier = item.Tier;
+            HitCount -= NOT_NORMALIZED_PENILTY;
+        Tier = item.Tier;
     }
 
     public SearchResultItem(Api.Client.Model.SearchResultItem item)
     {
-        this.Name = item.Name;
-        this.IconUrl = item.IconUrl;
-        this.Image = item.Img;
-        this.Name = item.Name;
-        Enum.TryParse<Tier>(item.Tier.ToString(),true, out this.Tier);
-        this.Type = item.Type;
-        this.Id = item.Id;
+        Name = item.Name;
+        IconUrl = item.IconUrl;
+        Image = item.Img;
+        Name = item.Name;
+        Enum.TryParse<Tier>(item.Tier.ToString(), true, out Tier);
+        Type = item.Type;
+        Id = item.Id;
     }
 
     private static bool IsPet(ItemDetails.ItemSearchResult item)
     {
-        return ((item?.Tag?.StartsWith("PET") ?? false) && !item.Tag.StartsWith("PET_SKIN"));
+        return (item?.Tag?.StartsWith("PET") ?? false) && !item.Tag.StartsWith("PET_SKIN") && !item.Tag.StartsWith("PET_ITEM");
     }
 
     public override bool Equals(object obj)
@@ -83,10 +83,10 @@ public class SearchResultItem
 
     public SearchResultItem(PlayerResult player)
     {
-        this.Name = player.Name;
-        this.Id = player.UUid;
-        this.IconUrl = SearchService.PlayerHeadUrl(player.UUid);
-        this.Type = "player";
-        this.HitCount = player.HitCount;
+        Name = player.Name;
+        Id = player.UUid;
+        IconUrl = SearchService.PlayerHeadUrl(player.UUid);
+        Type = "player";
+        HitCount = player.HitCount;
     }
 }
