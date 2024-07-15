@@ -97,14 +97,17 @@ namespace Coflnet.Sky.Commands.Shared
             services.AddSingleton<ICraftsApi>(context =>
             {
                 var config = context.GetRequiredService<IConfiguration>();
-                var craftsUrl = config["CRAFTS_BASE_URL"] ?? "http://" + config["CRAFTS_HOST"];
-                return new CraftsApi(craftsUrl);
+                return new CraftsApi(config["CRAFTS_BASE_URL"]);
             });
             services.AddSingleton<IKatApi>(context =>
             {
                 var config = context.GetRequiredService<IConfiguration>();
-                var craftsUrl = config["CRAFTS_BASE_URL"] ?? "http://" + config["CRAFTS_HOST"];
-                return new KatApi(craftsUrl);
+                return new KatApi(config["CRAFTS_BASE_URL"]);
+            });
+            services.AddSingleton<IForgeApi>(context =>
+            {
+                var config = context.GetRequiredService<IConfiguration>();
+                return new ForgeApi(config["CRAFTS_BASE_URL"]);
             });
             services.AddSingleton<Api.Client.Api.IPricesApi>(context =>
             {
