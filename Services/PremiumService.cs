@@ -55,6 +55,8 @@ namespace Coflnet.Sky.Commands.Shared
 
         public async Task<(AccountTier, DateTime)> GetCurrentTier(string userId)
         {
+            if(string.IsNullOrEmpty(userId))
+                return (AccountTier.NONE, DateTime.UtcNow + TimeSpan.FromMinutes(3));
             try
             {
                 if (GoogleUser.EveryoneIsPremium)
