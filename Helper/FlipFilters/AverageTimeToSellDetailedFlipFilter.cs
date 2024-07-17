@@ -12,7 +12,7 @@ public class AverageTimeToSellDetailedFlipFilter : VolumeDetailedFlipFilter
 {
     public override object[] Options => [];
 
-    public override FilterType FilterType => FilterType.TEXT;
+    public override FilterType FilterType => FilterType.Equal | FilterType.RANGE;
 
     public override Expression<Func<FlipInstance, bool>> GetExpression(FilterContext filters, string content)
     {
