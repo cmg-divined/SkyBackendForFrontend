@@ -76,7 +76,7 @@ namespace Coflnet.Sky.Commands.Shared
                 dev.Logger.Instance.Error(e, "retrieving premium status for " + userId);
                 return (AccountTier.PREMIUM, DateTime.UtcNow + TimeSpan.FromMinutes(3));
             }
-            return (AccountTier.NONE, DateTime.UtcNow + TimeSpan.FromMinutes(3));
+            return (AccountTier.NONE, DateTime.UtcNow + TimeSpan.FromHours(3));
         }
 
         public async Task<DateTime> ExpiresWhen(string userId)
