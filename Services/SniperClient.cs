@@ -67,7 +67,10 @@ public class SniperClient : ISniperClient
         var fromMed = pricing.Median * (1 - deduct);
         var target = Math.Max(fromMed, Math.Min(pricing.Lbin.Price * (1 - deduct - 0.08), fromMed * 1.2));
         if (pricing.ItemKey != pricing.LbinKey)
-            target = fromMed;
+            if (pricing.MedianKey == pricing.ItemKey)
+                target = fromMed;
+            else
+                target = Math.Min(fromMed, pricing.Lbin.Price * (1 - deduct - 0.08));
         return (target, fromMed == target);
     }
 }
