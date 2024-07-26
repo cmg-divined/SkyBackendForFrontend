@@ -79,9 +79,9 @@ namespace Coflnet.Sky.Commands.Shared
         public async Task<object> Update(IFlipConnection con, string key, string value)
         {
             if (key == "blacklist")
-                con.Settings.BlackList = JsonConvert.DeserializeObject<List<ListEntry>>(value);
+                con.Settings.BlackList = GetOrderedFilters(value);
             else if (key == "whitelist")
-                con.Settings.WhiteList = JsonConvert.DeserializeObject<List<ListEntry>>(value);
+                con.Settings.WhiteList = GetOrderedFilters(value);
             else if (key == "filter")
                 con.Settings.Filters = JsonConvert.DeserializeObject<Dictionary<string, string>>(value);
 
@@ -138,6 +138,13 @@ namespace Coflnet.Sky.Commands.Shared
                 UpdateValueOnObject(value, doc.RealName, con.Settings);
             }
             return value;
+        }
+
+        private static List<ListEntry> GetOrderedFilters(string value)
+        {
+            return JsonConvert.DeserializeObject<List<ListEntry>>(value)
+                .OrderByDescending(x => x.filter != null && x.filter.ContainsKey("ForTag") ? 1 : 0)
+                .ToList();
         }
 
         public async Task<object> GetCurrentValue(IFlipConnection con, string key)
