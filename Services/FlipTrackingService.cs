@@ -378,7 +378,7 @@ namespace Coflnet.Sky.Commands
             var newFlips = relevantFlips.Select(f => f.Flip).Select(f => new FlipDetails()
             {
                 BuyTime = f.PurchaseTime,
-                Finder = Enum.TryParse<LowPricedAuction.FinderType>(f.FinderType.ToString(), out var finder) ? finder : LowPricedAuction.FinderType.UNKOWN,
+                Finder = Enum.TryParse<LowPricedAuction.FinderType>(f.FinderType.ToString().Replace("SNIPERMEDIAN", "SNIPER_MEDIAN"), true, out var finder) ? finder : LowPricedAuction.FinderType.UNKOWN,
                 ItemName = f.ItemName,
                 ItemTag = f.ItemTag,
                 OriginAuction = f.PurchaseAuctionId.ToString("N"),
