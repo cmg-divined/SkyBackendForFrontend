@@ -136,6 +136,10 @@ public enum DescriptionField
         "sell an item with the same ",
         "valuable attributes")]
     TimeToSell,
+    [FieldDescription(
+        "How much the item/stack will",
+        "sell for in an npc shop")]
+    NpcSellPrice,
     // anything over 9000 gets hidden
     BAZAAR_COST = 9001
 }
