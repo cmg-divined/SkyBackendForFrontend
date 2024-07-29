@@ -387,6 +387,8 @@ namespace Coflnet.Sky.Commands.Shared
                         Matchers[item.Key] = compiled;
                         if (item.Key != string.Empty && !Matchers.ContainsKey("STARRED_" + item.Key))
                             Matchers.Add("STARRED_" + item.Key, compiled);
+                        if (item.Key != string.Empty && && item.Key.Contains("STARRED_") && !Matchers.ContainsKey(item.Key.Replace("STARRED_", "")))
+                            Matchers.Add(item.Key.Replace("STARRED_", ""), compiled);
                         if (DateTime.Now - startTime > TimeSpan.FromMilliseconds(100))
                             Activity.Current?.Log($"Took {DateTime.Now - startTime} ticks to compile filter for {item.Key}");
 
