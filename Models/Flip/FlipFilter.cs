@@ -65,6 +65,7 @@ namespace Coflnet.Sky.Commands.Shared
             AdditionalFilters.Add<ListingSlotsLeft>();
             AdditionalFilters.Add<KeepOnImportDetailedFlipFilter>();
             AdditionalFilters.Add<AverageTimeToSellDetailedFlipFilter>();
+            AdditionalFilters.Add<FraggedDetailedFlipFilter>();
         }
 
         public FlipFilter(Dictionary<string, string> originalf, IPlayerInfo playerInfo)
