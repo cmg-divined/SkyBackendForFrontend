@@ -64,6 +64,10 @@ public class SniperClient : ISniperClient
             deduct = 0.18;
         if (pricing.Median > 150_000_000)
             deduct = 0.10;
+        if(pricing.Volume < 1)
+            deduct += 0.05;
+        if(pricing.Volume < 0.15)
+            deduct += 0.05;
         var fromMed = pricing.Median * (1 - deduct);
         var target = Math.Max(fromMed, Math.Min(pricing.Lbin.Price * (1 - deduct - 0.08), fromMed * 1.2));
         if (pricing.ItemKey != pricing.LbinKey)
