@@ -93,7 +93,7 @@ namespace Coflnet.Sky.Commands.Shared
 
         public async Task UpdateSetting<T>(string userId, string key, T data)
         {
-            for (int i = 0; i < 3; i++)
+            for (int i = 0; i < 4; i++)
             {
                 try
                 {
@@ -102,10 +102,10 @@ namespace Coflnet.Sky.Commands.Shared
                 }
                 catch (Exception e)
                 {
-                    await Task.Delay(300 * (i + 1));
+                    await Task.Delay(500 * ((i + 1) * (i + 1)));
                     if (i > 0)
                         Console.WriteLine($"failed to update settings {e.Message} \n" + JsonConvert.SerializeObject(data));
-                    if (i == 2)
+                    if (i == 3)
                         throw;
                 }
             }
