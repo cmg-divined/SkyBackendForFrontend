@@ -177,7 +177,7 @@ public class InventoryParser
             {
                 Activity.Current?.AddEvent(new ActivityEvent("Log", default, new(new Dictionary<string, object>() { {
                     "message", "Error while parsing inventory" }, { "error", e }, {"item", JsonConvert.SerializeObject(item)} })));
-           //     dev.Logger.Instance.Error(e, "Error while parsing inventory");
+                //     dev.Logger.Instance.Error(e, "Error while parsing inventory");
             }
             yield return auction;
         }
@@ -338,6 +338,12 @@ public class InventoryParser
                 Uuid = extraAttributes["uuid"]?.ToString() ?? Random.Shared.Next().ToString(),
             };
             NBT.GetAndAssignTier(auction, item["tag"]["display"]["Lore"]?.LastOrDefault()?.ToString());
+            if (auction.Tier == Tier.UNKNOWN)
+                foreach (var line in item["tag"]["display"]["Lore"].Reverse())
+                {
+                    if (NBT.TryFindTierInString(line.ToString(), out Tier tier))
+                        auction.Tier = tier;
+                }
             auction.SetFlattenedNbt(flatNbt);
             FixItemTag(auction);
             if (auction.Tag?.EndsWith("RUNE") ?? false)
