@@ -365,7 +365,8 @@ namespace Coflnet.Sky.Commands
             // use flipTracking.FlipsPlayerIdGetAsync(uuid)
             var allSoldFlips = await Task.WhenAll(uuids.Select(async uuid =>
             {
-                var list = await flipTracking.FlipsPlayerIdGetAsync(Guid.Parse(uuid), startTime, endTime);
+                var response = await flipTracking.FlipsPlayerIdGetWithHttpInfoAsync(Guid.Parse(uuid), startTime, endTime);
+                var list = JsonConvert.DeserializeObject<List<PastFlip>>(response.RawContent);
                 if (list == null)
                     throw new CoflnetException("load_failed", $"Loading flips for {uuid} failed");
                 return (list, uuid);
