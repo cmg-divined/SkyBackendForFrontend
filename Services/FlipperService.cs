@@ -575,7 +575,7 @@ namespace Coflnet.Sky.Commands.Shared
 
         private async Task ConsumeBatch<T>(string[] topics, Action<T> work, int batchSize = 20)
         {
-            await KafkaConsumer.ConsumeBatch<T>(config, topics, x =>
+            await Kafka.KafkaConsumer.ConsumeBatch<T>(config, topics, x =>
             {
                 foreach (var item in x)
                 {
