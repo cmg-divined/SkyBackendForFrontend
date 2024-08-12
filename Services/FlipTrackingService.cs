@@ -68,7 +68,7 @@ namespace Coflnet.Sky.Commands
             IConfiguration config,
             IConnectApi connectApi,
             IProductsApi productApi,
-            KafkaCreator kafkaCreator,
+            Kafka.KafkaCreator kafkaCreator,
             IScoresApi scoresApi,
             ILogger<FlipTrackingService> logger)
         {

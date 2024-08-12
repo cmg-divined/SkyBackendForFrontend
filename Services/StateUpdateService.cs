@@ -21,7 +21,7 @@ namespace Coflnet.Sky.Commands.Shared
         ILogger<StateUpdateService> logger;
         IProducer<string, UpdateMessage> producer;
 
-        public StateUpdateService(IConfiguration config, ILogger<StateUpdateService> logger, KafkaCreator kafkaCreator)
+        public StateUpdateService(IConfiguration config, ILogger<StateUpdateService> logger, Sky.Kafka.KafkaCreator kafkaCreator)
         {
             this.logger = logger;
             this.config = config;

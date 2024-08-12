@@ -190,7 +190,6 @@ namespace Coflnet.Sky.Commands.Shared
             services.AddSingleton<AuctionService>();
             services.AddSingleton<FlipperService>();
             services.AddSingleton<Kafka.KafkaCreator>();
-            services.AddSingleton<Coflnet.Kafka.KafkaCreator>();
             services.AddSingleton<IStateUpdateService, StateUpdateService>();
             services.AddSingleton<McAccountService>();
             services.AddHostedService<ServicePorter>();
