@@ -52,10 +52,11 @@ public class FilterStateService
             return;
         try
         {
-            State.PreviousMayor = mayorApi.MayorLastGet();
+            State.PreviousMayor = mayorApi.MayorLastGet().ToLower();
             var response = await mayorApi.MayorCurrentGetWithHttpInfoAsync();
-            State.CurrentMayor = JsonConvert.DeserializeObject<ModelCandidate>(response.Data.ToString()).Name;
-            State.NextMayor = (await mayorApi.MayorNextGetAsync())?.Name;
+            State.CurrentMayor = JsonConvert.DeserializeObject<ModelCandidate>(response.Data.ToString()).Name.ToLower();
+            State.NextMayor = (await mayorApi.MayorNextGetAsync())?.Name.ToLower();
+            logger.LogInformation("Current mayor is {current}", State.CurrentMayor);
         }
         catch (Exception e)
         {

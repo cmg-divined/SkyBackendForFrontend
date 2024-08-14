@@ -21,7 +21,7 @@ public class CurrentMayorDetailedFlipFilter : DetailedFlipFilter
     public Expression<Func<FlipInstance, bool>> GetExpression(FilterContext filters, string val)
     {
         // normalize the name
-        val = Options.FirstOrDefault(t => t.ToString().ToLower() == val.ToLower())?.ToString();
+        val = Options.FirstOrDefault(t => t.ToString().ToLower() == val.ToLower())?.ToString().ToLower();
         if (val == null)
             throw new CoflnetException("invalid_mayor", "The specified mayor does not exist");
         var current = GetCurrentMayor();
