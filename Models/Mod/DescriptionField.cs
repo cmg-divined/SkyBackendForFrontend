@@ -140,6 +140,10 @@ public enum DescriptionField
         "How much the item/stack will",
         "sell for in an npc shop")]
     NpcSellPrice,
+    [FieldDescription(
+        "Color codes with their source",
+        "Highlights exotics like iTEM")]
+    ColorCode,
     // anything over 9000 gets hidden
     BAZAAR_COST = 9001
 }

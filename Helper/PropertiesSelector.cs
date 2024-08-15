@@ -132,7 +132,7 @@ namespace Coflnet.Sky.Commands.Helper
             return int.Parse(hex, System.Globalization.NumberStyles.HexNumber);
         }
 
-        private static object FormatHex(string separated)
+        public static string FormatHex(string separated)
         {
             // 0:0:0 to hex
             var parts = separated.Split(':').Select(p => int.Parse(p)).ToArray();
