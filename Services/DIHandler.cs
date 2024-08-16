@@ -21,7 +21,6 @@ using Coflnet.Sky.Filter;
 using Coflnet.Sky.EventBroker.Client.Api;
 using Coflnet.Sky.Bazaar.Flipper.Client.Api;
 using Coflnet.Sky.Auctions.Client.Api;
-using Coflnet.Sky.Core.Services;
 
 namespace Coflnet.Sky.Commands.Shared
 {
@@ -171,7 +170,6 @@ namespace Coflnet.Sky.Commands.Shared
             services.AddSingleton<PremiumService>();
             services.AddSingleton<ISniperClient, SniperClient>();
             services.AddSingleton<EventBrokerClient>();
-            services.AddSingleton<ExoticColorService>();
             services.AddSingleton<ISubscriptionsApi>(context =>
             {
                 var config = context.GetRequiredService<IConfiguration>();
