@@ -144,6 +144,13 @@ public enum DescriptionField
         "Color codes with their source",
         "Highlights exotics like iTEM")]
     ColorCode,
+    [FieldDescription(
+        "Placeholder for the skyblock",
+        "item description. Useful for",
+        "when you want some data above",
+        "the description directly below",
+        "the item name")]
+    DefaultLore,
     // anything over 9000 gets hidden
     BAZAAR_COST = 9001
 }
