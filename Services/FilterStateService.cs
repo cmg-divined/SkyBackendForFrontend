@@ -54,7 +54,15 @@ public class FilterStateService
         {
             State.PreviousMayor = mayorApi.MayorLastGet().ToLower();
             var response = await mayorApi.MayorCurrentGetWithHttpInfoAsync();
+            try
+            {
             State.CurrentMayor = JsonConvert.DeserializeObject<ModelCandidate>(response.Data.ToString()).Name.ToLower();
+            }
+            catch (System.Exception)
+            {
+                logger.LogInformation("Could not load current mayor " + response.Data.ToString());
+                throw;
+            }
             State.NextMayor = (await mayorApi.MayorNextGetAsync())?.Name.ToLower();
             logger.LogInformation("Current mayor is {current}", State.CurrentMayor);
         }
