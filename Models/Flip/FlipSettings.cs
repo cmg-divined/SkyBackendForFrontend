@@ -76,6 +76,9 @@ namespace Coflnet.Sky.Commands.Shared
         [DataMember(Name = "whitelistAftermain")]
         [SettingsDoc("whitelisted items will only show if they also meet main filters (min profit etc)")]
         public bool WhitelistAfterMain;
+        [DataMember(Name ="basedConfig")]
+        [SettingsDoc("The config this settings is based on, loads in addition", true)]
+        public string BasedConfig;
 
         private List<FlipFilter> blackListFilters;
         private ListMatcher BlackListMatcher;
