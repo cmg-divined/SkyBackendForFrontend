@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Runtime.Serialization;
 using Coflnet.Sky.Core;
@@ -49,20 +50,30 @@ namespace Coflnet.Sky.Commands.Shared
                 return ProfitAfterFees(targetPrice, cost);
             }
         }
-
+        
         public static long ProfitAfterFees(long targetPrice, long cost)
         {
             float reduction = GetFeeRateForStartingBid(targetPrice);
             return (long)(targetPrice * (100 - reduction) / 100 - cost);
         }
 
-        public static float GetFeeRateForStartingBid(long targetPrice)
+        static DateTime DerpyStart = new DateTime(2024, 8, 26, 7, 15, 0);
+        public static float GetFeeRateForStartingBid(long targetPrice, DateTime? date = null)
         {
+            date ??= DateTime.UtcNow;
+            var hoursSince = (date.Value - DerpyStart).TotalHours;
+            var isDerpy = (hoursSince % (124 * 25)) < 124 && hoursSince > 0;
             var reduction = 2f;
             if (targetPrice > 10_000_000)
                 reduction = 3;
             if (targetPrice >= 100_000_000)
                 reduction = 3.5f;
+            if(isDerpy)
+            {
+                reduction -= 1;
+                reduction *= 4;
+                reduction += 1;
+            }
             return reduction;
         }
 
