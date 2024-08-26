@@ -68,11 +68,10 @@ namespace Coflnet.Sky.Commands.Shared
                 reduction = 3;
             if (targetPrice >= 100_000_000)
                 reduction = 3.5f;
-            if(isDerpy)
+            if(isDerpy && targetPrice >= 1_000_000)
             {
-                reduction -= 1;
-                reduction *= 4;
-                reduction += 1;
+                // derpy 4xes the claiming tax
+                reduction += 3;
             }
             return reduction;
         }
