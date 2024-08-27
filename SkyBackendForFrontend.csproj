@@ -21,7 +21,7 @@
     <PackageReference Include="Coflnet.Sky.Auctions.Client" Version="0.1.1" />
     <PackageReference Include="Coflnet.Sky.Bazaar.Flipper.Client" Version="0.1.1" />
     <PackageReference Include="Coflnet.Sky.Mayor.Client" Version="0.3.2" />
-    <PackageReference Include="Coflnet.Payments.Client" Version="0.13.0" />
+    <PackageReference Include="Coflnet.Payments.Client" Version="0.14.0" />
     <PackageReference Include="Coflnet.Sky.McConnect" Version="0.4.0" />
     <PackageReference Include="Coflnet.Sky.PlayerName.Client" Version="0.2.2" />
     <PackageReference Include="Coflnet.Sky.PlayerState.Client" Version="0.3.1" />
@@ -35,13 +35,13 @@
     <PackageReference Include="Google.Apis.Auth" Version="1.68.0" />
     <PackageReference Include="Coflnet.Sky.EventBroker.Client" Version="0.5.4" />
     <PackageReference Include="Coflnet.Sky.Api.Client" Version="0.7.0" />
-    <PackageReference Include="System.IdentityModel.Tokens.Jwt" Version="8.0.1" />
+    <PackageReference Include="System.IdentityModel.Tokens.Jwt" Version="8.0.2" />
 
   </ItemGroup>
 
   <ItemGroup Condition="'$(Configuration)' != 'Release'">
     <PackageReference Include="NUnit3TestAdapter" Version="4.6.0" />
-    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.10.0" />
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.11.0" />
     <PackageReference Include="FluentAssertions" Version="6.12.0" />
   </ItemGroup>
 
