@@ -212,8 +212,15 @@ namespace Coflnet.Sky.Commands.Shared
             {
                 var val = await bazaarClient.ApiBazaarItemIdSnapshotGetAsync(itemTag, DateTime.UtcNow);
                 if (val == null)
-                    return null;
-
+                {
+                    var all = await bazaarClient.ApiBazaarPricesGetAsync();
+                    return all.Where(a => a.ProductId == itemTag).Select(a => new CurrentPrice()
+                    {
+                        Buy = a.BuyPrice,
+                        Sell = a.SellPrice,
+                        Available = (int)(100000 / a.SellPrice + 10)
+                    }).FirstOrDefault();
+                }
                 return new CurrentPrice()
                 {
                     Buy = GetBazaarCostForCount(val.BuyOrders, count),
