@@ -35,11 +35,11 @@ public class FilterStateService
     private Items.Client.Api.IItemsApi itemsApi;
     private ILogger<FilterStateService> logger;
 
-    public FilterStateService(ILogger<FilterStateService> logger)
+    public FilterStateService(ILogger<FilterStateService> logger, Mayor.Client.Api.IMayorApi mayorApi, Items.Client.Api.IItemsApi itemsApi)
     {
-        mayorApi = DiHandler.GetService<Mayor.Client.Api.IMayorApi>();
-        itemsApi = DiHandler.GetService<Items.Client.Api.IItemsApi>();
         this.logger = logger;
+        this.mayorApi = mayorApi;
+        this.itemsApi = itemsApi;
     }
 
     public async Task UpdateState()

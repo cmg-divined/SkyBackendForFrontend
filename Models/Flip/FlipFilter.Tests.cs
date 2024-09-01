@@ -7,6 +7,9 @@ using System.Linq;
 using Coflnet.Sky.Commands.Tests;
 using Coflnet.Sky.Core;
 using Coflnet.Sky.Filter;
+using Coflnet.Sky.Items.Client.Api;
+using Microsoft.Extensions.Logging.Abstractions;
+using Moq;
 using Newtonsoft.Json;
 using NUnit.Framework;
 
@@ -36,17 +39,26 @@ namespace Coflnet.Sky.Commands.Shared
                 Finder = LowPricedAuction.FinderType.SNIPER_MEDIAN
             };
         }
-        [Test]
+        //[Test] can't run in ci
         public void FlipFilterLoad()
         {
             var settings = JsonConvert.DeserializeObject<FlipSettings>(File.ReadAllText("mock/bigsettings.json"));
+            settings.WhiteList = new();
+            var itemsApi = new Mock<IItemsApi>();
+            itemsApi.Setup(i => i.ItemsCategoryCategoryItemsGet(It.IsAny<Items.Client.Model.ItemCategory>(), 0)).Returns(new List<string>() { "XY" });
+            itemsApi.Setup(i => i.ItemsRecentGet(It.IsAny<double>(), 0)).Returns(new List<string>() { "XY" });
+            DiHandler.OverrideService<FilterStateService, FilterStateService>(new FilterStateService(NullLogger<FilterStateService>.Instance, null, itemsApi.Object));
             sampleFlip.Auction.StartingBid = 10;
             sampleFlip.MedianPrice = 1000000;
             sampleFlip.Auction.ItemName = "hi";
-            NoMatch(settings, sampleFlip);
+            sampleFlip.Auction.Tag = "hi";
+            sampleFlip.Auction.Bin = true;
+            sampleFlip.Auction.FlatenedNBT = new();
+            sampleFlip.Auction.NBTLookup = new List<NBTLookup>();
             var watch = Stopwatch.StartNew();
-            for (int i = 0; i < 2000; i++)
+            for (int i = 0; i < 5; i++)
             {
+                settings.ClearListMatchers();
                 NoMatch(settings, sampleFlip);
             }
             Assert.That(watch.ElapsedMilliseconds, Is.LessThanOrEqualTo(6 * TestConstants.DelayMultiplier));

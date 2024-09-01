@@ -76,7 +76,7 @@ namespace Coflnet.Sky.Commands.Shared
         [DataMember(Name = "whitelistAftermain")]
         [SettingsDoc("whitelisted items will only show if they also meet main filters (min profit etc)")]
         public bool WhitelistAfterMain;
-        [DataMember(Name ="basedConfig")]
+        [DataMember(Name = "basedConfig")]
         [SettingsDoc("The config this settings is based on, loads in addition", true)]
         public string BasedConfig;
 
@@ -349,7 +349,18 @@ namespace Coflnet.Sky.Commands.Shared
             private HashSet<string> Ids = new HashSet<string>();
             private List<ListEntry> RemainingFilters = new List<ListEntry>();
             Dictionary<string, Func<FlipInstance, bool>> Matchers = new Dictionary<string, Func<FlipInstance, bool>>();
+            private static ConcurrentDictionary<string, CacheEntry> matcherLookup = new();
+            public class CacheEntry
+            {
+                public Func<FlipInstance, bool> matcher;
+                public DateTime lastUsed;
+            }
 
+            private string GetCacheKey(List<ListEntry> FullList)
+            {
+                return FullList?.Select(x => "f:" + x.filter.OrderBy(f => f.Key).Select(f => f.Key + "=" + f.Value).Aggregate((a, b) => a + b))
+                            .Aggregate((a, b) => a + b) ?? "";
+            }
 
             public ListMatcher(List<ListEntry> BlackList, IPlayerInfo playerInfo, CancellationToken token)
             {
@@ -363,45 +374,41 @@ namespace Coflnet.Sky.Commands.Shared
                     AddElement(item);
                 }
                 ConcurrentDictionary<string, Expression<Func<FlipInstance, bool>>> isMatch = new();
-                foreach (var item in RemainingFilters)
+                foreach (var item in RemainingFilters.GroupBy(g => KeyFromTag(g.ItemTag)))
                 {
-                    if (token.IsCancellationRequested)
-                        return;
-                    string key = KeyFromTag(item.ItemTag);
-                    var startTime = DateTime.Now;
-                    isMatch.AddOrUpdate(key, item.GetExpression(playerInfo), (k, old) => old.Or(item.GetExpression(playerInfo)));
-                    if (DateTime.Now - startTime > TimeSpan.FromMilliseconds(100))
-                        Activity.Current?.Log($"Took {DateTime.Now - startTime} ticks to compile filter for {item.ItemTag} {item.filter.FirstOrDefault()}");
+                    var cacheKey = GetCacheKey(item.ToList());
+                    if (matcherLookup.TryGetValue(cacheKey, out var cache))
+                    {
+                        Addmatcher(item.Key, cache.matcher);
+                        cache.lastUsed = DateTime.Now;
+                        continue;
+                    }
+                    foreach (var element in item)
+                    {
+                        isMatch.AddOrUpdate(item.Key, element.GetExpression(playerInfo), (k, old) => old.Or(element.GetExpression(playerInfo)));
+                    }
+                    var matcher = isMatch[item.Key].Compile();
+                    Addmatcher(item.Key, matcher);
+                    matcherLookup.TryAdd(cacheKey, new CacheEntry { matcher = matcher, lastUsed = DateTime.Now });
                 }
-                Activity.Current?.Log("converted filters to expressions");
-                AssignMatchers(isMatch, token);
+                if (matcherLookup.Count > 10_000)
+                {
+                    var toRemove = matcherLookup.OrderBy(x => x.Value.lastUsed).Take(1000).Select(x => x.Key).ToList();
+                    foreach (var key in toRemove)
+                    {
+                        matcherLookup.TryRemove(key, out _);
+                    }
+                }
+                return;
             }
 
-            private void AssignMatchers(ConcurrentDictionary<string, Expression<Func<FlipInstance, bool>>> isMatch, CancellationToken token)
+            private void Addmatcher(string key, Func<FlipInstance, bool> compiled)
             {
-                foreach (var item in isMatch)
-                {
-                    if (token.IsCancellationRequested)
-                        return;
-                    try
-                    {
-                        var startTime = DateTime.Now;
-                        var compiled = item.Value.Compile();
-                        Matchers[item.Key] = compiled;
-                        if (item.Key != string.Empty && !Matchers.ContainsKey("STARRED_" + item.Key))
-                            Matchers.Add("STARRED_" + item.Key, compiled);
-                        if (item.Key != string.Empty && item.Key.Contains("STARRED_") && !Matchers.ContainsKey(item.Key.Replace("STARRED_", "")))
-                            Matchers.Add(item.Key.Replace("STARRED_", ""), compiled);
-                        if (DateTime.Now - startTime > TimeSpan.FromMilliseconds(100))
-                            Activity.Current?.Log($"Took {DateTime.Now - startTime} ticks to compile filter for {item.Key}");
-
-                    }
-                    catch (Exception e)
-                    {
-                        Console.WriteLine($"Could not compile matcher for {item.Key}  {item.Value}");
-                        throw;
-                    }
-                }
+                Matchers[key] = compiled;
+                if (key != string.Empty && !Matchers.ContainsKey("STARRED_" + key))
+                    Matchers.Add("STARRED_" + key, compiled);
+                if (key != string.Empty && key.Contains("STARRED_") && !Matchers.ContainsKey(key.Replace("STARRED_", "")))
+                    Matchers.Add(key.Replace("STARRED_", ""), compiled);
             }
 
             private ConcurrentDictionary<string, List<ListEntry>> ExtractFiltersForTags()
@@ -421,24 +428,30 @@ namespace Coflnet.Sky.Commands.Shared
                 return forTags;
             }
 
+            /// <summary>
+            /// Meta filter "forTag" can add filter elements
+            /// </summary>
+            /// <param name="forTags"></param>
+            /// <param name="item"></param>
             private static void AddFiltersBasedOnTags(ConcurrentDictionary<string, List<ListEntry>> forTags, ListEntry item)
             {
-                if (item.Tags != null && item.Tags.Any())
+                if (item.Tags == null || !item.Tags.Any())
                 {
-                    foreach (var tag in item.Tags)
+                    return;
+                }
+                foreach (var tag in item.Tags)
+                {
+                    if (!forTags.TryGetValue(tag, out var list))
+                        continue;
+                    if (item.filter == null)
+                        item.filter = new();
+                    foreach (var element in list)
                     {
-                        if (!forTags.TryGetValue(tag, out var list))
-                            continue;
-                        if (item.filter == null)
-                            item.filter = new();
-                        foreach (var element in list)
+                        foreach (var filter in element.filter)
                         {
-                            foreach (var filter in element.filter)
-                            {
-                                if (item.filter.Any(f => f.Key == filter.Key) || filter.Key == FlipFilter.FilterForName)
-                                    continue;
-                                item.filter.Add(filter.Key, filter.Value);
-                            }
+                            if (item.filter.Any(f => f.Key == filter.Key) || filter.Key == FlipFilter.FilterForName)
+                                continue;
+                            item.filter.Add(filter.Key, filter.Value);
                         }
                     }
                 }
