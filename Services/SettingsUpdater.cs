@@ -90,30 +90,6 @@ namespace Coflnet.Sky.Commands.Shared
                 var closest = options.Keys.OrderBy(k => Fastenshtein.Levenshtein.Distance(k.ToLower(), key.ToLower())).First();
                 throw new UnknownSettingException(key, closest);
             }
-            else if (doc.Prefix == "show")
-            {
-                if (con.Settings.Visibility == null)
-                    con.Settings.Visibility = new VisibilitySettings();
-                return UpdateValueOnObject(value, doc.RealName, con.Settings.Visibility);
-            }
-            else if (doc.Prefix == "mod")
-            {
-                if (con.Settings.ModSettings == null)
-                    con.Settings.ModSettings = new ModSettings();
-                if (doc.RealName == "Format")
-                {
-                    try
-                    {
-                        var formatted = string.Format(value, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20);
-                    }
-                    catch (Exception e)
-                    {
-                        dev.Logger.Instance.Error(e, "format check");
-                        throw new CoflnetException("invalid_format", "Format update rejected. \nMake sure any squirly brackets are closed again or prefixed with another bracket to escape it, eg {{ will result in {.");
-                    }
-                }
-                return UpdateValueOnObject(value, doc.RealName, con.Settings.ModSettings);
-            }
             else if (doc.Prefix == "privacy")
             {
                 var settingsService = DiHandler.GetService<SettingsService>();
@@ -134,8 +110,49 @@ namespace Coflnet.Sky.Commands.Shared
                 return newVal;
             }
             else
+                return NewMethod(con.Settings, value, doc);
+            return value;
+        }
+
+        public object Update(FlipSettings con, string key, string value)
+        {
+            if (!options.TryGetValue(key, out SettingDoc doc))
             {
-                UpdateValueOnObject(value, doc.RealName, con.Settings);
+                var closest = options.Keys.OrderBy(k => Fastenshtein.Levenshtein.Distance(k.ToLower(), key.ToLower())).First();
+                throw new UnknownSettingException(key, closest);
+            }
+            return NewMethod(con, value, doc);
+        }
+
+        private static object NewMethod(FlipSettings con, string value, SettingDoc doc)
+        {
+            if (doc.Prefix == "show")
+            {
+                if (con.Visibility == null)
+                    con.Visibility = new VisibilitySettings();
+                return UpdateValueOnObject(value, doc.RealName, con.Visibility);
+            }
+            else if (doc.Prefix == "mod")
+            {
+                if (con.ModSettings == null)
+                    con.ModSettings = new ModSettings();
+                if (doc.RealName == "Format")
+                {
+                    try
+                    {
+                        var formatted = string.Format(value, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20);
+                    }
+                    catch (Exception e)
+                    {
+                        dev.Logger.Instance.Error(e, "format check");
+                        throw new CoflnetException("invalid_format", "Format update rejected. \nMake sure any squirly brackets are closed again or prefixed with another bracket to escape it, eg {{ will result in {.");
+                    }
+                }
+                return UpdateValueOnObject(value, doc.RealName, con.ModSettings);
+            }
+            else
+            {
+                UpdateValueOnObject(value, doc.RealName, con);
             }
             return value;
         }
@@ -178,7 +195,7 @@ namespace Coflnet.Sky.Commands.Shared
                 var current = await settingsService.GetCurrentValue(con.UserId.ToString(), "privacySettings", () => PrivacySettings.Default);
                 return GetValueOnObject(doc.RealName, current);
             }
-            else if(doc.Prefix == "lore")
+            else if (doc.Prefix == "lore")
             {
                 var settingsService = DiHandler.GetService<SettingsService>();
                 var current = await settingsService.GetCurrentValue(con.UserId.ToString(), "description", () =>
