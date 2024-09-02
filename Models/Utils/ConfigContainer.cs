@@ -10,6 +10,7 @@ public class ConfigContainer
     public string ChangeNotes { get; set; }
     public string OwnerId { get; set; }
     public int Price { get; set; }
+    public Dictionary<int, SettingsDiffer.SettingsDiff> Diffs { get; set; } = new();
 }
 
 public class CreatedConfigs
