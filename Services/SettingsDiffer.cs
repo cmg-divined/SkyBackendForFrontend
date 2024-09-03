@@ -3,6 +3,7 @@ using System.Linq;
 using System.Reflection;
 using System.Runtime.Serialization;
 using Coflnet.Sky.Api.Client.Model;
+using Coflnet.Sky.Core;
 
 namespace Coflnet.Sky.Commands.Shared;
 public class SettingsDiffer
@@ -22,8 +23,8 @@ public class SettingsDiffer
         AssignSetCommandsDiff(oldSettings.Visibility, newSettings.Visibility, differences, "show");
 
 
-        CompareList(differences, oldSettings.BlackList, newSettings.BlackList);
-        CompareList(differences, oldSettings.WhiteList, newSettings.WhiteList);
+        CompareList(differences.BlacklistAdded, differences.BlacklistChanged, differences.BlacklistRemoved, oldSettings.BlackList, newSettings.BlackList);
+        CompareList(differences.WhitelistAdded, differences.WhitelistChanged, differences.WhitelistRemoved, oldSettings.WhiteList, newSettings.WhiteList);
 
         return differences;
     }
@@ -40,52 +41,47 @@ public class SettingsDiffer
                 updater.Update(settings, parts[0], parts[1]);
             }
         }
-        foreach (var command in settingsDiff.BlacklistAdded)
-        {
-            settings.BlackList.Add(command);
-        }
-        foreach (var command in settingsDiff.BlacklistChanged)
-        {
-            var previous = settings.BlackList.FirstOrDefault(e => GetKey(e) == command.Key);
-            if (previous != null)
-            {
-                settings.BlackList.Remove(previous);
-            }
-            else
-            {
-                error.Add(($"Could not find previous entry to remove", command.Value));
-            }
-            settings.BlackList.Add(command.Value);
-        }
-        foreach (var command in settingsDiff.BlacklistRemoved)
-        {
-            settings.BlackList.Remove(command);
-        }
-        foreach (var command in settingsDiff.WhitelistAdded)
-        {
-            settings.WhiteList.Add(command);
-        }
-        foreach (var command in settingsDiff.WhitelistChanged)
-        {
-            var previous = settings.WhiteList.FirstOrDefault(e => GetKey(e) == command.Key);
-            if (previous != null)
-            {
-                settings.WhiteList.Remove(previous);
-            }
-            else
-            {
-                error.Add(($"Could not find previous entry to remove", command.Value));
-            }
-            settings.WhiteList.Add(command.Value);
-        }
-        foreach (var command in settingsDiff.WhitelistRemoved)
-        {
-            settings.WhiteList.Remove(command);
-        }
+
+        var blackList = settings.BlackList ?? new List<ListEntry>();
+        var whiteList = settings.WhiteList ?? new List<ListEntry>();
+        UpdateFilterList(error, blackList, settingsDiff.BlacklistAdded, settingsDiff.BlacklistChanged, settingsDiff.BlacklistRemoved);
+        UpdateFilterList(error, whiteList, settingsDiff.WhitelistAdded, settingsDiff.WhitelistChanged, settingsDiff.WhitelistRemoved);
+
         return settings;
     }
 
-    private static void CompareList(SettingsDiff differences, List<ListEntry> oldBlacklist, List<ListEntry> newBlacklist)
+    private static void UpdateFilterList(List<(string message, ListEntry affected)> error, List<ListEntry> currentList, List<ListEntry> added, Dictionary<string, ListEntry> changed, List<ListEntry> removed)
+    {
+        var listLookup = currentList.ToLookup(e => GetKey(e));
+        foreach (var command in added)
+        {
+            if (listLookup.Contains(GetKey(command)) && listLookup[GetKey(command)].Any(e => ListEntry.comparer.Equals(command.filter, e.filter)))
+            {
+                error.Add(($"Could not add blacklist entry, already exists", command));
+                continue;
+            }
+            currentList.Add(command);
+        }
+        foreach (var command in changed)
+        {
+            var previous = currentList.FirstOrDefault(e => GetKey(e) == command.Key);
+            if (previous != null)
+            {
+                currentList.Remove(previous);
+            }
+            else
+            {
+                error.Add(($"Could not find previous entry to remove", command.Value));
+            }
+            currentList.Add(command.Value);
+        }
+        foreach (var command in removed)
+        {
+            currentList.Remove(command);
+        }
+    }
+
+    private static void CompareList(List<ListEntry> added, Dictionary<string, ListEntry> changed, List<ListEntry> removed, List<ListEntry> oldBlacklist, List<ListEntry> newBlacklist)
     {
         if (oldBlacklist == null || newBlacklist == null)
         {
@@ -100,7 +96,7 @@ public class SettingsDiffer
             if (!oldLookup.Contains(elementKey))
             {
                 // add the entry to the blacklist added list
-                differences.BlacklistAdded.Add(entry);
+                added.Add(entry);
             }
             else
             {
@@ -110,7 +106,7 @@ public class SettingsDiffer
                 if (!entry.Equals(oldEntry))
                 {
                     // add the entry to the blacklist changed list
-                    differences.BlacklistChanged[elementKey] = entry;
+                    changed[elementKey] = entry;
                 }
             }
         }
@@ -122,7 +118,7 @@ public class SettingsDiffer
             if (!newBlacklist.Any(e => GetKey(e) == elementKey))
             {
                 // add the entry to the blacklist removed list
-                differences.BlacklistRemoved.Add(entry);
+                removed.Add(entry);
             }
         }
     }
@@ -132,8 +128,14 @@ public class SettingsDiffer
         // filters used to narrow down an item, not affecting actual actions are part of the id
         var relevantFilters = e.filter?.Where(f =>
             f.Key.Equals("petlevel", System.StringComparison.OrdinalIgnoreCase)
-            || f.Key.Equals("tier", System.StringComparison.OrdinalIgnoreCase)
+            || f.Key.Equals("rarity", System.StringComparison.OrdinalIgnoreCase)
             || f.Key.Equals("Recombobulated", System.StringComparison.OrdinalIgnoreCase)
+            || f.Key.Equals("FlipFinder", System.StringComparison.OrdinalIgnoreCase)
+            || f.Key.Equals("itemNameContains", System.StringComparison.OrdinalIgnoreCase)
+            || f.Key.Equals("Seller", System.StringComparison.OrdinalIgnoreCase)
+            || f.Key.ToLower().Contains("color")
+            || Constants.AttributeKeys.Contains(f.Key.ToLower())
+            || e.ItemTag == null // no item, all filters are relevant
         ).Select(f => f.Key + "=" + f.Value);
         return e.ItemTag + (e.Tags == null ? string.Empty : string.Join(',', e.Tags))
             + (relevantFilters == null ? string.Empty : string.Join(',', relevantFilters));
@@ -175,6 +177,11 @@ public class SettingsDiffer
         public List<ListEntry> WhitelistAdded { get; set; } = [];
         public Dictionary<string, ListEntry> WhitelistChanged { get; set; } = [];
         public List<ListEntry> WhitelistRemoved { get; set; } = [];
+
+        public int GetDiffCount()
+        {
+            return SetCommands.Count + BlacklistAdded.Count + BlacklistChanged.Count + BlacklistRemoved.Count + WhitelistAdded.Count + WhitelistChanged.Count + WhitelistRemoved.Count;
+        }
     }
 }
 

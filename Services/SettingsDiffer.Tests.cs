@@ -102,7 +102,7 @@ public class SettingsDifferTests
                     filter = new Dictionary<string, string>
                     {
                         { "key", "value" },
-                        { "tier", "epic" }
+                        { "Rarity", "epic" }
                     }
                 }
             }
@@ -116,7 +116,7 @@ public class SettingsDifferTests
                     filter = new Dictionary<string, string>
                     {
                         { "key", "value" },
-                        { "tier", "epic" }
+                        { "Rarity", "epic" }
                     }
                 }
             }
@@ -132,7 +132,7 @@ public class SettingsDifferTests
         result = SettingsDiffer.GetDifferences(oldSettings, newSettings);
 
         result.BlacklistRemoved.Should().BeEmpty();
-        result.BlacklistChanged.Should().ContainKey("tagtier=epic");
+        result.BlacklistChanged.Should().ContainKey("tagRarity=epic");
     }
 
     [Test]

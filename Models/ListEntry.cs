@@ -53,7 +53,7 @@ namespace Coflnet.Sky.Commands.Shared
                    comparer.Equals(filter, entry.filter);
         }
 
-        private static DictionaryComparer<string, string> comparer = new();
+        public static DictionaryComparer<string, string> comparer { get; } = new();
 
         public override int GetHashCode()
         {
