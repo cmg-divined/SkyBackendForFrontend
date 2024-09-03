@@ -66,6 +66,7 @@ namespace Coflnet.Sky.Commands.Shared
             AdditionalFilters.Add<KeepOnImportDetailedFlipFilter>();
             AdditionalFilters.Add<AverageTimeToSellDetailedFlipFilter>();
             AdditionalFilters.Add<FraggedDetailedFlipFilter>();
+            AdditionalFilters.Add<CraftCostWeightDetailedFlipFilter>();
         }
 
         public FlipFilter(Dictionary<string, string> originalf, IPlayerInfo playerInfo)
