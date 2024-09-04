@@ -97,6 +97,9 @@ namespace Coflnet.Sky.Commands.Shared
         [DataMember(Name = "blockExport")]
         [SettingsDoc("Block exporting this flip to the public list", true)]
         public bool BlockExport;
+        [DataMember(Name = "blockHighCompetition")]
+        [SettingsDoc("Block flips that are probably not purchaseable manually")]
+        public bool BlockHighCompetitionFlips;
         [IgnoreDataMember]
         public bool IsCompiled => BlackListMatcher != null && filterCompileLock.CurrentCount != 0;
         [IgnoreDataMember]
