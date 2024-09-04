@@ -12,7 +12,7 @@ namespace Coflnet.Sky.Commands.Shared;
 [FilterDescription("Adjusts target price based on craft cost of ingredients multiplied by weight")]
 public class CraftCostWeightDetailedFlipFilter : NumberDetailedFlipFilter
 {
-    public override FilterType FilterType => FilterType.TEXT;
+    public override FilterType FilterType => FilterType.RANGE;
 
     public override Expression<Func<FlipInstance, bool>> GetExpression(FilterContext filters, string val)
     {
