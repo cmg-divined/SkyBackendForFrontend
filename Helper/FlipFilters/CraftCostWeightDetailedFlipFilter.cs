@@ -27,7 +27,7 @@ public class CraftCostWeightDetailedFlipFilter : NumberDetailedFlipFilter
             f.Context.ContainsKey("breakdown") &&
              f.Context.TryAdd("target", (JsonSerializer.Deserialize<Dictionary<string, long>>(f.Context["breakdown"], (JsonSerializerOptions)null)
                 .Select(b => multipliers.GetValueOrDefault(b.Key, defaultMultiplier) * b.Value).Sum() + long.Parse(f.Context["cleanCost"])).ToString())
-                && (target == 0 || long.Parse(f.Context["target"]) - f.Auction.StartingBid>= target) 
+                && (target == 0 || long.Parse(f.Context["target"]) - f.Auction.StartingBid >= target)
                 || f.Context.Remove("target") && false; // clear up temp stored
     }
 
