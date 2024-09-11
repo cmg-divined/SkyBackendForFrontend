@@ -39,7 +39,7 @@ namespace Coflnet.Sky.Commands.Shared
                 Finder = LowPricedAuction.FinderType.SNIPER_MEDIAN
             };
         }
-        //[Test] can't run in ci
+        //[Test] //can't run in ci
         public void FlipFilterLoad()
         {
             var settings = JsonConvert.DeserializeObject<FlipSettings>(File.ReadAllText("mock/bigsettings.json"));
@@ -50,18 +50,46 @@ namespace Coflnet.Sky.Commands.Shared
             DiHandler.OverrideService<FilterStateService, FilterStateService>(new FilterStateService(NullLogger<FilterStateService>.Instance, null, itemsApi.Object));
             sampleFlip.Auction.StartingBid = 10;
             sampleFlip.MedianPrice = 1000000;
-            sampleFlip.Auction.ItemName = "hi";
-            sampleFlip.Auction.Tag = "hi";
+            sampleFlip.Auction.ItemName = "Something to match against";
+            sampleFlip.Auction.Tag = "PET_TIGER";
             sampleFlip.Auction.Bin = true;
-            sampleFlip.Auction.FlatenedNBT = new();
+            sampleFlip.Auction.FlatenedNBT = new() { { "colorx", "106:156:27" } };
             sampleFlip.Auction.NBTLookup = new List<NBTLookup>();
+            Modify(settings.BlackList);
+            Modify(settings.WhiteList);
+            NoMatch(settings, sampleFlip);
             var watch = Stopwatch.StartNew();
-            for (int i = 0; i < 5; i++)
+            for (int i = 0; i < 50; i++)
             {
                 settings.ClearListMatchers();
                 NoMatch(settings, sampleFlip);
             }
             Assert.That(watch.ElapsedMilliseconds, Is.LessThanOrEqualTo(6 * TestConstants.DelayMultiplier));
+            watch = Stopwatch.StartNew();
+            for (int i = 0; i < 50 * 200; i++)
+            {
+                NoMatch(settings, sampleFlip);
+            }
+            Assert.That(watch.ElapsedMilliseconds, Is.LessThanOrEqualTo(1 * TestConstants.DelayMultiplier));
+
+            static void Modify(List<ListEntry> list)
+            {
+                foreach (var item in list)
+                {
+                    if (item.ItemTag == null)
+                    {
+                        if(item.filter.Any(f=>f.Key.Contains("Color"))|| item.filter.ContainsKey("Seller"))
+                            item.ItemTag = "XY";
+                        else if (item.filter.ContainsKey("ItemNameContains") || item.filter.ContainsKey("ItemCategory") ||//
+                             item.filter.ContainsKey("ArmorSet") && true//
+                           //  item.filter.ContainsKey("ProfitPercentage") && false
+                            )
+                            item.ItemTag = "XY";
+                        else
+                            Console.WriteLine(JsonConvert.SerializeObject(item));
+                    }
+                }
+            }
         }
 
         [Test]

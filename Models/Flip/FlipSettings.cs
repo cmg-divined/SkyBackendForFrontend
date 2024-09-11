@@ -350,8 +350,9 @@ namespace Coflnet.Sky.Commands.Shared
         {
             public List<ListEntry> FullList { get; }
             private HashSet<string> Ids = new HashSet<string>();
+            private HashSet<string> Sellers = new HashSet<string>();
             private List<ListEntry> RemainingFilters = new List<ListEntry>();
-            Dictionary<string, Func<FlipInstance, bool>> Matchers = new Dictionary<string, Func<FlipInstance, bool>>();
+            Dictionary<string, Func<FlipInstance, bool>> Matchers = [];
             private static ConcurrentDictionary<string, CacheEntry> matcherLookup = new();
             public class CacheEntry
             {
@@ -377,7 +378,7 @@ namespace Coflnet.Sky.Commands.Shared
                     AddElement(item);
                 }
                 ConcurrentDictionary<string, Expression<Func<FlipInstance, bool>>> isMatch = new();
-                foreach (var item in RemainingFilters.GroupBy(g => KeyFromTag(g.ItemTag)))
+                foreach (var item in RemainingFilters.GroupBy(g => GetGroupKey(g)))
                 {
                     var cacheKey = GetCacheKey(item.ToList());
                     if (matcherLookup.TryGetValue(cacheKey, out var cache))
@@ -460,31 +461,52 @@ namespace Coflnet.Sky.Commands.Shared
                 }
             }
 
-            private static string KeyFromTag(string tag)
+            private static string GetGroupKey(ListEntry entry)
             {
-                var key = "";
-                if (tag != null)
-                    key = tag;
-                return key;
+                if (entry.ItemTag != null)
+                    return entry.ItemTag;
+                if (entry.filter != null && entry.filter.Count > 0 && entry.filter.Any(f => f.Key.Contains("Color")))
+                    return "color";
+                if (entry.filter != null && entry.filter.Count > 0 && entry.filter.Any(f => f.Key.StartsWith("Pet") || f.Key == "ItemCategory" && f.Value.Equals("PET", StringComparison.CurrentCultureIgnoreCase)))
+                    return "pets";
+                return string.Empty;
             }
 
             private void AddElement(ListEntry item)
             {
                 if (item.filter == null || item.filter.Count == 0 || (item.filter.Count == 1 && item.filter.First().Key == "ForceBlacklist"))
+                {
                     Ids.Add(item.ItemTag);
-                else
-                    RemainingFilters.Add(item);
+                    return;
+                }
+                if (item.ItemTag == null && item.filter != null)
+                {
+                    var seller = item.filter.Where(f => f.Key.Equals("seller", StringComparison.CurrentCultureIgnoreCase)).Select(f => f.Value).FirstOrDefault();
+                    var other = item.filter.Where(f => !f.Key.Equals("ForceBlacklist", StringComparison.CurrentCultureIgnoreCase)).Count();
+                    if (other == 1 && seller != null)
+                    {
+                        Sellers.Add(seller);
+                        return;
+                    }
+                }
+                RemainingFilters.Add(item);
             }
 
             public (bool, string) IsMatch(FlipInstance flip)
             {
                 if (Ids.Contains(flip.Auction.Tag))
                     return (true, "for " + flip.Auction.Tag);
+                if (Sellers.Contains(flip.Auction.AuctioneerId))
+                    return (true, "for " + flip.Auction.AuctioneerId);
 
                 if (flip.Auction.Tag != null && Matchers.TryGetValue(flip.Auction.Tag, out Func<FlipInstance, bool> matcher) && matcher(flip))
                     return (true, "matched filter for item");
                 // general filters without a tag
-                if (Matchers.TryGetValue("", out matcher) && matcher(flip))
+                if (flip.Auction.FlatenedNBT.ContainsKey("color") && Matchers.TryGetValue("color", out matcher) && matcher(flip))
+                    return (true, "matched color filter");
+                if (flip.Auction.Tag != null && flip.Auction.Tag.StartsWith("PET_") && Matchers.TryGetValue("pets", out matcher) && matcher(flip))
+                    return (true, "matched color filter");
+                if (Matchers.TryGetValue(string.Empty, out matcher) && matcher(flip))
                     return (true, "matched general filter");
                 /*foreach (var item in RemainingFilters)
                 {

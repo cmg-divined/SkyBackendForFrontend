@@ -5,6 +5,7 @@ using System.Linq.Expressions;
 using System.Linq;
 using Coflnet.Sky.Core;
 using Coflnet.Sky.Filter;
+using System.Text.RegularExpressions;
 
 namespace Coflnet.Sky.Commands.Shared;
 public class ArmorSetDetailedFlipFilter : DetailedFlipFilter
@@ -22,7 +23,7 @@ public class ArmorSetDetailedFlipFilter : DetailedFlipFilter
 
     public Expression<Func<FlipInstance, bool>> GetExpression(FilterContext filters, string val)
     {
-        return flip => flip.Auction.Tag.StartsWith(val)
-            && (flip.Auction.Tag.EndsWith("_LEGGINGS") || flip.Auction.Tag.EndsWith("_CHESTPLATE") || flip.Auction.Tag.EndsWith("_HELMET") || flip.Auction.Tag.EndsWith("_BOOTS"));
+        var regex = new Regex('^' + Regex.Escape(val) + "_(CHESTPLATE|HELMET|BOOTS|LEGGINGS)");
+        return flip => regex.Match(flip.Auction.Tag).Success;
     }
 }
