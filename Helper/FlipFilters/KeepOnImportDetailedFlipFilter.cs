@@ -13,6 +13,6 @@ public class KeepOnImportDetailedFlipFilter : DetailedFlipFilter
 
     public Expression<Func<FlipInstance, bool>> GetExpression(FilterContext filters, string val)
     {
-        return f => true;
+        return null;
     }
 }

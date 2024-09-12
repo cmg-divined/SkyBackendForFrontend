@@ -15,6 +15,6 @@ public class RemoveAfterDetailedFlipFilter : DetailedFlipFilter
 
     public Expression<Func<FlipInstance, bool>> GetExpression(FilterContext filters, string val)
     {
-        return x => true;
+        return null;
     }
 }

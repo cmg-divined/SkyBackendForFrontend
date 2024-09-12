@@ -372,9 +372,14 @@ namespace Coflnet.Sky.Commands.Shared
                     return;
                 this.FullList = new(BlackList.Select(b => b.Clone()));
                 ConcurrentDictionary<string, List<ListEntry>> forTags = ExtractFiltersForTags();
-                foreach (var item in FullList)
+                foreach (var item in FullList.ToList())
                 {
+                    // preprocessing
                     AddFiltersBasedOnTags(forTags, item);
+                    ExpandFilters(FullList, item);
+                }
+                foreach (var item in FullList.ToList())
+                {
                     AddElement(item);
                 }
                 ConcurrentDictionary<string, Expression<Func<FlipInstance, bool>>> isMatch = new();
@@ -404,6 +409,28 @@ namespace Coflnet.Sky.Commands.Shared
                     }
                 }
                 return;
+            }
+
+            /// <summary>
+            /// Expands group filters like ArmorSet into single filters that can be handled via lookup
+            /// </summary>
+            /// <param name="fullList"></param>
+            /// <param name="item"></param>
+            /// <exception cref="NotImplementedException"></exception>
+            private void ExpandFilters(List<ListEntry> fullList, ListEntry item)
+            {
+                if(item.filter == null || !item.filter.Any(f => f.Key == "ArmorSet"))
+                    return;
+                FullList.Remove(item);
+                string[] parts = ["Helmet", "Chestplate", "Leggings", "Boots"];
+                    var armorSet = item.filter.Where(f => f.Key == "ArmorSet").Select(f => f.Value).FirstOrDefault();
+                foreach (var part in parts)
+                {
+                    var clone = item.Clone();
+                    clone.filter.Remove("ArmorSet");
+                    clone.ItemTag = (armorSet + "_" + part).ToUpper();
+                    fullList.Add(clone);
+                }
             }
 
             private void Addmatcher(string key, Func<FlipInstance, bool> compiled)

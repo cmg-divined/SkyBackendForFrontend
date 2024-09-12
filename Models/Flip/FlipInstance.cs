@@ -50,7 +50,7 @@ namespace Coflnet.Sky.Commands.Shared
                 return ProfitAfterFees(targetPrice, cost);
             }
         }
-        
+
         public static long ProfitAfterFees(long targetPrice, long cost)
         {
             float reduction = GetFeeRateForStartingBid(targetPrice);
@@ -68,7 +68,7 @@ namespace Coflnet.Sky.Commands.Shared
                 reduction = 3;
             if (targetPrice >= 100_000_000)
                 reduction = 3.5f;
-            if(isDerpy && targetPrice >= 1_000_000)
+            if (isDerpy && targetPrice >= 1_000_000)
             {
                 // derpy 4xes the claiming tax
                 reduction += 3;
@@ -83,7 +83,7 @@ namespace Coflnet.Sky.Commands.Shared
         {
             get
             {
-                return (Finder == LowPricedAuction.FinderType.SNIPER? LowestBin : MedianPrice) ?? MedianPrice; 
+                return (Finder == LowPricedAuction.FinderType.SNIPER ? LowestBin : MedianPrice) ?? MedianPrice;
             }
             set
             {
@@ -97,7 +97,7 @@ namespace Coflnet.Sky.Commands.Shared
                 }
             }
         }
-        
+
 
         [DataMember(Name = "context")]
         public Dictionary<string, string> Context { get; set; }

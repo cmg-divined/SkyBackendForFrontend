@@ -69,7 +69,8 @@ namespace Coflnet.Sky.Commands.Shared
                 filter = filter == null ? null : new(filter),
                 Tags = Tags == null ? null : new(Tags),
                 Order = Order,
-                Group = Group
+                Group = Group,
+                Disabled=Disabled
             };
         }
 

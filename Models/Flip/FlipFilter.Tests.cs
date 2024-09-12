@@ -47,7 +47,11 @@ namespace Coflnet.Sky.Commands.Shared
             var itemsApi = new Mock<IItemsApi>();
             itemsApi.Setup(i => i.ItemsCategoryCategoryItemsGet(It.IsAny<Items.Client.Model.ItemCategory>(), 0)).Returns(new List<string>() { "XY" });
             itemsApi.Setup(i => i.ItemsRecentGet(It.IsAny<double>(), 0)).Returns(new List<string>() { "XY" });
-            DiHandler.OverrideService<FilterStateService, FilterStateService>(new FilterStateService(NullLogger<FilterStateService>.Instance, null, itemsApi.Object));
+            itemsApi.Setup(i => i.ItemNamesGetAsync(0, default)).ReturnsAsync(new List<Items.Client.Model.ItemPreview>() { new() { Name = "XY" } });
+            var stateService = new FilterStateService(NullLogger<FilterStateService>.Instance, null, itemsApi.Object);
+            stateService.State.LastUpdate = DateTime.UtcNow;
+            stateService.State.CurrentMayor = "Aatrox";
+            DiHandler.OverrideService<FilterStateService, FilterStateService>(stateService);
             sampleFlip.Auction.StartingBid = 10;
             sampleFlip.MedianPrice = 1000000;
             sampleFlip.Auction.ItemName = "Something to match against";
@@ -74,19 +78,26 @@ namespace Coflnet.Sky.Commands.Shared
 
             static void Modify(List<ListEntry> list)
             {
+                return;
                 foreach (var item in list)
                 {
                     if (item.ItemTag == null)
                     {
-                        if(item.filter.Any(f=>f.Key.Contains("Color"))|| item.filter.ContainsKey("Seller"))
-                            item.ItemTag = "XY";
+                        if (item.filter.Any(f => f.Key.Contains("Color")) || item.filter.ContainsKey("Seller") || item.filter.ContainsKey("ArmorSet") || item.filter.ContainsKey("Profit"))
+                            item.Tags = new List<string>() { "XY" };
                         else if (item.filter.ContainsKey("ItemNameContains") || item.filter.ContainsKey("ItemCategory") ||//
-                             item.filter.ContainsKey("ArmorSet") && true//
-                           //  item.filter.ContainsKey("ProfitPercentage") && false
+                             item.filter.ContainsKey("FlipFinder") && true//
+                                                                          //  || item.filter.ContainsKey("ReferenceCount") && true
+                                                                          //  item.filter.ContainsKey("ProfitPercentage") && false
                             )
                             item.ItemTag = "XY";
                         else
+                        {
+                            item.filter.Remove("ReferenceCount");
+                            item.filter.Remove("Volatility");
+                         //   item.filter.Remove("efficiency");
                             Console.WriteLine(JsonConvert.SerializeObject(item));
+                        }
                     }
                 }
             }
