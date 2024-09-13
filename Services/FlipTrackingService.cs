@@ -362,6 +362,7 @@ namespace Coflnet.Sky.Commands
                 endTime = DateTime.UtcNow;
             var startTime = endTime.Subtract(timeSpan);
             var playerGuids = uuids.Select(u => Guid.Parse(u)).ToHashSet();
+            Activity.Current.Log("uuids " + JsonConvert.SerializeObject(uuids));
             // use flipTracking.FlipsPlayerIdGetAsync(uuid)
             var allSoldFlips = await Task.WhenAll(uuids.Select(async uuid =>
             {
