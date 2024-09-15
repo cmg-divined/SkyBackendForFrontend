@@ -70,7 +70,7 @@ namespace Coflnet.Sky.Commands.Shared
                 Tags = Tags == null ? null : new(Tags),
                 Order = Order,
                 Group = Group,
-                Disabled=Disabled
+                Disabled = Disabled
             };
         }
 
@@ -84,7 +84,7 @@ namespace Coflnet.Sky.Commands.Shared
             }
             public bool Equals(Dictionary<TKey, TValue> x, Dictionary<TKey, TValue> y)
             {
-                if(x == null && y == null)
+                if (x == null && y == null)
                     return true;
                 if (x == null || y == null)
                     return false;
@@ -102,7 +102,16 @@ namespace Coflnet.Sky.Commands.Shared
 
             public int GetHashCode(Dictionary<TKey, TValue> obj)
             {
-                return obj.Sum(pair => pair.Key.GetHashCode() ^ valueComparer.GetHashCode(pair.Value));
+                unchecked
+                {
+                    int hash = 17;
+                    foreach (var pair in obj)
+                    {
+                        hash = hash * 23 + pair.Key.GetHashCode();
+                        hash = hash * 23 + valueComparer.GetHashCode(pair.Value);
+                    }
+                    return hash;
+                }
             }
         }
     }
