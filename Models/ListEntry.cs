@@ -102,7 +102,7 @@ namespace Coflnet.Sky.Commands.Shared
 
             public int GetHashCode(Dictionary<TKey, TValue> obj)
             {
-                throw new NotImplementedException();
+                return obj.Sum(pair => pair.Key.GetHashCode() ^ valueComparer.GetHashCode(pair.Value));
             }
         }
     }

@@ -104,6 +104,42 @@ namespace Coflnet.Sky.Commands.Shared
         }
 
         [Test]
+        public void DoesNotMatchBigBrain5()
+        {
+            var auction = """
+            {"enchantments":[{"color":"§d","value":17293216,"type":"ultimate_soul_eater","level":5},{"color":"§5","value":13785139,"type":"overload","level":5},
+            {"color":"§5","value":9999997,"type":"dragon_hunter","level":4},{"color":"§5","value":99458,"type":"power","level":6},
+            {"color":"§5","value":57633,"type":"infinite_quiver","level":10},{"color":"§9","value":-1,"type":"impaling","level":3},
+            {"color":"§9","value":-1,"type":"chance","level":3},{"color":"§9","value":-1,"type":"piercing","level":1},{"color":"§9","value":-1,"type":"telekinesis","level":1},
+            {"color":"§9","value":-1,"type":"snipe","level":3},{"color":"§9","value":-1,"type":"punch","level":2},{"color":"§9","value":-1,"type":"flame","level":2},
+            {"color":"§9","value":-1,"type":"aiming","level":5},{"color":"§9","value":-1,"type":"cubism","level":5}],
+            "uuid":"26c6b4b15fd44eafa249c2f4721ce58e","count":1,"startingBid":64000000,"tag":"JUJU_SHORTBOW","itemName":"Spiritual Juju Shortbow ✪✪✪✪✪",
+            "start":"2024-09-13T09:57:31","end":"2024-09-13T09:57:50","auctioneerId":"1b4327dd25bf42f1bd8db5295932f7a8",
+            "profileId":"723c00cd08644d2aaad26fb5c2c08108","coop":null,"coopMembers":null,"highestBidAmount":64000000,
+            "bids":[{"bidder":"5058f327c0284938b66a7c436b496460","profileId":"cd30f581b5d346bda043ffb9c576ce51","amount":64000000,"timestamp":"2024-09-13T09:57:54"}],
+            "anvilUses":0,"nbtData":{"data":{"rarity_upgrades":1,"stats_book":123351,"hpc":15,"dungeon_item_level":5,"uid":"fe60bd663205","uuid":"97a9d78e-3944-499f-99b6-fe60bd663205"}},
+            "itemCreatedAt":"2021-12-08T21:06:00","reforge":"Spiritual","category":"WEAPON","tier":"LEGENDARY","bin":true,
+            "flatNbt":{"rarity_upgrades":"1","stats_book":"123351","hpc":"15","dungeon_item_level":"5","uid":"fe60bd663205","uuid":"97a9d78e-3944-499f-99b6-fe60bd663205"}}
+            """;
+            var parsed = JsonConvert.DeserializeObject<Core.SaveAuction>(auction);
+            var flip = new FlipInstance()
+            {
+                MedianPrice = 10,
+                Volume = 10,
+                Auction = parsed,
+                Context = new Dictionary<string, string>(),
+                Finder = LowPricedAuction.FinderType.SNIPER_MEDIAN
+            };
+            var settings = new FlipSettings()
+            {
+                MinProfit = 10000,
+                WhiteList = new List<ListEntry>() { new() { filter = new Dictionary<string, string>() {
+                    { "MinProfit", "5" }, {"big_brain", "5-5"} } } }
+            };
+            NoMatch(settings, flip);
+        }
+
+        [Test]
         public void IsMatch()
         {
             var settings = new FlipSettings()

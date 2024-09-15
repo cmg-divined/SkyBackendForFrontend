@@ -75,9 +75,12 @@ public class SettingsDiffer
             }
             currentList.Add(command.Value);
         }
-        foreach (var command in removed)
+        var alltoRemove = removed.Concat(currentList.GroupBy(e => GetKey(e)).SelectMany(g => g.Skip(1)).ToList());
+        foreach (var command in alltoRemove)
         {
-            currentList.Remove(command);
+            var match = currentList.FirstOrDefault(e => GetKey(e) == GetKey(command));
+            if (match != default)
+                currentList.Remove(match);
         }
     }
 
@@ -127,14 +130,12 @@ public class SettingsDiffer
     {
         // filters used to narrow down an item, not affecting actual actions are part of the id
         var relevantFilters = e.filter?.Where(f =>
-            f.Key.Equals("petlevel", System.StringComparison.OrdinalIgnoreCase)
-            || f.Key.Equals("rarity", System.StringComparison.OrdinalIgnoreCase)
-            || f.Key.Equals("Recombobulated", System.StringComparison.OrdinalIgnoreCase)
-            || f.Key.Equals("FlipFinder", System.StringComparison.OrdinalIgnoreCase)
-            || f.Key.Equals("itemNameContains", System.StringComparison.OrdinalIgnoreCase)
-            || f.Key.Equals("Seller", System.StringComparison.OrdinalIgnoreCase)
-            || f.Key.ToLower().Contains("color")
-            || Constants.AttributeKeys.Contains(f.Key.ToLower())
+            !f.Key.Equals("MaxCost", System.StringComparison.OrdinalIgnoreCase)
+            && !f.Key.Equals("Minprofit", System.StringComparison.OrdinalIgnoreCase)
+            && !f.Key.Equals("profit", System.StringComparison.OrdinalIgnoreCase)
+            && !f.Key.Equals("PricePerUnit", System.StringComparison.OrdinalIgnoreCase)
+            && !f.Key.Equals("StartingBid", System.StringComparison.OrdinalIgnoreCase)
+            && !f.Key.Equals("ProfitPercentage", System.StringComparison.OrdinalIgnoreCase)
             || e.ItemTag == null // no item, all filters are relevant
         ).Select(f => f.Key + "=" + f.Value);
         return e.ItemTag + (e.Tags == null ? string.Empty : string.Join(',', e.Tags))

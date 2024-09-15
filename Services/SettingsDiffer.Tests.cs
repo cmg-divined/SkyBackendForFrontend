@@ -62,7 +62,7 @@ public class SettingsDifferTests
                     DisplayName = "name",
                     filter = new Dictionary<string, string>
                     {
-                        { "key", "value" }
+                        { "minprofit", "value" }
                     }, Tags = new List<string> { "xy" }
                 }
             }
@@ -77,7 +77,7 @@ public class SettingsDifferTests
                     DisplayName = "name",
                     filter = new Dictionary<string, string>
                     {
-                        { "key", "value2" }
+                        { "minprofit", "value2" }
                     }, Tags = new List<string> { "xy" }
                 }
             }
@@ -87,7 +87,7 @@ public class SettingsDifferTests
 
         result.BlacklistChanged.Should().ContainKey("tagxy");
         result.BlacklistChanged["tagxy"].filter.Should()
-            .ContainKey("key").WhoseValue.Should().Be("value2");
+            .ContainKey("minprofit").WhoseValue.Should().Be("value2");
     }
 
     [Test]
@@ -101,7 +101,7 @@ public class SettingsDifferTests
                     ItemTag = "tag",
                     filter = new Dictionary<string, string>
                     {
-                        { "key", "value" },
+                        { "minprofit", "value" },
                         { "Rarity", "epic" }
                     }
                 }
@@ -115,7 +115,7 @@ public class SettingsDifferTests
                     ItemTag = "tag",
                     filter = new Dictionary<string, string>
                     {
-                        { "key", "value" },
+                        { "minprofit", "value" },
                         { "Rarity", "epic" }
                     }
                 }
@@ -127,7 +127,7 @@ public class SettingsDifferTests
         result.BlacklistRemoved.Should().BeEmpty();
         result.BlacklistChanged.Should().BeEmpty();
 
-        newSettings.BlackList[0].filter["key"] = "value2";
+        newSettings.BlackList[0].filter["minprofit"] = "value2";
 
         result = SettingsDiffer.GetDifferences(oldSettings, newSettings);
 
@@ -167,6 +167,47 @@ public class SettingsDifferTests
         });
 
         result.BlackList.Should().BeEmpty();
+    }
+
+    [Test]
+    public void DeduplicatesEntriesOnUpdate()
+    {
+        var oldSettings = new FlipSettings()
+        {
+            BlackList = new List<ListEntry>
+            {
+                new() {
+                    ItemTag = "tag",
+                    filter = new Dictionary<string, string>
+                    {
+                        { "key", "value" }
+                    }
+                },
+                new() {
+                    ItemTag = "tag",
+                    filter = new Dictionary<string, string>
+                    {
+                        { "key", "value" }
+                    }
+                }
+            }
+        };
+        var differ = new SettingsDiffer();
+        var result = differ.ApplyDiff(oldSettings, new SettingsDiffer.SettingsDiff()
+        {
+            BlacklistAdded = new List<ListEntry>
+            {
+                new() {
+                    ItemTag = "tag",
+                    filter = new Dictionary<string, string>
+                    {
+                        { "key", "value" }
+                    }
+                }
+            }
+        });
+
+        result.BlackList.Should().HaveCount(1);
     }
 
     [Test]
