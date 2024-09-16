@@ -394,7 +394,14 @@ namespace Coflnet.Sky.Commands.Shared
                     }
                     foreach (var element in item)
                     {
-                        isMatch.AddOrUpdate(item.Key, element.GetExpression(playerInfo), (k, old) => old.Or(element.GetExpression(playerInfo)));
+                        try
+                        {
+                            isMatch.AddOrUpdate(item.Key, element.GetExpression(playerInfo), (k, old) => old.Or(element.GetExpression(playerInfo)));
+                        }
+                        catch (Exception e)
+                        {
+                            throw new CoflnetException("compile_error", $"Error for filter {element.DisplayName ?? element.ItemTag}: " + e.Message);
+                        }
                     }
                     var matcher = isMatch[item.Key].Compile();
                     Addmatcher(item.Key, matcher);
@@ -419,11 +426,11 @@ namespace Coflnet.Sky.Commands.Shared
             /// <exception cref="NotImplementedException"></exception>
             private void ExpandFilters(List<ListEntry> fullList, ListEntry item)
             {
-                if(item.filter == null || !item.filter.Any(f => f.Key == "ArmorSet"))
+                if (item.filter == null || !item.filter.Any(f => f.Key == "ArmorSet"))
                     return;
                 FullList.Remove(item);
                 string[] parts = ["Helmet", "Chestplate", "Leggings", "Boots"];
-                    var armorSet = item.filter.Where(f => f.Key == "ArmorSet").Select(f => f.Value).FirstOrDefault();
+                var armorSet = item.filter.Where(f => f.Key == "ArmorSet").Select(f => f.Value).FirstOrDefault();
                 foreach (var part in parts)
                 {
                     var clone = item.Clone();
