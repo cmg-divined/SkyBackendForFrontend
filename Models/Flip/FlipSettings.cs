@@ -443,10 +443,8 @@ namespace Coflnet.Sky.Commands.Shared
             private void Addmatcher(string key, Func<FlipInstance, bool> compiled)
             {
                 Matchers[key] = compiled;
-                if (key != string.Empty && !Matchers.ContainsKey("STARRED_" + key))
+                if (key != string.Empty)
                     Matchers.Add("STARRED_" + key, compiled);
-                if (key != string.Empty && key.Contains("STARRED_") && !Matchers.ContainsKey(key.Replace("STARRED_", "")))
-                    Matchers.Add(key.Replace("STARRED_", ""), compiled);
             }
 
             private ConcurrentDictionary<string, List<ListEntry>> ExtractFiltersForTags()
@@ -498,7 +496,7 @@ namespace Coflnet.Sky.Commands.Shared
             private static string GetGroupKey(ListEntry entry)
             {
                 if (entry.ItemTag != null)
-                    return entry.ItemTag;
+                    return entry.ItemTag.Replace("STARRED_", "");
                 if (entry.filter != null && entry.filter.Count > 0 && entry.filter.Any(f => f.Key.Contains("Color")))
                     return "color";
                 if (entry.filter != null && entry.filter.Count > 0 && entry.filter.Any(f => f.Key.StartsWith("Pet") || f.Key == "ItemCategory" && f.Value.Equals("PET", StringComparison.CurrentCultureIgnoreCase)))

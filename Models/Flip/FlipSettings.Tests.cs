@@ -123,6 +123,30 @@ namespace Coflnet.Sky.Commands.Shared
             var bRes = settings.MatchesSettings(flipB);
             Assert.That(!bRes.Item1, bRes.Item2);
         }
+        [TestCase("STARRED_TEST", "TEST")]
+        [TestCase("STARRED_TEST", "STARRED_TEST")]
+        [TestCase("TEST", "STARRED_TEST")]
+        [TestCase("TEST", "TEST")]
+        public void WhitelistStarred(string tag, string whitelistTag)
+        {
+            flipB.Auction.Tag = tag;
+            var bRes = settings.MatchesSettings(flipB);
+            Assert.That(!bRes.Item1, bRes.Item2);
+            settings = new FlipSettings
+            {
+                WhiteList =
+                [
+                    new ListEntry(){ItemTag = whitelistTag, filter = new System.Collections.Generic.Dictionary<string, string>()
+                        {
+                            { "sharpness","6"}
+                        }}
+                ],
+                MinProfit = 1_000_000_000
+            };
+            settings.WhiteList[0].ItemTag = whitelistTag;
+            bRes = settings.MatchesSettings(flipB);
+            Assert.That(bRes.Item1, bRes.Item2);
+        }
 
         [Test]
         public async Task ConcurrentTest()
