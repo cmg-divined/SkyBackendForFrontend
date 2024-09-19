@@ -68,6 +68,7 @@ namespace Coflnet.Sky.Commands.Shared
             AdditionalFilters.Add<FraggedDetailedFlipFilter>();
             AdditionalFilters.Add<CraftCostWeightDetailedFlipFilter>();
             AdditionalFilters.Add<CleanCostDetailedFlipFilter>();
+            AdditionalFilters.Add<LegacyReforgeDetailedFlipFilter>();
         }
 
         public FlipFilter(Dictionary<string, string> originalf, IPlayerInfo playerInfo)
