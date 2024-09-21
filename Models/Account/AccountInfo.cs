@@ -54,5 +54,35 @@ namespace Coflnet.Sky.Commands.Shared
         public string CaptchaSlimChar;
         [DataMember(Name = "captchaSpaceCount")]
         public int CaptchaSpaceCount;
+        /// <summary>
+        /// Penalty for trying to trick the fairness system
+        /// </summary>
+        [DataMember(Name = "fairnessTrick")]
+        public FairnessTrick Tricks = new FairnessTrick();
+    }
+
+    [DataContract]
+    public class FairnessTrick
+    {
+        [DataMember(Name = "count")]
+        public int Count;
+        [DataMember(Name = "penalizeUntil")]
+        public DateTime PenalizeUntil;
+        [DataMember(Name = "lastPenalized")]
+        public DateTime LastPenalized;
+        [DataMember(Name = "context")]
+        public string Context;
+
+        public void TickFound(string context, TimeSpan length = default)
+        {
+            if(length == default)
+            {
+                length = TimeSpan.FromHours(3);
+            }
+            Context = context;
+            Count++;
+            LastPenalized = DateTime.UtcNow;
+            PenalizeUntil = LastPenalized + length;
+        }
     }
 }
