@@ -11,14 +11,14 @@ namespace Coflnet.Sky.Commands.Shared
 {
     public class NumberDetailedFlipFilter : DetailedFlipFilter
     {
-        public virtual object[] Options => new object[]{1,10_000_000_000};
+        public virtual object[] Options => new object[] { 1, 10_000_000_000 };
         public virtual FilterType FilterType => FilterType.NUMERICAL | FilterType.RANGE;
         public virtual Expression<Func<FlipInstance, bool>> GetExpression(FilterContext filters, string content)
         {
             var selector = GetSelector(filters);
-            if (content.Contains("-"))
+            if (content.Contains("-") && (!content.StartsWith("-") || content.Count(c => c == '-') > 1))
             {
-                var parts = content.Split("-").Select(a => NumberParser.Double(a)).ToArray();
+                var parts = content.Split(['-'], 2).Select(NumberParser.Double).ToArray();
                 var min = parts[0];
                 var max = parts[1];
                 return ExpressionMinMax(selector, min, max);
@@ -54,6 +54,6 @@ namespace Coflnet.Sky.Commands.Shared
             );
         }
     }
-    
+
 
 }
