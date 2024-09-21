@@ -13,6 +13,6 @@ public class MaxCostDetailedFlipFilter : NoRangeBase
 
     public override Expression<Func<FlipInstance, bool>> GetNumExpression(long val)
     {
-        return flip => flip.Auction.StartingBid < val;
+        return flip => Math.Max(flip.Auction.StartingBid, flip.Auction.HighestBidAmount) < val;
     }
 }
