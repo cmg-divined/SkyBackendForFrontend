@@ -61,6 +61,7 @@ namespace Coflnet.Sky.Commands.Shared
                     throw new Exception("config option BAZAAR_BASE_URL is not set");
                 return new Bazaar.Client.Api.BazaarApi(url);
             });
+            services.AddSingleton<Bazaar.Client.Api.IBazaarApi, Bazaar.Client.Api.BazaarApi>(di => di.GetRequiredService<Bazaar.Client.Api.BazaarApi>());
             services.AddSingleton<SettingsService>();
             services.AddSingleton<UpgradePriceService>();
             //services.AddHostedService<UpgradePriceService>(di => di.GetRequiredService<UpgradePriceService>());
