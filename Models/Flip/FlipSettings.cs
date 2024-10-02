@@ -187,7 +187,7 @@ namespace Coflnet.Sky.Commands.Shared
 
         private void MakeSureMatchersAreInitialized()
         {
-            if (BlackListMatcher != null)
+            if (BlackListMatcher != null && WhiteListMatcher != null)
                 return;
             // return if already compiling
             if (!filterCompileLock.Wait(0) || filterCompileCancel.Token.IsCancellationRequested)
