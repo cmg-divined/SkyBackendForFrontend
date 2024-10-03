@@ -75,14 +75,16 @@ namespace Coflnet.Sky.Commands.Shared
 
         public void TickFound(string context, TimeSpan length = default)
         {
-            if(length == default)
+            if (length == default)
             {
                 length = TimeSpan.FromHours(3);
             }
             Context = context;
             Count++;
             LastPenalized = DateTime.UtcNow;
-            PenalizeUntil = LastPenalized + length;
+            if (PenalizeUntil < LastPenalized)
+                PenalizeUntil = LastPenalized;
+            PenalizeUntil += length;
         }
     }
 }
