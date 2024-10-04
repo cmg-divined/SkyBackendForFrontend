@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Text.Json.Serialization;
 using Coflnet.Sky.Core;
 using Newtonsoft.Json.Converters;
 
@@ -42,6 +43,10 @@ namespace Coflnet.Sky.Commands.Shared
         /// </summary>
         public List<PropertyChange> PropertyChanges;
         public FlipFlags Flags;
+        [MessagePack.IgnoreMember]
+        [Newtonsoft.Json.JsonIgnore]
+        [JsonIgnore]
+        public string Seller;
     }
 
     public class PropertyChange

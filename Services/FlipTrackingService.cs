@@ -377,23 +377,28 @@ namespace Coflnet.Sky.Commands
                 .Where(f => f.Flip != null && f.Flip.Profit != 0)
                 .GroupBy(f => f.Flip.PurchaseAuctionId)
                 .Select(g => g.Last()).ToList();
-            var newFlips = relevantFlips.Select(f => f.Flip).Select(f => new FlipDetails()
+            var newFlips = relevantFlips.Select(e =>
             {
-                BuyTime = f.PurchaseTime,
-                Finder = Enum.TryParse<LowPricedAuction.FinderType>(f.FinderType.ToString().Replace("SNIPERMEDIAN", "SNIPER_MEDIAN"), true, out var finder) ? finder : LowPricedAuction.FinderType.UNKOWN,
-                ItemName = f.ItemName,
-                ItemTag = f.ItemTag,
-                OriginAuction = f.PurchaseAuctionId.ToString("N"),
-                PricePaid = f.PurchaseCost,
-                SellTime = f.SellTime,
-                SoldAuction = f.SellAuctionId.ToString("N"),
-                SoldFor = f.SellPrice,
-                Tier = f.ItemTier.ToString(),
-                uId = f.Uid,
-                PropertyChanges = f.ProfitChanges.Select(c => new PropertyChange(c.Label, c.Amount)).ToList(),
-                Profit = f.Profit,
-                // flag enum converted to array
-                Flags = (Shared.FlipFlags)f.Flags
+                var f = e.Flip;
+                return new FlipDetails()
+                {
+                    BuyTime = f.PurchaseTime,
+                    Finder = Enum.TryParse<LowPricedAuction.FinderType>(f.FinderType.ToString().Replace("SNIPERMEDIAN", "SNIPER_MEDIAN"), true, out var finder) ? finder : LowPricedAuction.FinderType.UNKOWN,
+                    ItemName = f.ItemName,
+                    ItemTag = f.ItemTag,
+                    OriginAuction = f.PurchaseAuctionId.ToString("N"),
+                    PricePaid = f.PurchaseCost,
+                    SellTime = f.SellTime,
+                    SoldAuction = f.SellAuctionId.ToString("N"),
+                    SoldFor = f.SellPrice,
+                    Tier = f.ItemTier.ToString(),
+                    uId = f.Uid,
+                    PropertyChanges = f.ProfitChanges.Select(c => new PropertyChange(c.Label, c.Amount)).ToList(),
+                    Profit = f.Profit,
+                    // flag enum converted to array
+                    Flags = (Shared.FlipFlags)f.Flags,
+                    Seller = e.uuid
+                };
             }).ToArray();
             foreach (var uuid in uuids)
             {
