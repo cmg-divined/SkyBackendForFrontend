@@ -6,9 +6,9 @@ namespace Coflnet.Sky.Commands.Shared;
 
 public class CraftCostWeightTests
 {
-    [TestCase("2", "ethermerge:1,default:0.8", true, 53368000)]
+    [TestCase("2", "ethermerge:1,default:0.8", true, 50908000)]
     [TestCase("50000000", "ethermerge:1,default:0.8", false, 0)]
-    [TestCase("2", "ethermerge:1,aoteStone:0.1,default:0.8", true, 46368000)]
+    [TestCase("2", "ethermerge:1,aoteStone:0.1,default:0.8", true, 43908000)]
     public void Test(string minProfit, string filterVal, bool expected, int target)
     {
         var filter = new CraftCostWeightDetailedFlipFilter();

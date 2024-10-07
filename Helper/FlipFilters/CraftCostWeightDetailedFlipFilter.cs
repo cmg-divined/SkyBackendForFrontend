@@ -13,10 +13,21 @@ namespace Coflnet.Sky.Commands.Shared;
 public class CraftCostWeightDetailedFlipFilter : NumberDetailedFlipFilter
 {
     public override FilterType FilterType => FilterType.RANGE;
+    private static Dictionary<string, double> DefaultWeights = new() {
+        { "skin", 0.5 },
+        { "ultimate_fatal_tempo", 0.65},
+        { "rarity_upgrades", 0.5},
+        { "upgrade_level", 0.8},
+        { "talisman_enrichment", 0.1}
+    };
 
     public override Expression<Func<FlipInstance, bool>> GetExpression(FilterContext filters, string val)
     {
         Dictionary<string, double> multipliers = ParseMultipliers(val);
+        foreach (var item in DefaultWeights)
+        {
+            multipliers.TryAdd(item.Key, item.Value);
+        }
         if (!multipliers.TryGetValue("default", out var defaultMultiplier))
             throw new ArgumentException("No default multiplier provided, use default:1 to disable");
 
