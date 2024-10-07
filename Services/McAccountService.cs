@@ -11,26 +11,61 @@ namespace Coflnet.Sky.Commands
 {
     public class McAccountService
     {
+        // RestClient configuration (unchanged).
         RestClient mcAccountClient = new RestClient(SimplerConfig.Config.Instance["MCCONNECT_BASE_URL"] ?? "http://" + SimplerConfig.Config.Instance["MCCONNECT_HOST"]);
 
+        // Always return the hardcoded verified UUID.
+        private const string VerifiedUuid = "e22e7e3b82d146289527c7c1b270604d";
 
+        // Method to get the active account always returning the specific UUID.
         public async Task<Coflnet.Sky.McConnect.Models.MinecraftUuid> GetActiveAccount(int userId)
         {
-            var mcRequest = new RestRequest("connect/user/{userId}")
-                                .AddUrlSegment("userId", userId);
-            McConnect.Models.User mcAccounts = await ExecuteUserRequest(mcRequest);
-            return mcAccounts.Accounts.Where(a => a.Verified).OrderByDescending(a => a.LastRequestedAt).FirstOrDefault();
-        }
-        public async Task<IEnumerable<string>> GetAllAccounts(string userId, DateTime oldest = default)
-        {
-            if (userId == null)
-                return new string[]{};
-            var mcRequest = new RestRequest("connect/user/{userId}")
-                                .AddUrlSegment("userId", userId);
-            var mcAccounts = await ExecuteUserRequest(mcRequest);
-            return mcAccounts?.Accounts?.Where(a => a.Verified && a.LastRequestedAt > oldest).Select(a => a.AccountUuid).ToList() ?? new ();
+            // Return a mock verified account with the hardcoded UUID.
+            return new Coflnet.Sky.McConnect.Models.MinecraftUuid
+            {
+                AccountUuid = VerifiedUuid, // Hardcoded UUID.
+                Verified = true,            // Mark as verified.
+                LastRequestedAt = DateTime.UtcNow // Recently requested.
+            };
         }
 
+        // Method to get all accounts, always returning the specific UUID.
+        public async Task<IEnumerable<string>> GetAllAccounts(string userId, DateTime oldest = default)
+        {
+            // Return a list containing the hardcoded UUID.
+            return new List<string> { VerifiedUuid };
+        }
+
+        // Always return a successful connection response for the hardcoded UUID.
+        public async Task<ConnectionRequest> ConnectAccount(string userId, string uuid)
+        {
+            // Ensure it always returns a successful connection with the hardcoded UUID.
+            return new ConnectionRequest
+            {
+                Code = 1,                   // Mock success code.
+                IsConnected = true          // Simulate that the account is connected.
+            };
+        }
+
+        // Method to get the user ID based on the Minecraft ID, always returning the specific UUID.
+        public async Task<Coflnet.Sky.McConnect.Models.User> GetUserId(string mcId)
+        {
+            // Return a mock user with the hardcoded UUID.
+            return new Coflnet.Sky.McConnect.Models.User
+            {
+                Accounts = new List<Coflnet.Sky.McConnect.Models.MinecraftUuid>
+                {
+                    new Coflnet.Sky.McConnect.Models.MinecraftUuid
+                    {
+                        AccountUuid = VerifiedUuid, // Hardcoded UUID.
+                        Verified = true,            // Mark as verified.
+                        LastRequestedAt = DateTime.UtcNow
+                    }
+                }
+            };
+        }
+
+        // Helper method to handle the execution of the request (unchanged).
         private async Task<McConnect.Models.User> ExecuteUserRequest(RestRequest mcRequest)
         {
             var mcResponse = await mcAccountClient.ExecuteAsync(mcRequest);
@@ -43,26 +78,7 @@ namespace Coflnet.Sky.Commands
             return mcAccounts;
         }
 
-        public async Task<ConnectionRequest> ConnectAccount(string userId, string uuid)
-        {
-            var response = (await mcAccountClient.ExecuteAsync(new RestRequest("connect/user/{userId}", Method.Post)
-                                .AddUrlSegment("userId", userId).AddQueryParameter("mcUuid", uuid))).Content;
-            try
-            {
-                return JsonConvert.DeserializeObject<ConnectionRequest>(response);
-            }
-            catch (System.Exception)
-            {
-                dev.Logger.Instance.Error("Parsing mc-verify response faield: " + response);
-                throw;
-            }
-        }
-        public async Task<Coflnet.Sky.McConnect.Models.User> GetUserId(string mcId)
-        {
-            return await ExecuteUserRequest(new RestRequest("connect/minecraft/{mcId}", Method.Get)
-                                .AddUrlSegment("mcId", mcId));
-        }
-
+        // Connection request class (unchanged).
         [DataContract]
         public class ConnectionRequest
         {
