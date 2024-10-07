@@ -29,7 +29,7 @@ public class CraftCostWeightDetailedFlipFilter : NumberDetailedFlipFilter
             multipliers.TryAdd(item.Key, item.Value);
         }
         if (!multipliers.TryGetValue("default", out var defaultMultiplier))
-            throw new ArgumentException("No default multiplier provided, use default:1 to disable");
+            throw new CoflnetException("missing_argument", "No default multiplier provided, use default:1 to disable");
 
         filters.filters.TryGetValue("MinProfit", out var minprofitString);
         NumberParser.TryLong(minprofitString, out var target);
