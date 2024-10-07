@@ -11,6 +11,7 @@ using Coflnet.Sky.Mayor.Client.Model;
 using dev;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
+using RestSharp;
 
 namespace Coflnet.Sky.Commands.Shared;
 public class FilterStateService
@@ -25,6 +26,7 @@ public class FilterStateService
         public DateTime LastUpdate { get; set; }
         public Dictionary<int, HashSet<string>> IntroductionAge { get; set; } = new();
         public HashSet<string> ExistingTags { get; set; } = new();
+        public HashSet<string> CurrentPerks { get; set; } = new();
     }
 
     private SemaphoreSlim updateLock = new SemaphoreSlim(1, 1);
@@ -56,7 +58,7 @@ public class FilterStateService
             var response = await mayorApi.MayorCurrentGetWithHttpInfoAsync();
             try
             {
-            State.CurrentMayor = JsonConvert.DeserializeObject<ModelCandidate>(response.Data.ToString()).Name.ToLower();
+                State.CurrentMayor = JsonConvert.DeserializeObject<ModelCandidate>(response.Data.ToString()).Name.ToLower();
             }
             catch (System.Exception)
             {
@@ -65,6 +67,7 @@ public class FilterStateService
             }
             State.NextMayor = (await mayorApi.MayorNextGetAsync())?.Name.ToLower();
             logger.LogInformation("Current mayor is {current}", State.CurrentMayor);
+            UpdateCurrentPerks();
         }
         catch (Exception e)
         {
@@ -87,6 +90,21 @@ public class FilterStateService
             State.ExistingTags.Add(item);
         }
         logger.LogInformation("Loaded {0} item tags", State.ExistingTags.Count);
+    }
+
+    private void UpdateCurrentPerks()
+    {
+        var restsharp = new RestClient("https://api.hypixel.net");
+        var mayorResponse = restsharp.Execute(new RestRequest("/v2/resources/skyblock/election"));
+        var mayors = JsonConvert.DeserializeObject<MayorResponse>(mayorResponse.Content);
+        if (mayors.success)
+        {
+            var mayor = mayors.mayor.perks.Select(p => p.name).ToList();
+            State.CurrentPerks = new HashSet<string>(mayor)
+                {
+                    mayors.mayor.minister.perk.name
+                };
+        }
     }
 
     public void GetItemCategory(ItemCategory category)
@@ -158,4 +176,28 @@ public class FilterStateService
         }
         local.LastUpdate = DateTime.UtcNow;
     }
+
+    public record MayorResponse(
+       [property: JsonProperty("success")] bool success,
+       [property: JsonProperty("lastUpdated")] long lastUpdated,
+       [property: JsonProperty("mayor")] Mayor mayor
+   );
+
+    public record Mayor(
+        [property: JsonProperty("key")] string key,
+        [property: JsonProperty("name")] string name,
+        [property: JsonProperty("perks")] IReadOnlyList<Perk> perks,
+        [property: JsonProperty("minister")] Minister minister
+    );
+    public record Minister(
+        [property: JsonProperty("key")] string key,
+        [property: JsonProperty("name")] string name,
+        [property: JsonProperty("perk")] Perk perk
+    );
+
+    public record Perk(
+        [property: JsonProperty("name")] string name,
+        [property: JsonProperty("description")] string description,
+        [property: JsonProperty("minister")] bool minister
+    );
 }

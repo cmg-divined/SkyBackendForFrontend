@@ -36,6 +36,7 @@ namespace Coflnet.Sky.Commands.Shared
             AdditionalFilters.Add<CurrentMayorDetailedFlipFilter>();
             AdditionalFilters.Add<LastMayorDetailedFlipFilter>();
             AdditionalFilters.Add<NextMayorDetailedFlipFilter>();
+            AdditionalFilters.Add<ActivePerkDetailedFlipFilter>();
             AdditionalFilters.Add<DoNotOpenDetailedFlipFilter>();
             AdditionalFilters.Add<MinProfitPercentageDetailedFlipFilter>();
             AdditionalFilters.Add<ItemCategoryDetailedFlipFilter>();
