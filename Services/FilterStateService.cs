@@ -25,6 +25,7 @@ namespace Coflnet.Sky.Commands.Shared
             public DateTime LastUpdate { get; set; }
             public Dictionary<int, HashSet<string>> IntroductionAge { get; set; } = new();
             public HashSet<string> ExistingTags { get; set; } = new();
+            public List<string> CurrentPerks { get; set; } = new();
         }
 
         private SemaphoreSlim updateLock = new SemaphoreSlim(1, 1);
